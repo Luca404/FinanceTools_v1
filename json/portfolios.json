@@ -1,0 +1,10 @@
+{
+    "PortFolios" : [
+        {
+            "pfName":"StocksPortfolio","tickers":["GOOG","AAPL","MSFT"]
+        },
+        {
+            "pfName":"IndicesPortfolio","tickers":["^GSPC","^IXIC","^GDAXI"]
+        }
+    ]
+}

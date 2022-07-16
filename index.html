@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Finance Tools</title>
+
+        <!-- Bootstrap -->
+        <link href="https://fonts.googleapis.com/css?family=Poppins:300,400,500,600,700,800,900" rel="stylesheet">
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+        <link rel="stylesheet" href="./css/style.css">
+        
+        <link rel="stylesheet" href="./css/stylePfManager.css">
+        <script src="js/scriptPfManager.js"></script>
+    </head>
+    <body id="corpo">
+
+        <div class="wrapper d-flex align-items-stretch">
+			<nav id="sidebar">
+				<div class="custom-menu">
+					<button type="button" id="sidebarCollapse" class="btn btn-primary" >
+                        <i class="fa fa-bars"></i>
+                        <span class="sr-only">Toggle Menu</span>
+                    </button>
+                </div>
+				<div class="p-4">
+		  		    <h1><a href="./index.html" class="logo">Finance Tools<span>Portfolio Optimization Tools</span></a></h1>
+	                <ul id="lista" class="list-unstyled components mb-5">
+                        <li id="pf1" class="active">
+                            <a href="#"><span class="fa mr-3"></span>Portfolios manager</a>
+                        </li>
+                        <li id="pf2">
+                            <a href="pfCorrelation.html"><span class="fa mr-3"></span>Portfolio Correlation</a>
+                        </li>
+                        <li id="pf3">
+                            <a href="#"><span class="fa mr-3"></span>Portfolio Risk</a>
+                        </li>
+                        <li id="pf4">
+                            <a href="#"><span class="fa mr-3"></span>Markowitz Portfolio Optimization</a>
+                        </li>
+                        <li id="pf5">
+                            <a href="#"><span class="fa mr-3"></span>MonteCarlo Portfolio analyses</a>
+                        </li>
+                        <li id="pf6">
+                            <a href="#"><span class="fa mr-3"></span>Black-Scholes</a>
+                        </li>
+                        <li>
+                            <a href="#"><span class="fa mr-3"></span>SourceCode</a>
+                        </li>
+	                </ul>
+
+                    <div class="footer">
+                        <p>0xLika</p>
+                    </div>
+	            </div>
+    	    </nav>
+
+            <!-- Page Content  -->
+            <div id="content" class="p-4 p-md-5 pt-5">
+                <h2 class="mb-4">Saved Portfolios:</h2>
+                <table class="table table-hover table-dark">
+                    <thead id="table1Head">
+                        <tr>
+                            <th scope="col">Name</th>
+                            <th scope="col">Tickers</th>
+                            <th scope="col"></th>                                
+                        </tr>
+                    </thead>
+                    <tbody id="tbody1">
+                        <tr >
+                            <td colspan="3" id="addTd">
+                                <div id="addTdDiv" data-toggle="modal" data-target="#addModal">
+                                    <span class="hoverText" data-hover="Click to add a Portfolio" >Add</span>
+                                </div>
+                                <!-- Modal -->
+                                <div class="modal fade" id="addModal" tabindex="-1" role="dialog" aria-labelledby="addModalLabel" aria-hidden="true">
+                                    <div class="modal-dialog" role="document">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title" id="addModalLabel">Add Portfolio</h5>
+                                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                    <span aria-hidden="true">&times;</span></button>
+                                                </button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <h5>Portfolio Name:</h5>
+                                                <input />
+                                                <br />
+                                                <br />
+                                                <h5>Portfolio Tickers:</h5>
+                                                <span id="portfolioTickers" style="display:inline-block; vertical-align:top;">
+                                                    <span class="mb-3" style="display:inline-block; color:black;">
+                                                        <div>
+                                                            <div class="color-1">
+                                                                <select data-placeholder="Select Asset Type" class="select" id="tickerTypeInput" tabindex="1" onchange="showTickerExchange(this.value);">
+                                                                    <option value="1" selected="selected">Stocks</option>
+                                                                    <option value="2">ETF</option>
+                                                                    <option value="3">Commodities</option>
+                                                                    <option value="4">Cryptocurrencies</option>
+                                                                </select>
+                                                            </div>                                                        
+                                                        </div>
+                                                    </span>
+                                                    <span class="mb-3" style="display:inline-block; color:black;">
+                                                        <div>
+                                                            <div class="color-1">
+                                                                <select data-placeholder="Select Country" class="select" id="tickerExchangeInput" tabindex="1">
+                                                                <optgroup label="Nord America">
+                                                                    <option>NASDAQ</option>
+                                                                <optgroup label="Europe">
+                                                                    <option>FTSE</option>
+                                                                <optgroup label="Asia">
+                                                                    <option>CSI</option>
+                                                                </select>
+                                                            </div>                                                        
+                                                        </div>
+                                                    </span>
+                                                </span>
+                                                <div id="inputTicker">
+                                                    <input id="pfInputTicker" />
+                                                </div>
+                                                </div>
+                                                
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                                <button type="button" class="btn btn-primary">Save changes</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                
+                
+            </div>
+		</div>
+
+        <!--
+                <h2>Insert asset symbol: </h2>
+                <input type="text" text="insert symbols separated by ;" />
+                <button>Done</button>
+            -->
+        <script src="./js/jquery.min.js"></script>
+        <script src="./js/popper.js"></script>
+        <script src="./js/bootstrap.min.js"></script>
+        <script src="./js/main.js"></script>
+    </body>
+</html>
