@@ -12,7 +12,13 @@
         <link rel="stylesheet" href="./css/style.css">
         
         <link rel="stylesheet" href="./css/stylePfCorr.css">
+
+        <!-- Chart.JS -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.5.0/Chart.min.js"></script>
+
+        <!-- Socket.IO -->
         <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/3.1.3/socket.io.min.js"></script>
+
         <script src="js/scriptPfCorr.js"></script>
     </head>
     <body id="corpo">
@@ -63,9 +69,10 @@
                 <h4>Select saved portfolio: </h4>
                 <select id="savedPfMenu" onchange="loadSelectedPf();">
                 </select>
-                <div id="pythonContent">
-
-                </div>
+                <br />
+                <br />
+                <h5>Portfolio performance</h5>
+                <canvas id="pfPerformanceCanvas"></canvas>
             </div>
 		</div>
 
