@@ -1,7 +1,10 @@
 import socketio
+from waitress import serve
 
 server = socketio.Server()
-app = socketio.WSGIApp(server)
+app = socketio.WSGIApp(server, static_files={
+    "/": "./public/"
+})
 
 @server.event
 def connect(sid, env):
@@ -10,3 +13,5 @@ def connect(sid, env):
 @server.event
 def disconnect(sid):
     print(sid, "disconnected")
+
+serve(app, listen='*:8081')

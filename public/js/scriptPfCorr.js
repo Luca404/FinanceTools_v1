@@ -17,6 +17,11 @@ async function loadSavedPf(){
     } 
 }
 
+const server = io();
+server.on("connect", () => {
+    console.log("Connected");
+});
 
-var socket = io.connect('http://127.0.0.1:8081');
-socket.send('lalala');
+server.on("disconnect", () => {
+    console.log("Disconnected");
+});
