@@ -10,7 +10,6 @@ function showTickerExchange(value){
 		inputExchange.style.display = "none";
 }
 
-
 async function loadTable1(){
 	const pf = await import( "../json/portfolios.json", {
 		assert: {
@@ -177,4 +176,5 @@ async function fetchFromYahoo(ticker){
 		})
 		.catch(err => console.error(err));
 }
- 
+
+
