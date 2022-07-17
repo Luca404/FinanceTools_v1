@@ -1,6 +1,8 @@
 import socketio
+import os
 import pandas as pd
 from pandas_datareader import data as wb
+import json
 
 server = socketio.AsyncServer(async_mode="asgi")
 app = socketio.ASGIApp(server, static_files={
@@ -17,17 +19,30 @@ async def disconnect(sid):
 
 @server.event
 async def pfInfo(sid, data):
-    df = loadPriceHistory(data["tickers"], data["period"], data["norm"])
-    await server.emit("pfHistory", df, to=sid)
+    dfData = pd.DataFrame()
+    for ticker in list(data["tickers"].split(",")):
+        #Read ticker data from file if exist
+        if( os.path.isfile("./json/" + ticker + ".json") ):
+            dfData[ticker] = pd.read_json("./json/" + ticker + ".json")
+        #Load ticker data from yahoo and save to file
+        else:
+            dfData[ticker] = loadTickerPrice( data["tickers"] )
 
 
-def loadPriceHistory(tickers, period, norm):
-    data = pd.DataFrame()
-    #Download data from yahoo
-    for ticker in list(tickers.split(",")):
-        print(ticker)
-        data[ticker] = wb.DataReader(ticker, data_source="yahoo", start='2020-1-1', end="2022-1-1")['Adj Close']
     #Normalize data to 100
-    if(norm):
-        data = (data/data.iloc[0] * 100)
-    return data.to_json()
+    if(data["norm"]):
+        dfData = (dfData/dfData.iloc[0] * 100)
+
+    #Send data to client
+    await server.emit("pfHistory", dfData, to=sid)
+
+
+def loadTickerPrice(ticker):
+    data = pd.Series()
+    data = wb.DataReader(ticker, data_source="yahoo", start='2000-1-1', end="2022-1-1")['Adj Close']
+    
+    #Save to json
+    path = "./json/" + ticker + ".json"
+    data.to_json( path )
+    
+    return data
