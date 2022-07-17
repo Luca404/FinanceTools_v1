@@ -1,3 +1,4 @@
+//Connection to server
 const server = io();
 server.on("connect", () => {
     console.log("Connected");
@@ -12,57 +13,74 @@ server.on("pfHistory", (data) => {
     drawPerformaceChart(pfData);
 });
 
+
+//PortFolio Period
+var PERIOD = 2;
+var NORMALIZED = true;
+
 function drawPerformaceChart(data) {
     console.log(data);
     var tickers = Object.keys(data);
     var dataset = [];
     for(var i = 0; i < tickers.length; i++){
-        dataset.append({
-            data: data[tickers[i]],
+        dataset[i] = {
+            data: Object.values(data[tickers[i]]),
             label: tickers[i],
+            borderColor: "#" + Math.floor(Math.random()*16777215).toString(16),
             fill: false
-        });
+        };
     }
-    /*
+    var dateArray = Object.keys(data[tickers[0]]);
+    var dateList = [];
+    for(var i = 0; i < dateArray.length; i++){
+        var date = new Date(dateArray[i] * 1);
+        var aDate = date.toLocaleDateString();
+        dateList.push(aDate);
+    }
+    
     new Chart(document.getElementById("pfPerformanceCanvas"), {
         type: 'line',
         data: {
-            labels: tickers,
-            datasets: [{}] 
-                data: [86,114,106,106,107,111,133,221,783,2478],
-                label: "Africa",
-                borderColor: "#3e95cd",
-                fill: false
-            }, { 
-                data: [282,350,411,502,635,809,947,1402,3700,5267],
-                label: "Asia",
-                borderColor: "#8e5ea2",
-                fill: false
-            }, { 
-                data: [168,170,178,190,203,276,408,547,675,734],
-                label: "Europe",
-                borderColor: "#3cba9f",
-                fill: false
-            }, { 
-                data: [40,20,10,16,24,38,74,167,508,784],
-                label: "Latin America",
-                borderColor: "#e8c3b9",
-                fill: false
-            }, { 
-                data: [6,3,2,2,7,26,82,172,312,433],
-                label: "North America",
-                borderColor: "#c45850",
-                fill: false
-            }
-            ]
+            labels: dateList,
+            datasets: dataset 
         },
         options: {
             title: {
-            display: true,
-            text: 'PortFolios performance'
+                display: true,
+                text: 'Single Assets performance'
+            },
+            responsive:false,
+            elements: {
+                point:{
+                    radius: 0
+                }
+            },
+            scales: {
+                xAxes: [{
+                    ticks: {
+                        maxTicksLimit: 20
+                    }
+                }]
             }
-        }
-    });*/
+        }        
+    });
+}
+
+function setPeriod(){
+    var opt = document.getElementById("selectPeriod");
+    var pfPeriod = opt.options[opt.selectedIndex].text;
+    PERIOD = pfPeriod.split("Y")[0];
+    console.log(PERIOD);
+}
+
+function setNormalized(){
+    var opt = document.getElementById("selectNormalized");
+    var pfNorm = opt.options[opt.selectedIndex].text;
+    if( pfNorm == "Yes" )
+        NORMALIZED = true;
+    else
+        NORMALIZED = false;
+    console.log(NORMALIZED);
 }
 
 async function loadSavedPf(){
@@ -87,9 +105,9 @@ loadSavedPf();
 function loadSelectedPf(){
     var opt = document.getElementById("savedPfMenu");
     var pfInfo = opt.options[opt.selectedIndex].text;
-    pfName = pfInfo.split(": ")[0]    
-    pfTickers = pfInfo.split(": ")[1]
-    server.emit("pfInfo", {name: pfName, tickers: pfTickers})
+    var pfName = pfInfo.split(": ")[0];
+    var pfTickers = pfInfo.split(": ")[1];
+    await server.emit("pfInfo", {name: pfName, tickers: pfTickers, period: PERIOD, norm: NORMALIZED});
     console.log(pfName, "+", pfTickers);
 }
 

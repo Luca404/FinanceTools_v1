@@ -1,6 +1,7 @@
 import socketio
 import pandas as pd
 from pandas_datareader import data as wb
+
 server = socketio.AsyncServer(async_mode="asgi")
 app = socketio.ASGIApp(server, static_files={
     "/": "./public/"
@@ -16,13 +17,17 @@ async def disconnect(sid):
 
 @server.event
 async def pfInfo(sid, data):
-    df = loadPriceHistory(data["tickers"])
+    df = loadPriceHistory(data["tickers"], data["period"], data["norm"])
     await server.emit("pfHistory", df, to=sid)
 
 
-def loadPriceHistory(tickers):
+def loadPriceHistory(tickers, period, norm):
     data = pd.DataFrame()
+    #Download data from yahoo
     for ticker in list(tickers.split(",")):
         print(ticker)
-        data[ticker] = wb.DataReader(ticker, data_source="yahoo", start='2020-1-1')['Adj Close']
+        data[ticker] = wb.DataReader(ticker, data_source="yahoo", start='2020-1-1', end="2022-1-1")['Adj Close']
+    #Normalize data to 100
+    if(norm):
+        data = (data/data.iloc[0] * 100)
     return data.to_json()
