@@ -1,8 +1,9 @@
 import socketio
 import os
+import datetime
+import time
 import pandas as pd
 from pandas_datareader import data as wb
-import json
 
 server = socketio.AsyncServer(async_mode="asgi")
 app = socketio.ASGIApp(server, static_files={
@@ -26,15 +27,21 @@ async def pfInfo(sid, data):
             dfData[ticker] = pd.read_json("./json/" + ticker + ".json")
         #Load ticker data from yahoo and save to file
         else:
-            dfData[ticker] = loadTickerPrice( data["tickers"] )
+            dfData[ticker] = loadTickerPrice( ticker )
 
+    #Set Period
+    startYear = datetime.datetime.now().year - data["period"]
+    date = datetime.datetime.strptime( str(startYear) + '-01-01', '%Y-%m-%d')
+    dateTs = time.mktime(date.timetuple()) * 1000
+    dfData = dfData.loc[dateTs:]
 
     #Normalize data to 100
     if(data["norm"]):
         dfData = (dfData/dfData.iloc[0] * 100)
 
     #Send data to client
-    await server.emit("pfHistory", dfData, to=sid)
+    await server.emit("pfHistory", dfData.to_json(), to=sid)
+
 
 
 def loadTickerPrice(ticker):
