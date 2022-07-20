@@ -3,7 +3,7 @@ const server = io();
 server.on("connect", () => {
     console.log("Connected");
 });
-
+ 
 server.on("disconnect", () => {
     console.log("Disconnected");
 });
@@ -20,23 +20,46 @@ var NORMALIZED = true;
 
 function drawPerformaceChart(data) {
     console.log(data);
+    //Canvas creation
     var canvasDiv = document.getElementById("canvasDiv");
-    if( canvasDiv.children.length > 0 )
-        canvasDiv.removeChild( document.getElementById("pfPerformanceCanvas") );
-    var canvas = document.createElement("canvas");
-    canvas.id = "pfPerformanceCanvas";
-    canvas.width = 800;
-    canvas.height = 450;
-    canvasDiv.appendChild(canvas);
+    if( canvasDiv.children.length > 0 ){
+        canvasDiv.removeChild( document.getElementById("singlePerfCanvas") );
+        canvasDiv.removeChild( document.getElementById("pfPerfCanvas") );
+    }
+    var canvasSinglePerformance = document.createElement("canvas");
+    var canvasPfPerformance = document.createElement("canvas");
+    canvasSinglePerformance.id = "singlePerfCanvas";
+    canvasPfPerformance.id = "pfPerfCanvas";
+    canvasSinglePerformance.width = 700;
+    canvasSinglePerformance.height = 450;
+    canvasPfPerformance.width = 700;
+    canvasPfPerformance.height = 450;
+    canvasSinglePerformance.setAttribute("style", "display: inline-block");
+    canvasPfPerformance.setAttribute("style", "display: inline-block; margin-left: 5%");
+    canvasDiv.appendChild(canvasSinglePerformance);
+    canvasDiv.appendChild(canvasPfPerformance);
+
+    //Timestamp to Date conversion
     var tickers = Object.keys(data);
-    var dataset = [];
+    var datasetSingle = [];
+    var datasetPf = []
     for(var i = 0; i < tickers.length; i++){
-        dataset[i] = {
-            data: Object.values(data[tickers[i]]),
-            label: tickers[i],
-            borderColor: "#" + Math.floor(Math.random()*16777215).toString(16),
-            fill: false
-        };
+        if( tickers[i] == "pfRet" ){
+            datasetPf[0] = {
+                data: Object.values(data[tickers[i]]),
+                label: "Portfolio",
+                borderColor: "#" + Math.floor(Math.random()*16777215).toString(16),
+                fill: false
+            };
+        }
+        else{
+            datasetSingle[i] = {
+                data: Object.values(data[tickers[i]]),
+                label: tickers[i],
+                borderColor: "#" + Math.floor(Math.random()*16777215).toString(16),
+                fill: false
+            };
+        }
     }
     var dateArray = Object.keys(data[tickers[0]]);
     var dateList = [];
@@ -46,11 +69,12 @@ function drawPerformaceChart(data) {
         dateList.push(aDate);
     }
     
-    new Chart(document.getElementById("pfPerformanceCanvas"), {
+    //Single Performance Chart Draw
+    new Chart(document.getElementById("singlePerfCanvas"), {
         type: 'line',
         data: {
             labels: dateList,
-            datasets: dataset 
+            datasets: datasetSingle
         },
         options: {
             title: {
@@ -70,8 +94,37 @@ function drawPerformaceChart(data) {
                     }
                 }]
             }
-        }        
+        }          
     });
+
+    //PortFolio performance chart draw
+    new Chart(document.getElementById("pfPerfCanvas"), {
+        type: 'line',
+        data: {
+            labels: dateList,
+            datasets: datasetPf 
+        },
+        options: {
+            title: {
+                display: true,
+                text: 'Portfolio performance'
+            },
+            responsive:false,
+            elements: {
+                point:{
+                    radius: 0
+                }
+            },
+            scales: {
+                xAxes: [{
+                    ticks: {
+                        maxTicksLimit: 20
+                    }
+                }]
+            }
+        }          
+    });
+
 }
 
 function setPeriod(){
@@ -110,10 +163,21 @@ async function loadSavedPf(){
 }
 loadSavedPf();
 
-function loadSelectedPf(){
+async function loadSelectedPf(){
     var opt = document.getElementById("savedPfMenu");
     var pfInfo = opt.options[opt.selectedIndex].text;
     var pfName = pfInfo.split(": ")[0];
     var pfTickers = pfInfo.split(": ")[1];
-    server.emit("getPfData", {name: pfName, tickers: pfTickers, period: PERIOD, norm: NORMALIZED});
+    const pf = await import( "../json/portfolios.json", {
+		assert: {
+			type: 'json'
+		}
+	});
+    var portFolios = pf.default.PortFolios;
+	for(var i = 0; i < portFolios.length; i++) {
+        if(portFolios[i].pfName == pfName)
+            var weights = portFolios[i].numShares;
+    }
+
+    server.emit("getPfData", {name: pfName, tickers: pfTickers, period: PERIOD, norm: NORMALIZED, weights: weights});
 }
