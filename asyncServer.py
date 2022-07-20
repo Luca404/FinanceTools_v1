@@ -19,29 +19,29 @@ async def disconnect(sid):
     print(sid, "disconnected")
 
 @server.event
-async def pfInfo(sid, data):
+async def getPfData(sid, data):
     dfData = pd.DataFrame()
     for ticker in list(data["tickers"].split(",")):
         #Read ticker data from file if exist
         if( os.path.isfile("./json/" + ticker + ".json") ):
-            dfData[ticker] = pd.read_json("./json/" + ticker + ".json")
+            dfData[ticker] = pd.read_json("./json/" + str(ticker) + ".json" , typ='series')            
+            #dfData.set_index([0], inplace=True)
         #Load ticker data from yahoo and save to file
         else:
             dfData[ticker] = loadTickerPrice( ticker )
 
     #Set Period
-    startYear = datetime.datetime.now().year - data["period"]
+    startYear = datetime.datetime.now().year - int(data["period"])
     date = datetime.datetime.strptime( str(startYear) + '-01-01', '%Y-%m-%d')
-    dateTs = time.mktime(date.timetuple()) * 1000
-    dfData = dfData.loc[dateTs:]
+    #dateTs = time.mktime(date.timetuple()) * 1000
+    dfData = dfData.loc[date:]
 
     #Normalize data to 100
     if(data["norm"]):
         dfData = (dfData/dfData.iloc[0] * 100)
 
     #Send data to client
-    await server.emit("pfHistory", dfData.to_json(), to=sid)
-
+    await server.emit("pfData", dfData.to_json(), to=sid)
 
 
 def loadTickerPrice(ticker):

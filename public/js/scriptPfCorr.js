@@ -8,7 +8,7 @@ server.on("disconnect", () => {
     console.log("Disconnected");
 });
 
-server.on("pfHistory", (data) => {
+server.on("pfData", (data) => {
     var pfData = JSON.parse( data );
     drawPerformaceChart(pfData);
 });
@@ -20,6 +20,14 @@ var NORMALIZED = true;
 
 function drawPerformaceChart(data) {
     console.log(data);
+    var canvasDiv = document.getElementById("canvasDiv");
+    if( canvasDiv.children.length > 0 )
+        canvasDiv.removeChild( document.getElementById("pfPerformanceCanvas") );
+    var canvas = document.createElement("canvas");
+    canvas.id = "pfPerformanceCanvas";
+    canvas.width = 800;
+    canvas.height = 450;
+    canvasDiv.appendChild(canvas);
     var tickers = Object.keys(data);
     var dataset = [];
     for(var i = 0; i < tickers.length; i++){
@@ -70,7 +78,7 @@ function setPeriod(){
     var opt = document.getElementById("selectPeriod");
     var pfPeriod = opt.options[opt.selectedIndex].text;
     PERIOD = pfPeriod.split("Y")[0];
-    console.log(PERIOD);
+    loadSelectedPf();
 }
 
 function setNormalized(){
@@ -80,7 +88,7 @@ function setNormalized(){
         NORMALIZED = true;
     else
         NORMALIZED = false;
-    console.log(NORMALIZED);
+    loadSelectedPf();
 }
 
 async function loadSavedPf(){
@@ -107,7 +115,5 @@ function loadSelectedPf(){
     var pfInfo = opt.options[opt.selectedIndex].text;
     var pfName = pfInfo.split(": ")[0];
     var pfTickers = pfInfo.split(": ")[1];
-    await server.emit("pfInfo", {name: pfName, tickers: pfTickers, period: PERIOD, norm: NORMALIZED});
-    console.log(pfName, "+", pfTickers);
+    server.emit("getPfData", {name: pfName, tickers: pfTickers, period: PERIOD, norm: NORMALIZED});
 }
-
