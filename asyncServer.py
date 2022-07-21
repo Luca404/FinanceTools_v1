@@ -4,6 +4,7 @@ import datetime
 import pandas as pd
 import yfinance as yf
 from pandas_datareader import data as wb
+import json
 
 server = socketio.AsyncServer(async_mode="asgi")
 app = socketio.ASGIApp(server, static_files={
@@ -20,8 +21,27 @@ async def disconnect(sid):
 
 @server.event
 async def login(sid, data):
-    print(data)
-    await server.emit("loginResult", "pollo", to=sid)
+    print(data)    
+    username = data["username"]
+    password = data["password"]
+    with open("./json/users/users.json") as f:
+        data = json.load(f)
+        print(data)
+    accountExist = False
+    logged = False
+    for user in data["Users"]:
+        if( user["usern"] == username ):
+            accountExist = True
+            if( user["passwd"] == password ):
+                logged = True
+
+    if( accountExist and not(logged) ):
+        text = "Wrong Password"
+    elif( not(accountExist) and not(logged) ):
+        text = "Account does not exist"
+    else:
+        text = username
+    await server.emit("loginResult", {"status":logged,"text":text}, to=sid)
 
 @server.event
 async def getPfData(sid, data):

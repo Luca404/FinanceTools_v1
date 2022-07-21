@@ -9,8 +9,7 @@ server.on("disconnect", () => {
 });
 
 server.on("loginResult", (data) => {
-    var pfData = JSON.parse( data );
-    drawPerformaceChart(pfData);
+    console.log(data);
 });
 
 
@@ -201,9 +200,7 @@ function showLoginModal(){
 function checkLogin(){
 	var usrn = document.getElementById("usernInput");
 	var passwd = document.getElementById("passwdInput");
-	if(usrn.value != ""){
-	}
-	else{
+	if(usrn.value == ""){
 		usrn.style.animation = "0.25s linear 0s 1 normal forwards running error";
 		usrn.placeholder = "Insert username";
 		setTimeout(() => {
@@ -213,9 +210,7 @@ function checkLogin(){
 			usrn.placeholder = "";
 		}, 1500);
 	}
-	if(passwd.value != ""){
-	}
-	else{
+	if(passwd.value == ""){
 		passwd.style.animation = "0.25s linear 0s 1 normal forwards running error";
 		passwd.placeholder = "Insert password";
 		setTimeout(() => {
@@ -225,4 +220,12 @@ function checkLogin(){
 			passwd.placeholder = "";
 		}, 1500);
 	}
+	
+	if( usrn.value != "" && passwd.value != "" ){		
+		var hashPass = hash(passwd.value);
+		console.log(hashPass);
+		server.emit("login",{"username":usrn.value, "password":hashPass});
+	}
 }
+
+function hash(e){for(var r=0,i=0;i<e.length;i++)r=(r<<5)-r+e.charCodeAt(i),r&=r;return r};
