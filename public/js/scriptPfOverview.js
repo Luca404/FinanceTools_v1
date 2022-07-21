@@ -17,6 +17,8 @@ server.on("pfData", (data) => {
 //PortFolio Period
 var PERIOD = 2;
 var NORMALIZED = true;
+var colorsArray = ["#17A589","#F9E79F","#EC7063","#82E0AA","#F7DC6F","#99A3A4","#B3B6B7","#A569BD","#CB4335","#196F3D"];
+
 
 function drawPerformaceChart(data) {
     console.log(data);
@@ -48,7 +50,7 @@ function drawPerformaceChart(data) {
             datasetPf[0] = {
                 data: Object.values(data[tickers[i]]),
                 label: "Portfolio",
-                borderColor: "#" + Math.floor(Math.random()*16777215).toString(16),
+                borderColor: "#3498DB",
                 fill: false
             };
         }
@@ -56,7 +58,7 @@ function drawPerformaceChart(data) {
             datasetSingle[i] = {
                 data: Object.values(data[tickers[i]]),
                 label: tickers[i],
-                borderColor: "#" + Math.floor(Math.random()*16777215).toString(16),
+                borderColor: colorsArray[i],
                 fill: false
             };
         }

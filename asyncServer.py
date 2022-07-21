@@ -1,9 +1,8 @@
 import socketio
 import os
 import datetime
-import time
 import pandas as pd
-import numpy as np
+import yfinance as yf
 from pandas_datareader import data as wb
 
 server = socketio.AsyncServer(async_mode="asgi")
@@ -31,6 +30,7 @@ async def getPfData(sid, data):
         #Load ticker data from yahoo and save to file
         else:
             dfData[ticker] = loadTickerPrice( ticker )
+        
 
     #dfData.set_index([0], inplace=True)
     #Set Period
