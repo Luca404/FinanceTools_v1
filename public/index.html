@@ -138,9 +138,9 @@
                     </tbody>
                 </table>
             </div>
-            <div class="modal fade" id="loginModal" tabindex="-1" role="dialog" aria-labelledby="loginModal" aria-hidden="true" style="display: block;">
+            <div class="modal fade" id="loginModal" style="display: block;">
                 <div class="modal-dialog" role="document"> 
-                    <div class="modal-content">
+                    <div class="modal-content" style="justify-content: center;">
                         <div class="modal-header">
                             <h5 class="modal-title" id="loginModal">Login</h5>
                         </div>
@@ -150,22 +150,45 @@
                             <br />
                             <br />
                             <h5>Password: </h5>
-                            <input type="password" id="passwdInput" class="logInput" />                
+                            <input type="password" id="passwdInput" class="logInput" /> 
+                            <br /> 
+                            <br />             
                         </div>
-                        <div class="modal-footer" style="display: flex; justify-content: center;">
+                        <div class="modal-footer" style="display: flex; justify-content: center; vertical-align: middle;">
+                            <button type="button" class="btn btn-secondary" onclick="showRegisterModal();">Register</button>
                             <button type="button" class="btn btn-secondary" onclick="checkLogin();">Login</button>
                         </div>
                     </div>
                 </div>
             </div>
-
+            <div class="modal fade" id="registrationModal" style="display: none;">
+                <div class="modal-dialog" role="document"> 
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="registrationModal">Registration</h5>
+                        </div>
+                        <div class="modal-body">
+                            <h5>Username: </h5>
+                            <input id="usernInputReg" class="logInput" />
+                            <br />
+                            <br />
+                            <h5>Password: </h5>
+                            <input type="password" id="passwdInputReg" class="logInput" />
+                            <br />
+                            <br />
+                            <h5>Confirm Password: </h5>
+                            <input type="password" id="passwdInputConf" class="logInput" />
+                            <br />
+                            <br />                
+                        </div>
+                        <div class="modal-footer" style="display: flex; justify-content: center;">
+                            <button type="button" class="btn btn-secondary" onclick="showLoginModal();">Login</button>
+                            <button type="button" class="btn btn-secondary" onclick="registerUser();">Register</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
 		</div>
-
-        <!--
-                <h2>Insert asset symbol: </h2>
-                <input type="text" text="insert symbols separated by ;" />
-                <button>Done</button>
-            -->
         <script src="./js/jquery.min.js"></script>
         <script src="./js/popper.js"></script>
         <script src="./js/bootstrap.min.js"></script>

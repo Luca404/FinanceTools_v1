@@ -21,18 +21,16 @@ async def disconnect(sid):
 
 @server.event
 async def login(sid, data):
-    print(data)    
     username = data["username"]
     password = data["password"]
     with open("./json/users/users.json") as f:
         data = json.load(f)
-        print(data)
     accountExist = False
     logged = False
     for user in data["Users"]:
         if( user["usern"] == username ):
             accountExist = True
-            if( user["passwd"] == password ):
+            if( int(user["passwd"]) == int(password) ):
                 logged = True
 
     if( accountExist and not(logged) ):

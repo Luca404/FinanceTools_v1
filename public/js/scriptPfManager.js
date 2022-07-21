@@ -10,6 +10,7 @@ server.on("disconnect", () => {
 
 server.on("loginResult", (data) => {
     console.log(data);
+
 });
 
 
@@ -197,6 +198,19 @@ function showLoginModal(){
 	$("#loginModal").modal("show");
 }
 
+function showRegisterModal(){
+	$('#registrationModal').css('display', 'block');
+	$('#registrationModal').modal({backdrop: 'static', keyboard: false});	
+	$("#registrationModal").modal("show");
+	$("#loginModal").modal("hide");
+}
+
+function showLoginModal(){	
+	$('#loginModal').modal({backdrop: 'static', keyboard: false});
+	$("#loginModal").modal("show");
+	$("#registrationModal").modal("hide");
+}
+
 function checkLogin(){
 	var usrn = document.getElementById("usernInput");
 	var passwd = document.getElementById("passwdInput");
@@ -223,8 +237,59 @@ function checkLogin(){
 	
 	if( usrn.value != "" && passwd.value != "" ){		
 		var hashPass = hash(passwd.value);
-		console.log(hashPass);
 		server.emit("login",{"username":usrn.value, "password":hashPass});
+	}
+}
+
+function registerUser(){
+	var usrn = document.getElementById("usernInputReg");
+	var passwd = document.getElementById("passwdInputReg");
+	var passwdConf = document.getElementById("passwdInputConf");
+	if(usrn.value == ""){
+		usrn.style.animation = "0.25s linear 0s 1 normal forwards running error";
+		usrn.placeholder = "Insert username";
+		setTimeout(() => {
+			usrn.style.animation = "";
+		}, 250);
+		setTimeout(() => {
+			usrn.placeholder = "";
+		}, 1500);
+	}
+	if(passwd.value == ""){
+		passwd.style.animation = "0.25s linear 0s 1 normal forwards running error";
+		passwd.placeholder = "Insert password";
+		setTimeout(() => {
+			passwd.style.animation = ""
+		}, 250);
+		setTimeout(() => {
+			passwd.placeholder = "";
+		}, 1500);
+	}
+	if(passwdConf.value == ""){
+		passwdConf.style.animation = "0.25s linear 0s 1 normal forwards running error";
+		passwdConf.placeholder = "Confirm password";
+		setTimeout(() => {
+			passwdConf.style.animation = ""
+		}, 250);
+		setTimeout(() => {
+			passwdConf.placeholder = "";
+		}, 1500);
+	}
+	if(passwd.value != passwdConf.value){
+		passwdConf.style.animation = "0.25s linear 0s 1 normal forwards running error";
+		passwdConf.value = "";
+		passwdConf.placeholder = "Passwords dont match";
+		setTimeout(() => {
+			passwdConf.style.animation = ""
+		}, 250);
+		setTimeout(() => {
+			passwdConf.placeholder = "";
+		}, 1500);
+	}
+
+	if( usrn.value != "" && passwd.value != "" && passwd.value == passwdConf.value && false ){		
+		var hashPass = hash(passwd.value);
+		server.emit("register",{"username":usrn.value, "password":hashPass});
 	}
 }
 

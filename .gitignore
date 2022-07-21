@@ -1,4 +1,5 @@
 node_modules/
 __pycache__/
+json/users/
 package.json
 package-lock.json
