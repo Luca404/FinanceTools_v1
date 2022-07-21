@@ -1,3 +1,19 @@
+//Connection to server
+const server = io();
+server.on("connect", () => {
+    console.log("Connected");
+});
+ 
+server.on("disconnect", () => {
+    console.log("Disconnected");
+});
+
+server.on("loginResult", (data) => {
+    var pfData = JSON.parse( data );
+    drawPerformaceChart(pfData);
+});
+
+
 loadTable1();
 showTickerExchange();
 
@@ -177,4 +193,36 @@ async function fetchFromYahoo(ticker){
 		.catch(err => console.error(err));
 }
 
+function showLoginModal(){
+	$('#loginModal').modal({backdrop: 'static', keyboard: false});
+	$("#loginModal").modal("show");
+}
 
+function checkLogin(){
+	var usrn = document.getElementById("usernInput");
+	var passwd = document.getElementById("passwdInput");
+	if(usrn.value != ""){
+	}
+	else{
+		usrn.style.animation = "0.25s linear 0s 1 normal forwards running error";
+		usrn.placeholder = "Insert username";
+		setTimeout(() => {
+			usrn.style.animation = "";
+		}, 250);
+		setTimeout(() => {
+			usrn.placeholder = "";
+		}, 1500);
+	}
+	if(passwd.value != ""){
+	}
+	else{
+		passwd.style.animation = "0.25s linear 0s 1 normal forwards running error";
+		passwd.placeholder = "Insert password";
+		setTimeout(() => {
+			passwd.style.animation = ""
+		}, 250);
+		setTimeout(() => {
+			passwd.placeholder = "";
+		}, 1500);
+	}
+}

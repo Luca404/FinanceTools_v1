@@ -7,10 +7,25 @@ body{
     overflow:hidden;
     display:block;
 }
-
 #corpo{
     background-color: white;
 }
+
+.logInput::placeholder{
+    color:red;
+}
+.logInput{
+    border: 1px solid black;
+    animation-fill-mode: forwards;
+}
+@keyframes error{
+    20%{border: 1px solid red;}
+    40%{margin-top: 10px;}
+    60%{margin-top: 5px;}
+    80%{margin-top: -10px;}
+    100%{border: 1px solid black;}
+} 
+
 #cella{
     width: 20%;
     margin-left: 40%;

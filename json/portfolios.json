@@ -1,0 +1,10 @@
+{
+    "PortFolios" : [
+        {
+            "userID":"Lika44","pfName":"StocksPortfolio","tickers":["GOOG","AAPL","MSFT"],"numShares":[1,3,4]
+        },
+        {
+            "userID":"Lika44","pfName":"IndicesPortfolio","tickers":["TSLA","META","PG"],"numShares":[1,3,10]
+        }
+    ]
+}

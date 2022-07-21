@@ -19,13 +19,18 @@ async def disconnect(sid):
     print(sid, "disconnected")
 
 @server.event
+async def login(sid, data):
+    print(data)
+    await server.emit("loginResult", "pollo", to=sid)
+
+@server.event
 async def getPfData(sid, data):
     dfData = pd.DataFrame()
     dataList = list(data["tickers"].split(","))
     for ticker in dataList:
         #Read ticker data from file if exist
-        if( os.path.isfile("./json/" + ticker + ".json") ):
-            dfData[ticker] = pd.read_json("./json/" + str(ticker) + ".json" , typ='series')            
+        if( os.path.isfile("./json/tickers/" + ticker + ".json") ):
+            dfData[ticker] = pd.read_json("./json/tickers/" + str(ticker) + ".json" , typ='series')            
             
         #Load ticker data from yahoo and save to file
         else:
@@ -62,7 +67,7 @@ def loadTickerPrice(ticker):
     data = wb.DataReader(ticker, data_source="yahoo", start='2000-1-1', end="2022-1-1")['Adj Close']
     
     #Save to json
-    path = "./json/" + ticker + ".json"
+    path = "./json/tickers/" + ticker + ".json"
     data.to_json( path )
     
     return data
