@@ -9,8 +9,10 @@ server.on("disconnect", () => {
 });
 
 server.on("loginResult", (data) => {
-    console.log(data);
-
+	if( data["status"] )
+		successLogin( data["text"] );
+	else
+		failedLogin( data["text"] );
 });
 
 
@@ -26,6 +28,7 @@ function showTickerExchange(value){
 		inputExchange.style.display = "none";
 }
 
+//Load table with portfolios
 async function loadTable1(){
 	const pf = await import( "../json/portfolios.json", {
 		assert: {
@@ -155,6 +158,7 @@ function modifyPfManager(item){
 	console.log(pfNum);
 }
 
+
 function addPfInputTickers(input){
 
 	if(input.value.slice(-1) == ","){
@@ -167,50 +171,22 @@ function addPfInputTickers(input){
 	
 }
 
-async function fetchFromYahoo(ticker){
-	const encodedParams = new URLSearchParams();
-	encodedParams.append("symbol", ticker );
-
-	const options = {
-		method: 'POST',
-		headers: {
-			'content-type': 'application/x-www-form-urlencoded',
-			'X-RapidAPI-Key': '1d07df0099msh1a0d579d94b2bcfp13e6b3jsnc049c5c88a8e',
-			'X-RapidAPI-Host': 'yahoo-finance97.p.rapidapi.com'
-		},
-		body: encodedParams
-	};
-	
-	fetch('https://yahoo-finance97.p.rapidapi.com/stock-info', options)
-		.then(response => response.json())
-		.then(response => {
-			var name = response.data.longName;
-			if( name != undefined )
-				console.log(name);
-			else
-				console.log("Symbol not found");
-		})
-		.catch(err => console.error(err));
-}
-
+//Show modal for login
 function showLoginModal(){
-	$('#loginModal').modal({backdrop: 'static', keyboard: false});
-	$("#loginModal").modal("show");
-}
-
-function showRegisterModal(){
-	$('#registrationModal').css('display', 'block');
-	$('#registrationModal').modal({backdrop: 'static', keyboard: false});	
-	$("#registrationModal").modal("show");
-	$("#loginModal").modal("hide");
-}
-
-function showLoginModal(){	
-	$('#loginModal').modal({backdrop: 'static', keyboard: false});
-	$("#loginModal").modal("show");
+	$("#content").css("filter", "blur(5px)");
+	$('#loginModal').modal({backdrop: 'static', keyboard: false, show: true});
 	$("#registrationModal").modal("hide");
+	$('#registrationModal').data('bs.modal',null);
 }
 
+//Show modal for registration
+function showRegisterModal(){
+	$('#registrationModal').modal({backdrop: 'static', keyboard: false, show: true});
+	$("#loginModal").modal("hide");	
+	$('#loginModal').data('bs.modal',null);
+}
+
+//Call server and check if login is ok
 function checkLogin(){
 	var usrn = document.getElementById("usernInput");
 	var passwd = document.getElementById("passwdInput");
@@ -241,6 +217,68 @@ function checkLogin(){
 	}
 }
 
+//If login is successful
+function successLogin( usern ){
+	var loginModal = document.getElementById("loginModal");
+	var content = loginModal.getElementsByClassName("modal-content")[0];
+	content.style = "filter: blur(10px)";
+	var divSuccess = document.createElement("div");
+	divSuccess.appendChild(document.createTextNode("Successfully logged in!"));
+	divSuccess.id = "successLoginDiv";
+	loginModal.appendChild(divSuccess);
+	content.style.pointerEvents = "none";
+	loginModal.style.userSelect = "none";
+	setTimeout(() => {
+		$("#loginModal").modal("hide");
+		$("#content").css("filter", "");
+	}, 2000);
+	setCookie("username",usern,5);
+	drawProfileDiv();
+}
+
+//Save cookies function
+function setCookie(cname, cvalue, exdays) {
+	const d = new Date();
+	d.setTime(d.getTime() + (exdays*24*60*60*1000));
+	let expires = "expires="+ d.toUTCString();
+	document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
+}
+
+//If login is unsuccessful
+function failedLogin( error ){
+	var usrn = document.getElementById("usernInput");
+	var passwd = document.getElementById("passwdInput");
+	if( error == "Wrong Password" ){
+		passwd.value = "";
+		passwd.style.animation = "0.25s linear 0s 1 normal forwards running error";
+		passwd.placeholder = "Wrong password";
+		setTimeout(() => {
+			passwd.style.animation = ""
+		}, 250);
+		setTimeout(() => {
+			passwd.placeholder = "";
+		}, 2000);
+	}
+	else{
+		usrn.value = "";
+		passwd.value = "";
+		usrn.style.animation = "0.25s linear 0s 1 normal forwards running error";
+		usrn.placeholder = "Account doesnt exist";
+		setTimeout(() => {
+			usrn.style.animation = "";
+		}, 250);
+		setTimeout(() => {
+			usrn.placeholder = "";
+		}, 2000);
+	}
+}
+
+//Draw profile div
+function drawProfileDiv(){
+	
+}
+
+//function for register a user
 function registerUser(){
 	var usrn = document.getElementById("usernInputReg");
 	var passwd = document.getElementById("passwdInputReg");
