@@ -42,6 +42,18 @@ async def login(sid, data):
     await server.emit("loginResult", {"status":logged,"text":text}, to=sid)
 
 @server.event
+async def getPfList(sid, data):
+    pfData = []
+    username = data["username"]
+    with open("./json/portfolios.json") as f:
+        data = json.load(f)
+    for pf in data["PortFolios"]:
+        if( pf["userID"] == username ):
+            pfData.append(pf)
+    
+    await server.emit( "returnPfList", pfData, to=sid )    
+
+@server.event
 async def getPfData(sid, data):
     dfData = pd.DataFrame()
     dataList = list(data["tickers"].split(","))

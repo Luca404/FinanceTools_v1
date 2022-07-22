@@ -15,27 +15,28 @@ server.on("loginResult", (data) => {
 		failedLogin( data["text"] );
 });
 
+server.on("returnPfList", (data) => {
+	console.log(data);
+	loadTable1(data);
+});
 
-loadTable1();
-showTickerExchange();
+
+//loadTable1();
+//showTickerExchange();
 
 //Function for showing portFolios ticker option
+/*
 function showTickerExchange(value){
 	inputExchange = document.getElementById("tickerExchangeInput");
 	if( value == 1 )
 		inputExchange.style.display = "inline-block";
 	else 
 		inputExchange.style.display = "none";
-}
+}*/
 
 //Load table with portfolios
-async function loadTable1(){
-	const pf = await import( "../json/portfolios.json", {
-		assert: {
-			type: 'json'
-		}
-	});
-	var portFolios = pf.default.PortFolios;
+async function loadTable1(data){
+	var portFolios = data.default.PortFolios;
 	var tbody = document.getElementById("tbody1");
 	for(var i = 0; i < portFolios.length; i++) {
 		var tr = document.createElement("tr");
@@ -173,11 +174,35 @@ function addPfInputTickers(input){
 
 //Show modal for login
 function showLoginModal(){
-	$("#content").css("filter", "blur(5px)");
-	$('#loginModal').modal({backdrop: 'static', keyboard: false, show: true});
-	$("#registrationModal").modal("hide");
-	$('#registrationModal').data('bs.modal',null);
+	let usern = checkIfLogged()
+	if( usern == "" ){
+		$("#content").css("filter", "blur(5px)");
+		$('#loginModal').modal({backdrop: 'static', keyboard: false, show: true});
+		$("#registrationModal").modal("hide");
+		$('#registrationModal').data('bs.modal',null);
+	}
+	else{
+		drawProfileDiv(usern);
+	}
 }
+
+//Function to check if still logged
+function checkIfLogged(){
+	let decodedCookie = decodeURIComponent(document.cookie);
+	let cookie = decodedCookie.split(';');
+	let cookieName = "username=";
+	for(let i = 0; i <cookie.length; i++) {
+		let c = cookie[i];
+		while (c.charAt(0) == ' ') {
+		  c = c.substring(1);
+		}
+		if (c.indexOf(cookieName) == 0) {
+		  return c.substring(cookieName.length, c.length);
+		}
+	}
+	return "";
+}
+
 
 //Show modal for registration
 function showRegisterModal(){
@@ -233,7 +258,7 @@ function successLogin( usern ){
 		$("#content").css("filter", "");
 	}, 2000);
 	setCookie("username",usern,5);
-	drawProfileDiv();
+	drawProfileDiv(usern);
 }
 
 //Save cookies function
@@ -274,8 +299,11 @@ function failedLogin( error ){
 }
 
 //Draw profile div
-function drawProfileDiv(){
-	
+function drawProfileDiv( username ){
+	let profileDiv = document.getElementById("profileDiv");
+	let profileP = profileDiv.getElementsByTagName("p")[0];
+	profileP.innerText = "User:    " + username;
+	server.emit("getPfList",{"username":username});
 }
 
 //function for register a user
