@@ -24,7 +24,7 @@ body{
     text-align: center;
     background-color: #3445b4;
     font-size: 15px;
-    padding-top: 7px;
+    padding-top: 8px;
     color: white;
 }
 
@@ -42,24 +42,26 @@ body{
 }
 
 .modal-body{
-    padding-left:32%;
+    padding-left:20px;
+    padding-top: 5%;
+    padding-bottom: 5%;
 }
 .modal-header{
     padding-left: 5%;
 }
 
-.logInput::placeholder{
+.inputCheck::placeholder{
     color:red;
 }
-.logInput{
+.inputCheck{
     border: 1px solid black;
     animation-fill-mode: forwards;
 }
 @keyframes error{
     20%{border: 1px solid red;}
     40%{margin-top: 10px;}
-    60%{margin-top: 5px;}
-    80%{margin-top: -10px;}
+    60%{margin-top: 5px; border: 1px solid red;}
+    80%{margin-top: -10px; border: 1px solid red;}
     100%{border: 1px solid black;}
 } 
 

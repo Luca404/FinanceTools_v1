@@ -67,12 +67,13 @@
                         <tr>
                             <th scope="col">Name</th>
                             <th scope="col">Tickers</th>
+                            <th scope="col">N. Shares</th>
                             <th scope="col"></th>                                
                         </tr>
                     </thead>
                     <tbody id="tbody1">
                         <tr >
-                            <td colspan="3" id="addTd">
+                            <td colspan="4" id="addTd">
                                 <div id="addTdDiv" data-toggle="modal" data-target="#addModal">
                                     <span class="hoverText" data-hover="Click to add a Portfolio" >Add</span>
                                 </div>
@@ -88,7 +89,7 @@
                                             </div>
                                             <div class="modal-body">
                                                 <h5>Portfolio Name:</h5>
-                                                <input />
+                                                <input id="addPfNameInput" class="inputCheck"/>
                                                 <br />
                                                 <br />
                                                 <h5>Portfolio Tickers:</h5>
@@ -121,14 +122,16 @@
                                                     </span>
                                                 </span>
                                                 <div id="inputTicker">
-                                                    <input id="pfInputTicker" />
+                                                    <input id="addPfTickersInput" class="inputCheck"/>
                                                 </div>
+                                                <br />
+                                                <h5>Num of Shares:</h5>
+                                                <input id="addPfSharesInput" class="inputCheck"/>
                                                 </div>
-                                                
-                                            </div>
-                                            <div class="modal-footer">
-                                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                                                <button type="button" class="btn btn-primary">Save changes</button>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                                    <button type="button" class="btn btn-primary" onclick="addPfButton();">Save changes</button>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
@@ -149,11 +152,11 @@
                         </div>
                         <div class="modal-body">
                             <h5>Username: </h5>
-                            <input id="usernInput" class="logInput" />
+                            <input id="usernInput" class="inputCheck" />
                             <br />
                             <br />
                             <h5>Password: </h5>
-                            <input type="password" id="passwdInput" class="logInput" /> 
+                            <input type="password" id="passwdInput" class="inputCheck" /> 
                             <br /> 
                             <br />             
                         </div>
@@ -172,15 +175,15 @@
                         </div>
                         <div class="modal-body">
                             <h5>Username: </h5>
-                            <input id="usernInputReg" class="logInput" />
+                            <input id="usernInputReg" class="inputCheck" />
                             <br />
                             <br />
                             <h5>Password: </h5>
-                            <input type="password" id="passwdInputReg" class="logInput" />
+                            <input type="password" id="passwdInputReg" class="inputCheck" />
                             <br />
                             <br />
                             <h5>Confirm Password: </h5>
-                            <input type="password" id="passwdInputConf" class="logInput" />
+                            <input type="password" id="passwdInputConf" class="inputCheck" />
                             <br />
                             <br />                
                         </div>

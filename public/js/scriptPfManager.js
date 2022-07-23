@@ -16,8 +16,12 @@ server.on("loginResult", (data) => {
 });
 
 server.on("returnPfList", (data) => {
-	console.log(data);
-	loadTable1(data);
+	if( data.length > 0 ){
+		loadTable1(data);
+	}
+	else{
+		console.log("No saved Portfolio for logged user!");
+	}
 });
 
 
@@ -25,18 +29,18 @@ server.on("returnPfList", (data) => {
 //showTickerExchange();
 
 //Function for showing portFolios ticker option
-/*
+
 function showTickerExchange(value){
 	inputExchange = document.getElementById("tickerExchangeInput");
 	if( value == 1 )
 		inputExchange.style.display = "inline-block";
 	else 
 		inputExchange.style.display = "none";
-}*/
+}
 
 //Load table with portfolios
-async function loadTable1(data){
-	var portFolios = data.default.PortFolios;
+function loadTable1(data){
+	var portFolios = data;
 	var tbody = document.getElementById("tbody1");
 	for(var i = 0; i < portFolios.length; i++) {
 		var tr = document.createElement("tr");
@@ -51,6 +55,11 @@ async function loadTable1(data){
 		td2.className = "itemTd"
 		td2.appendChild(document.createTextNode(portFolios[i].tickers));
 		tr.appendChild(td2);
+
+		var td3 = document.createElement("td");
+		td3.className = "itemTd"
+		td3.appendChild(document.createTextNode(portFolios[i].numShares));
+		tr.appendChild(td3);
 
 		var td3 = document.createElement("td");
 		td3.className = "modifyTd"
@@ -124,6 +133,13 @@ async function loadTable1(data){
 		pfTickers.appendChild(pfTickersInput);
 		modalDiv5.appendChild(pfTickers);
 
+		var pfShares = document.createElement("h5");
+		pfShares.appendChild(document.createTextNode("Num of Shares: "));
+		var pfSharesInput = document.createElement("input");
+		pfSharesInput.value = portFolios[i].numShares;
+		pfShares.appendChild(pfSharesInput);
+		modalDiv5.appendChild(pfShares);
+
 		modalDiv3.appendChild(modalDiv5);
 
 		var modalDiv6 = document.createElement("div");
@@ -160,6 +176,7 @@ function modifyPfManager(item){
 }
 
 
+/*
 function addPfInputTickers(input){
 
 	if(input.value.slice(-1) == ","){
@@ -170,6 +187,53 @@ function addPfInputTickers(input){
 		fetchFromYahoo1(ticker);
 	}
 	
+}
+*/
+
+//Function to add a portFolio
+function addPfButton(){
+	var pfName = document.getElementById("addPfNameInput");
+	var pfTickers = document.getElementById("addPfTickersInput");
+	var pfShares = document.getElementById("addPfSharesInput");
+
+	let pfNameValue = pfName.value.replace(/\s+/g, '');
+	if( pfNameValue == "" ){
+		pfName.style.animation = "0.25s linear 0s 1 normal forwards running error";
+		pfName.value = "";
+		pfName.placeholder = "Insert Portfolio Name";
+		setTimeout(() => {
+			pfName.style.animation = "";
+		}, 250);
+		setTimeout(() => {
+			pfName.placeholder = "";
+		}, 1500);
+	}
+
+	let pfTickersValue = pfTickers.value.replace(/\s+/g, '');
+	if( pfTickersValue == "" ){
+		pfTickers.style.animation = "0.25s linear 0s 1 normal forwards running error";
+		pfTickers.value = "";
+		pfTickers.placeholder = "Insert at least 1 Ticker";
+		setTimeout(() => {
+			pfTickers.style.animation = "";
+		}, 250);
+		setTimeout(() => {
+			pfTickers.placeholder = "";
+		}, 1500);
+	}
+
+	let pfSharesValue = pfShares.value.replace(/\s+/g, '');
+	if( pfSharesValue == "" ){
+		pfShares.style.animation = "0.25s linear 0s 1 normal forwards running error";
+		pfShares.value = "";
+		pfShares.placeholder = "Insert Num of Shares";
+		setTimeout(() => {
+			pfShares.style.animation = "";
+		}, 250);
+		setTimeout(() => {
+			pfShares.placeholder = "";
+		}, 1500);
+	}
 }
 
 //Show modal for login
