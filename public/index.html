@@ -74,7 +74,7 @@
                     <tbody id="tbody1">
                         <tr >
                             <td colspan="4" id="addTd">
-                                <div id="addTdDiv" data-toggle="modal" data-target="#addModal">
+                                <div id="addTdDiv" data-toggle="modal" data-target="#addModal" onclick="showTickerExchange();">
                                     <span class="hoverText" data-hover="Click to add a Portfolio" >Add</span>
                                 </div>
                                 <!-- Modal -->
@@ -97,7 +97,7 @@
                                                     <span class="mb-3" style="display:inline-block; color:black;">
                                                         <div>
                                                             <div class="color-1">
-                                                                <select data-placeholder="Select Asset Type" class="select" id="tickerTypeInput" tabindex="1" onchange="showTickerExchange(this.value);">
+                                                                <select data-placeholder="Select Asset Type" class="select" id="tickerTypeInput" tabindex="1" onchange="showTickerExchange();">
                                                                     <option value="1" selected="selected">Stocks</option>
                                                                     <option value="2">ETF</option>
                                                                     <option value="3">Commodities</option>
@@ -109,7 +109,7 @@
                                                     <span class="mb-3" style="display:inline-block; color:black;">
                                                         <div>
                                                             <div class="color-1">
-                                                                <select data-placeholder="Select Country" class="select" id="tickerExchangeInput" tabindex="1">
+                                                                <select data-placeholder="Select Country" class="select" id="tickerExchangeInput" tabindex="1" onchange="showTickerExchange();">
                                                                 <optgroup label="Nord America">
                                                                     <option>NASDAQ</option>
                                                                 <optgroup label="Europe">
@@ -122,7 +122,9 @@
                                                     </span>
                                                 </span>
                                                 <div id="inputTicker">
-                                                    <input id="addPfTickersInput" class="inputCheck"/>
+                                                    <select id="addPfTickersInput" class="mdb-select md-form" searchable="Search symbols">
+                                                        <option value="" disabled selected>Choose your Symbol</option>
+                                                    </select>
                                                 </div>
                                                 <br />
                                                 <h5>Num of Shares:</h5>

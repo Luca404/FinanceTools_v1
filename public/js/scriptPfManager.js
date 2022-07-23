@@ -24,18 +24,34 @@ server.on("returnPfList", (data) => {
 	}
 });
 
+server.on("returnTickersList", (data) => {
+	showTickersInInput(data);
+});
 
-//loadTable1();
-//showTickerExchange();
-
-//Function for showing portFolios ticker option
-
-function showTickerExchange(value){
-	inputExchange = document.getElementById("tickerExchangeInput");
-	if( value == 1 )
+//Function for showing tickers exchange
+function showTickerExchange(){
+	var inputTickerType = document.getElementById("tickerTypeInput");
+	let selectedType = inputTickerType.options[inputTickerType.selectedIndex].text;
+	var inputExchange = document.getElementById("tickerExchangeInput");
+	let selectedExchange = inputExchange.options[inputExchange.selectedIndex].text;
+	console.log( selectedExchange );
+	if( selectedType == "Stocks" )
 		inputExchange.style.display = "inline-block";
 	else 
 		inputExchange.style.display = "none";
+	
+	server.emit("getTickersList", {"type": selectedType, "exchange": selectedExchange} );
+}
+
+//Show dropdown menu with the tickers list from the server
+function showTickersInInput(data){
+	var tickersList = [];
+	var nameList = [];
+	for( var i = 0; i < data.length; i++ ){
+		tickersList[i] = data[i].s;
+		nameList[i] = data[i].n;
+	}
+	console.log(tickersList);
 }
 
 //Load table with portfolios

@@ -42,6 +42,15 @@ async def login(sid, data):
     await server.emit("loginResult", {"status":logged,"text":text}, to=sid)
 
 @server.event
+async def getTickersList(sid, data):
+    tickerType = str(data["type"]).lower()
+    exchange = str(data["exchange"]).lower()
+    with open( "./json/tickersList/" + tickerType + "/" + exchange + ".json" ) as f:
+        jsonData = json.load(f)
+    tickersList = jsonData["data"]
+    await server.emit( "returnTickersList" , tickersList, to=sid )
+
+@server.event
 async def getPfList(sid, data):
     pfData = []
     username = data["username"]
