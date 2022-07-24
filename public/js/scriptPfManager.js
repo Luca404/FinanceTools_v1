@@ -39,6 +39,7 @@ var multipleSelect = new Choices('#addPfTickersInput', {
     searchFields: ['label', 'value'],
 	shouldSort: false,
     shouldSortItems: false,
+	searchResultLimit: 6,
 	//itemSelectText: 'Press to select',
 });
 
@@ -52,8 +53,10 @@ function showTickerExchange(){
 	console.log( selectedExchange );
 	if( selectedType == "Stocks" )
 		inputExchange.style.display = "inline-block";
-	else 
+	else{
 		inputExchange.style.display = "none";
+		selectedExchange = selectedType;
+	}
 	
 	server.emit("getTickersList", {"type": selectedType, "exchange": selectedExchange} );
 }
