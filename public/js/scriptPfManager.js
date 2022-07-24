@@ -28,6 +28,21 @@ server.on("returnTickersList", (data) => {
 	showTickersInInput(data);
 });
 
+//Constant
+
+var multipleSelect = new Choices('#addPfTickersInput', {
+	removeItemButton: true,
+	addItems: true,
+	loadingText: 'Loading...',
+	noResultsText: 'No results found',
+	noChoicesText: 'No choices',
+    searchFields: ['label', 'value'],
+	shouldSort: false,
+    shouldSortItems: false,
+	//itemSelectText: 'Press to select',
+});
+
+
 //Function for showing tickers exchange
 function showTickerExchange(){
 	var inputTickerType = document.getElementById("tickerTypeInput");
@@ -45,15 +60,12 @@ function showTickerExchange(){
 
 //Show dropdown menu with the tickers list from the server
 function showTickersInInput(data){
-	var tickersList = [];
-	var nameList = [];
+	var tickersData = [];
 	for( var i = 0; i < data.length; i++ ){
-		tickersList[i] = data[i].s;
-		nameList[i] = data[i].n;
+		tickersData[i] = {value: data[i].s, label: data[i].n + " (" + data[i].s + ")", title: data[i].n};
 	}
-	console.log(tickersList);
+	multipleSelect.setChoices( tickersData, "value", "label", "title");
 }
-
 //Load table with portfolios
 function loadTable1(data){
 	var portFolios = data;

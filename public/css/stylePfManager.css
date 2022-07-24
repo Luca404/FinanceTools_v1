@@ -11,6 +11,21 @@ body{
     background-color: white;
 }
 
+#addPfTickersDiv{
+    position: relative;
+    max-width: 500px;
+    width: 100%;
+}
+
+.choices__item{
+    color:black;
+}
+
+.dropdown-menu {
+    max-width: 300%;
+    top: 270px !important;
+}
+
 #profileDiv{
     position: absolute;
     border-radius: 7px; 
