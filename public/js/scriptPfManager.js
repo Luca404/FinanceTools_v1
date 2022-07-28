@@ -69,6 +69,7 @@ function showTickersInInput(data){
 	}
 	multipleSelect.setChoices( tickersData, "value", "label", "title");
 }
+
 //Load table with portfolios
 function loadTable1(data){
 	var portFolios = data;
@@ -240,24 +241,40 @@ function addPfButton(){
 		}, 1500);
 	}
 
-	let pfTickersValue = pfTickers.value.replace(/\s+/g, '');
-	if( pfTickersValue == "" ){
-		pfTickers.style.animation = "0.25s linear 0s 1 normal forwards running error";
-		pfTickers.value = "";
-		pfTickers.placeholder = "Insert at least 1 Ticker";
+	var choicesDiv = document.getElementsByClassName("choices__inner")[0];
+	let choicesInput = choicesDiv.getElementsByTagName("input")[0];
+	let tickersNum = $('#addPfTickersInput option').length;
+	if( tickersNum == 0 ){
+		choicesDiv.style.animation = "0.25s linear 0s 1 normal forwards running error";
+		choicesInput.placeholder = "Insert Symbol";
+		choicesInput.classList.add("selectCheck");
 		setTimeout(() => {
-			pfTickers.style.animation = "";
+			choicesDiv.style.animation = "";
 		}, 250);
 		setTimeout(() => {
-			pfTickers.placeholder = "";
+			choicesInput.classList.remove("selectCheck");
+			choicesInput.placeholder = "Select Symbols";
 		}, 1500);
 	}
 
 	let pfSharesValue = pfShares.value.replace(/\s+/g, '');
+	let pfSharesNum = pfSharesValue.split(",");
+	console.log(pfSharesNum);
 	if( pfSharesValue == "" ){
 		pfShares.style.animation = "0.25s linear 0s 1 normal forwards running error";
 		pfShares.value = "";
 		pfShares.placeholder = "Insert Num of Shares";
+		setTimeout(() => {
+			pfShares.style.animation = "";
+		}, 250);
+		setTimeout(() => {
+			pfShares.placeholder = "";
+		}, 1500);
+	}
+	if( pfSharesNum.length != tickersNum ){
+		pfShares.style.animation = "0.25s linear 0s 1 normal forwards running error";
+		pfShares.value = "";
+		pfShares.placeholder = "Insert a number for symbol";
 		setTimeout(() => {
 			pfShares.style.animation = "";
 		}, 250);
