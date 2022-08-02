@@ -18,7 +18,7 @@
         <link rel="stylesheet" href="./css/stylePfManager.css">
         <link rel="stylesheet" href="./css/style.css">
     </head>
-    <body id="corpo" onload="showLoginModal();">
+    <body id="corpo">
 
         <div class="wrapper d-flex align-items-stretch">
 			<nav id="sidebar">
@@ -166,8 +166,8 @@
                             <br />             
                         </div>
                         <div class="modal-footer" style="display: flex; justify-content: center; vertical-align: middle;">
-                            <button type="button" class="btn btn-secondary" onclick="showRegisterModal();">Register</button>
-                            <button type="button" class="btn btn-secondary" onclick="checkLogin();">Login</button>
+                            <button type="button" class="btn btn-secondary" id="registerButton">Register</button>
+                            <button type="button" class="btn btn-secondary" id="loginButton">Login</button>
                         </div>
                     </div>
                 </div>
@@ -193,19 +193,18 @@
                             <br />                
                         </div>
                         <div class="modal-footer" style="display: flex; justify-content: center;">
-                            <button type="button" class="btn btn-secondary" onclick="showLoginModal();">Login</button>
-                            <button type="button" class="btn btn-secondary" onclick="registerUser();">Register</button>
+                            <button type="button" class="btn btn-secondary" id="loginButton2">Login</button>
+                            <button type="button" class="btn btn-secondary" id="registerButton2">Register</button>
                         </div>
                     </div>
                 </div>
             </div>
-		</div>        
+		</div>
         <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
         <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
         <script src="https://cdn.jsdelivr.net/gh/bbbootstrap/libraries@main/choices.min.js"></script>
-
-        <script src="js/scriptPfManager.js"></script>
+        <script type="module" src="js/scriptPfManager.js"></script>
         <script src="./js/main.js"></script>
     </body>
 </html>
