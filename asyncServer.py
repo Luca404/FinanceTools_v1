@@ -8,7 +8,8 @@ import json
 
 server = socketio.AsyncServer(async_mode="asgi")
 app = socketio.ASGIApp(server, static_files={
-    "/": "./public/"
+    '/': './public/pfManager.html',
+    "/static": "./public/",
 })
  
 @server.event

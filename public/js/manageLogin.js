@@ -1,18 +1,10 @@
 const server = io();
-
-//Show modal for login
-function showLoginModal(){
-	let usern = checkIfLogged()
-	if( usern == "" ){
-		$("#content").css("filter", "blur(5px)");
-		$('#loginModal').modal({backdrop: 'static', keyboard: false, show: true});
-		$("#registrationModal").modal("hide");
-		$('#registrationModal').data('bs.modal',null);
-	}
-	else{
-		drawProfileDiv(usern);
-	}
-}
+server.on("loginResult", (data) => {
+	if( data["status"] )
+		successLogin( data["text"] );
+	else
+		failedLogin( data["text"] );
+});
 
 //Function to check if still logged
 function checkIfLogged(){
@@ -83,9 +75,8 @@ function successLogin( usern ){
 	setTimeout(() => {
 		$("#loginModal").modal("hide");
 		$("#content").css("filter", "");
-	}, 2000);
+	}, 1500);
 	setCookie("username",usern,5);
-	drawProfileDiv(usern);
 }
 
 //Save cookies function
@@ -123,14 +114,6 @@ function failedLogin( error ){
 			usrn.placeholder = "";
 		}, 2000);
 	}
-}
-
-//Draw profile div
-function drawProfileDiv( username ){
-	let profileDiv = document.getElementById("profileDiv");
-	let profileP = profileDiv.getElementsByTagName("p")[0];
-	profileP.innerText = "User:    " + username;
-	server.emit("getPfList",{"username":username});
 }
 
 //function for register a user
@@ -188,4 +171,4 @@ function registerUser(){
 
 function hash(e){for(var r=0,i=0;i<e.length;i++)r=(r<<5)-r+e.charCodeAt(i),r&=r;return r};
 
-export {showLoginModal, checkIfLogged, showRegisterModal, checkLogin, successLogin, setCookie, failedLogin, drawProfileDiv, registerUser};  
+export { checkIfLogged, showRegisterModal, checkLogin, successLogin, setCookie, failedLogin, registerUser};  

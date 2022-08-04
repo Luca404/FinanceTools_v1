@@ -4,7 +4,7 @@ import * as login from './manageLogin.js';
 const server = io();
 server.on("connect", () => {
     console.log("Connected");
-	login.showLoginModal();
+	showLoginModal();
 });
  
 server.on("disconnect", () => {
@@ -12,8 +12,10 @@ server.on("disconnect", () => {
 });
 
 server.on("loginResult", (data) => {
-	if( data["status"] )
+	if( data["status"] ){
 		login.successLogin( data["text"] );
+		drawProfileDiv( data["text"] );
+	}
 	else
 		login.failedLogin( data["text"] );
 });
@@ -39,10 +41,48 @@ function setEvent(){
 	$("#registerButton").click( login.showRegisterModal );
 	$("#loginButton").click( login.checkLogin );
 	$("#registerButton2").click( login.registerUser );
-	$("#loginButton2").click( login.showLoginModal );
+	$("#loginButton2").click( showLoginModal );
+	$("#addTdDiv").click( showTickerExchange );	
+	$("#tickerTypeInput").change( showTickerExchange );	
+	$("#tickerExchangeInput").change( showTickerExchange );	
+}
+
+//Draw profile div
+function drawProfileDiv( username ){
+	let profileDiv = document.getElementById("profileDiv");
+	let profileP = profileDiv.getElementsByTagName("p")[0];
+	profileP.innerText = "User:    " + username;
+	server.emit("getPfList",{"username":username});
+}
+
+//Show modal for login
+function showLoginModal(){
+	let usern = login.checkIfLogged()
+	if( usern == "" ){
+		$("#content").css("filter", "blur(5px)");
+		$('#loginModal').modal({backdrop: 'static', keyboard: false, show: true});
+		$("#registrationModal").modal("hide");
+		$('#registrationModal').data('bs.modal',null);
+	}
+	else{
+		drawProfileDiv(usern);
+	}
 }
 
 var multipleSelect = new Choices('#addPfTickersInput', {
+	removeItemButton: true,
+	addItems: true,
+	loadingText: 'Loading...',
+	noResultsText: 'No results found',
+	noChoicesText: 'No choices',
+    searchFields: ['label', 'value'],
+	shouldSort: false,
+    shouldSortItems: false,
+	searchResultLimit: 6,
+	//itemSelectText: 'Press to select',
+});
+
+var multipleSelect1 = new Choices('#modifyTickersInput', {
 	removeItemButton: true,
 	addItems: true,
 	loadingText: 'Loading...',
@@ -80,6 +120,7 @@ function showTickersInInput(data){
 		tickersData[i] = {value: data[i].s, label: data[i].n + " (" + data[i].s + ")", title: data[i].n};
 	}
 	multipleSelect.setChoices( tickersData, "value", "label", "title");
+	multipleSelect1.setChoices( tickersData, "value", "label", "title");
 }
 
 //Load table with portfolios
@@ -117,7 +158,7 @@ function loadTable1(data){
 		button.onclick = function() { modifyPfManager(this); };
 		var modifyImg = document.createElement("img");
 		modifyImg.id = "modifyImg";
-		modifyImg.src = "img/modify-icon.jpg";
+		modifyImg.src = "static/img/modify-icon.jpg";
 		button.append(modifyImg);
         td3.appendChild(button);
 		
@@ -140,7 +181,7 @@ function loadTable1(data){
 		var modalDiv4 = document.createElement("div");
 		modalDiv4.className = "modal-header";
 
-		//Modal title
+		//Modify Pf Modal
 		var modalTitle = document.createElement("h4");
 		modalTitle.className = "modal-title";
 		modalTitle.id = "modifyModalLabel";
@@ -170,12 +211,44 @@ function loadTable1(data){
 		pfName.appendChild(pfNameInput);
 		modalDiv5.appendChild(pfName);
 
-		var pfTickers = document.createElement("h5");
+		var pfTickersDiv = document.createElement("div");
+		pfTickersDiv.className ="color-1";
+		var pfTickers = document.createElement("h5");		
 		pfTickers.appendChild(document.createTextNode("Portfolio Tickers: "));
-		var pfTickersInput = document.createElement("input");
-		pfTickersInput.value = portFolios[i].tickers;
-		pfTickers.appendChild(pfTickersInput);
-		modalDiv5.appendChild(pfTickers);
+		pfTickers.appendChild( document.createElement("br") );
+
+		var pfTickersSelectType = document.createElement("select");
+		pfTickersSelectType.className = "select";
+		pfTickersSelectType.id = "tickerTypeInput";
+		$(pfTickersSelectType).append($('<option>').val('1').text('Stocks'));
+		$(pfTickersSelectType).append($('<option>').val('2').text('ETF'));
+		$(pfTickersSelectType).append($('<option>').val('3').text('Commodities'));
+		$(pfTickersSelectType).append($('<option>').val('4').text('Cryptocurrencies'));
+		pfTickers.appendChild( pfTickersSelectType );
+
+		var pfTickersSelectExch = document.createElement("select");
+		pfTickersSelectExch.className = "select mb-3";
+		pfTickersSelectExch.id = "tickerExchangeInput";
+		var optGroupNA = $('<optgroup label="Nord America">');
+		$(optGroupNA).append($('<option>').text('NYSE'));
+		$(optGroupNA).append($('<option>').text('NASDAQ'));
+		$(pfTickersSelectExch).append(optGroupNA);
+		var optGroupE = $('<optgroup label="Europe">');
+		$(optGroupE).append($('<option>').text('FTSE'));
+		$(pfTickersSelectExch).append(optGroupE);
+		var optGroupA = $('<optgroup label="Asia">');
+		$(optGroupA).append($('<option>').text('CSI'));
+		$(pfTickersSelectExch).append(optGroupA);
+		pfTickers.appendChild( pfTickersSelectExch );		
+
+		var pfTickersInput = document.createElement("select");
+		pfTickers.id = "modifyTickersInput";
+		//pfTickersInput.value = portFolios[i].tickers;
+		pfTickers.appendChild( document.createElement("br") );
+		pfTickers.appendChild( pfTickersInput );
+		pfTickersDiv.appendChild( pfTickers );
+		pfTickersDiv.appendChild( document.createElement("br") );
+		modalDiv5.appendChild( pfTickersDiv );
 
 		var pfShares = document.createElement("h5");
 		pfShares.appendChild(document.createTextNode("Num of Shares: "));
@@ -214,7 +287,7 @@ function loadTable1(data){
 }
 
 function modifyPfManager(item){
-	pfNum = item.id.toString();
+	var pfNum = item.id.toString();
 	pfNum = pfNum.split("modifyButt")[1];
 	console.log(pfNum);
 }
