@@ -49,7 +49,7 @@ async def getTickersList(sid, data):
     with open( "./json/tickersList/" + tickerType + "/" + exchange + ".json" ) as f:
         jsonData = json.load(f)
     tickersList = jsonData["data"]
-    await server.emit( "returnTickersList" , tickersList, to=sid )
+    return {"data": tickersList, "type":tickerType, "exchange":exchange}
 
 @server.event
 async def getPfList(sid, data):

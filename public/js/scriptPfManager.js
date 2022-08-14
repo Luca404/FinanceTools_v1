@@ -1,5 +1,24 @@
 import * as login from './manageLogin.js';
 
+//CONST
+var pfData = [];
+var multiSelectOption = {
+	removeItemButton: true,
+	addItems: true,
+	loadingText: 'Loading...',
+	noResultsText: 'No results found',
+	noChoicesText: 'No choices',
+    searchFields: ['label', 'value'],
+	shouldSort: false,
+	placeholder: true,
+    shouldSortItems: false,
+	searchResultLimit: 6,
+	//itemSelectText: 'Press to select',
+};
+var multipleSelect = new Choices('#addPfTickersInput', multiSelectOption );
+
+
+
 //Connection to server
 const server = io();
 server.on("connect", () => {
@@ -22,6 +41,7 @@ server.on("loginResult", (data) => {
 
 server.on("returnPfList", (data) => {
 	if( data.length > 0 ){
+		pfData = data;
 		loadTable1(data);
 	}
 	else{
@@ -29,9 +49,6 @@ server.on("returnPfList", (data) => {
 	}
 });
 
-server.on("returnTickersList", (data) => {
-	showTickersInInput(data);
-});
 
 //Add onload function to body
 document.getElementById("corpo").addEventListener("load", setEvent(), false);
@@ -42,9 +59,17 @@ function setEvent(){
 	$("#loginButton").click( login.checkLogin );
 	$("#registerButton2").click( login.registerUser );
 	$("#loginButton2").click( showLoginModal );
-	$("#addTdDiv").click( showTickerExchange );	
+	$("#addTdDiv").click( showTickerExchange );
+	$("#addTdDiv").click( addPf );		
 	$("#tickerTypeInput").change( showTickerExchange );	
-	$("#tickerExchangeInput").change( showTickerExchange );	
+	$("#tickerExchangeInput").change( showTickerExchange );
+	$("#profileDiv").click( showUserOption );
+	$("#addPfButt").click( addPfButton );
+}
+
+//Show user option for disconnect
+function showUserOption(){
+
 }
 
 //Draw profile div
@@ -69,33 +94,6 @@ function showLoginModal(){
 	}
 }
 
-var multipleSelect = new Choices('#addPfTickersInput', {
-	removeItemButton: true,
-	addItems: true,
-	loadingText: 'Loading...',
-	noResultsText: 'No results found',
-	noChoicesText: 'No choices',
-    searchFields: ['label', 'value'],
-	shouldSort: false,
-    shouldSortItems: false,
-	searchResultLimit: 6,
-	//itemSelectText: 'Press to select',
-});
-
-var multipleSelect1 = new Choices('#modifyTickersInput', {
-	removeItemButton: true,
-	addItems: true,
-	loadingText: 'Loading...',
-	noResultsText: 'No results found',
-	noChoicesText: 'No choices',
-    searchFields: ['label', 'value'],
-	shouldSort: false,
-    shouldSortItems: false,
-	searchResultLimit: 6,
-	//itemSelectText: 'Press to select',
-});
-
-
 //Function for showing tickers exchange
 function showTickerExchange(){
 	var inputTickerType = document.getElementById("tickerTypeInput");
@@ -109,18 +107,34 @@ function showTickerExchange(){
 		inputExchange.style.display = "none";
 		selectedExchange = selectedType;
 	}
-	
-	server.emit("getTickersList", {"type": selectedType, "exchange": selectedExchange} );
+	server.emit( "getTickersList", {"type": selectedType, "exchange": selectedExchange}, (result) => {
+		showTickersInInput(result);
+	});
+}
+
+//Function to change selected ticker type and exchange
+async function changeSelectedExchange( type, exchange ){
+	var inputTickerType = document.getElementById("tickerTypeInput");
+	inputTickerType.value = type;
+	let selectedType = inputTickerType.options[inputTickerType.selectedIndex].text;
+	if( selectedType == "Stocks" ){
+		var inputExchange = document.getElementById("tickerExchangeInput");
+		inputExchange.value = exchange;
+		inputExchange.style.display = "inline-block";
+	}
+	else{
+		inputExchange.style.display = "none";
+	}
 }
 
 //Show dropdown menu with the tickers list from the server
-function showTickersInInput(data){
+async function showTickersInInput(data){
 	var tickersData = [];
-	for( var i = 0; i < data.length; i++ ){
-		tickersData[i] = {value: data[i].s, label: data[i].n + " (" + data[i].s + ")", title: data[i].n};
+	for( var i = 0; i < data.data.length; i++ ){
+		//tickersData[i] = {value: data[i].s, label: data[i].n + " (" + data[i].s + ")", title: data[i].n};
+		tickersData[i] = {value: data.data[i].s, label: data.data[i].s, placeholderValue: data.data[i].n };
 	}
-	multipleSelect.setChoices( tickersData, "value", "label", "title");
-	multipleSelect1.setChoices( tickersData, "value", "label", "title");
+	multipleSelect.setChoices( tickersData, "value", "label", "placeholderValue");
 }
 
 //Load table with portfolios
@@ -154,161 +168,65 @@ function loadTable1(data){
         button.className = "btn btn-dark modifyPf";
         button.type = "button";
 		button.dataset.toggle = "modal";
-		button.dataset.target = "#modifyModal" + i;
+		//button.dataset.target = "#modifyModal" + i;
+		button.dataset.target = "#addModal";
 		button.onclick = function() { modifyPfManager(this); };
 		var modifyImg = document.createElement("img");
 		modifyImg.id = "modifyImg";
 		modifyImg.src = "static/img/modify-icon.jpg";
 		button.append(modifyImg);
         td3.appendChild(button);
-		
-		//Modal
-		var modalDiv1 = document.createElement("div");
-		modalDiv1.className = "modal fade";
-		modalDiv1.id = "modifyModal" + i;
-		modalDiv1.tabIndex = "-1";
-		modalDiv1.role = "dialog";
-		modalDiv1.ariaLabelledBy = "modifyModalLabel";
-		modalDiv1.ariaHidden = "true";
-
-		var modalDiv2 = document.createElement("div");
-		modalDiv2.className = "modal-dialog";
-		modalDiv2.role = "document";
-
-		var modalDiv3 = document.createElement("div");
-		modalDiv3.className = "modal-content";
-
-		var modalDiv4 = document.createElement("div");
-		modalDiv4.className = "modal-header";
-
-		//Modify Pf Modal
-		var modalTitle = document.createElement("h4");
-		modalTitle.className = "modal-title";
-		modalTitle.id = "modifyModalLabel";
-		modalTitle.appendChild(document.createTextNode("Modify Portfolio"));
-		modalDiv4.appendChild(modalTitle);
-
-		var closeButton = document.createElement("button");
-		closeButton.type = "button";
-		closeButton.className = "close";
-		closeButton.dataset.dismiss = "modal";
-		closeButton.ariaLabel = "Close";
-
-		var closeSpan = document.createElement("span");
-		closeSpan.innerHTML = "&times;";
-		closeButton.appendChild(closeSpan);
-		modalDiv4.appendChild(closeButton);
-		modalDiv3.appendChild(modalDiv4);
-
-		//Modal content
-		var modalDiv5 = document.createElement("div");
-		modalDiv5.className = "modal-body";
-
-		var pfName = document.createElement("h5");
-		pfName.appendChild(document.createTextNode("Portfolio Name: "));
-		var pfNameInput = document.createElement("input");
-		pfNameInput.value = portFolios[i].pfName;
-		pfName.appendChild(pfNameInput);
-		modalDiv5.appendChild(pfName);
-
-		var pfTickersDiv = document.createElement("div");
-		pfTickersDiv.className ="color-1";
-		var pfTickers = document.createElement("h5");		
-		pfTickers.appendChild(document.createTextNode("Portfolio Tickers: "));
-		pfTickers.appendChild( document.createElement("br") );
-
-		var pfTickersSelectType = document.createElement("select");
-		pfTickersSelectType.className = "select";
-		pfTickersSelectType.id = "tickerTypeInput";
-		$(pfTickersSelectType).append($('<option>').val('1').text('Stocks'));
-		$(pfTickersSelectType).append($('<option>').val('2').text('ETF'));
-		$(pfTickersSelectType).append($('<option>').val('3').text('Commodities'));
-		$(pfTickersSelectType).append($('<option>').val('4').text('Cryptocurrencies'));
-		pfTickers.appendChild( pfTickersSelectType );
-
-		var pfTickersSelectExch = document.createElement("select");
-		pfTickersSelectExch.className = "select mb-3";
-		pfTickersSelectExch.id = "tickerExchangeInput";
-		var optGroupNA = $('<optgroup label="Nord America">');
-		$(optGroupNA).append($('<option>').text('NYSE'));
-		$(optGroupNA).append($('<option>').text('NASDAQ'));
-		$(pfTickersSelectExch).append(optGroupNA);
-		var optGroupE = $('<optgroup label="Europe">');
-		$(optGroupE).append($('<option>').text('FTSE'));
-		$(pfTickersSelectExch).append(optGroupE);
-		var optGroupA = $('<optgroup label="Asia">');
-		$(optGroupA).append($('<option>').text('CSI'));
-		$(pfTickersSelectExch).append(optGroupA);
-		pfTickers.appendChild( pfTickersSelectExch );		
-
-		var pfTickersInput = document.createElement("select");
-		pfTickers.id = "modifyTickersInput";
-		//pfTickersInput.value = portFolios[i].tickers;
-		pfTickers.appendChild( document.createElement("br") );
-		pfTickers.appendChild( pfTickersInput );
-		pfTickersDiv.appendChild( pfTickers );
-		pfTickersDiv.appendChild( document.createElement("br") );
-		modalDiv5.appendChild( pfTickersDiv );
-
-		var pfShares = document.createElement("h5");
-		pfShares.appendChild(document.createTextNode("Num of Shares: "));
-		var pfSharesInput = document.createElement("input");
-		pfSharesInput.value = portFolios[i].numShares;
-		pfShares.appendChild(pfSharesInput);
-		modalDiv5.appendChild(pfShares);
-
-		modalDiv3.appendChild(modalDiv5);
-
-		var modalDiv6 = document.createElement("div");
-		modalDiv6.className = "modal-footer";
-
-		var footCloseButton = document.createElement("button");
-		footCloseButton.type="button";
-		footCloseButton.className = "btn btn-secondary";
-		footCloseButton.dataset.dismiss = "modal";
-		footCloseButton.appendChild(document.createTextNode("Close"));
-		modalDiv6.appendChild(footCloseButton);
-
-		var saveButton = document.createElement("button");
-		saveButton.type = "button";
-		saveButton.className = "btn btn-primary";
-		saveButton.appendChild(document.createTextNode("Save changes"));
-		modalDiv6.appendChild(saveButton);
-
-		modalDiv3.appendChild(modalDiv6);
-		modalDiv2.appendChild(modalDiv3);
-		modalDiv1.appendChild(modalDiv2);
-
-		td3.appendChild(modalDiv1);
-		
 		tr.appendChild(td3);
 		tbody.insertBefore( tr, tbody.lastElementChild);
 	}
 }
 
-function modifyPfManager(item){
+async function modifyPfManager(item){
+	multipleSelect.clearStore();
+	showTickerExchange();
+	$("#addModalLabel").text("Modify Portfolio");
 	var pfNum = item.id.toString();
 	pfNum = pfNum.split("modifyButt")[1];
-	console.log(pfNum);
-}
-
-
-/*
-function addPfInputTickers(input){
-
-	if(input.value.slice(-1) == ","){
-		document.getElementById(input.id).setAttribute("disabled", true);
-		document.getElementById("loaderIcon").style.display = "block";
-		var ticker = input.value.split(",")[0];
-		console.log(ticker);
-		fetchFromYahoo1(ticker);
+	$("#addPfNameInput").val(pfData[pfNum].pfName);
+	$("#addPfSharesInput").val(pfData[pfNum].numShares);
+	console.log(pfData[pfNum]);
+	var inputTickerType = document.getElementById("tickerTypeInput");
+	var selectedType = inputTickerType.options[inputTickerType.selectedIndex].value;
+	var inputExchange = document.getElementById("tickerExchangeInput");
+	var selectedExchange = inputExchange.options[inputExchange.selectedIndex].value;
+	for( let i = 0; i<pfData[pfNum].tickers.length; i++ ){
+		selectedType = inputTickerType.options[inputTickerType.selectedIndex].value;
+		selectedExchange = inputExchange.options[inputExchange.selectedIndex].value;
+		var type = pfData[pfNum].type[i].split(":")[0];
+		var exch = pfData[pfNum].type[i].split(":")[1];
+		console.log( "selectedExch: ", selectedExchange );
+		console.log( "tickerExch: ", exch );
+		await new Promise(r => setTimeout(r, 200));
+		if( selectedType.toLowerCase() != type || selectedExchange.toLowerCase() != exch ){
+			console.log("typeDiverso:", pfData[pfNum].tickers[i]);
+			server.emit( "getTickersList", {"type": type, "exchange": exch}, (result) => {		
+				showTickersInInput(result);
+				changeSelectedExchange(type, exch);					
+				multipleSelect.setChoiceByValue(pfData[pfNum].tickers[i]);
+			});	
+		}
+		else{
+			console.log("typeUguale: ", pfData[pfNum].tickers[i]);
+			multipleSelect.setChoiceByValue(pfData[pfNum].tickers[i]);
+		}
 	}
-	
 }
-*/
+
+function addPf(){
+	multipleSelect.clearStore();
+	$("#addModalLabel").text("Add Portfolio");	
+	$("#addPfNameInput").val("");
+	$("#addPfSharesInput").val("");
+}
 
 //Function to add a portFolio
 function addPfButton(){
+	console.log("pollo");
 	var pfName = document.getElementById("addPfNameInput");
 	var pfTickers = document.getElementById("addPfTickersInput");
 	var pfShares = document.getElementById("addPfSharesInput");
