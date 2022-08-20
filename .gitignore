@@ -1,5 +1,5 @@
-node_modules/
 __pycache__/
+node_modules/
 json/users/
 package.json
 package-lock.json

@@ -24,44 +24,43 @@
     <body id="corpo">
 
         <div class="wrapper d-flex align-items-stretch">
-			<nav id="sidebar">
-				<div class="custom-menu">
-					<button type="button" id="sidebarCollapse" class="btn btn-primary" >
-                        <i class="fa fa-bars"></i>
-                        <span class="sr-only">Toggle Menu</span>
-                    </button>
-                </div>
-				<div class="p-4">
-		  		    <h1><a href="/" class="logo">Finance Tools<span>Portfolio Optimization Tools</span></a></h1>
-	                <ul id="lista" class="list-unstyled components mb-5">
-                        <li id="pf1">
-                            <a href="/"><span class="fa mr-3"></span>Portfolios Manager</a>
-                        </li>
-                        <li id="pf2" class="active">
-                            <a href="static/pfOverview.html"><span class="fa mr-3"></span>Portfolio Overview</a>
-                        </li>
-                        <li id="pf3">
-                            <a href="#"><span class="fa mr-3"></span>Portfolio Risk</a>
-                        </li>
-                        <li id="pf4">
-                            <a href="#"><span class="fa mr-3"></span>Markowitz Portfolio Optimization</a>
-                        </li>
-                        <li id="pf5">
-                            <a href="#"><span class="fa mr-3"></span>MonteCarlo Portfolio analyses</a>
-                        </li>
-                        <li id="pf6">
-                            <a href="#"><span class="fa mr-3"></span>Black-Scholes</a>
-                        </li>
-                        <li>
-                            <a href="#"><span class="fa mr-3"></span>SourceCode</a>
-                        </li>
-	                </ul>
-
-                    <div class="footer">
-                        <p>0xLika</p>
+            <div class="d-flex">
+                <nav id="sidebar">
+                    <div class="custom-menu">
+                        <button type="button" id="sidebarCollapse" class="btn btn-primary" onclick="fixContent();" >
+                            <i class="fa fa-bars"></i>
+                            <span class="sr-only">Toggle Menu</span>
+                        </button>
                     </div>
-	            </div>
-    	    </nav>
+                    <div class="p-4">
+                        <h1><a href="/" class="logo">Finance Tools<span>Portfolio Optimization Tools</span></a></h1>
+                        <ul id="lista" class="list-unstyled components mb-5">
+                            <li id="pf1">
+                                <a href="/"><span class="fa mr-3"></span>Portfolios Manager</a>
+                            </li>
+                            <li id="pf2" class="active">
+                                <a href="static/pfOverview.html"><span class="fa mr-3"></span>Portfolio Overview</a>
+                            </li>
+                            <li id="pf3">
+                                <a href="#"><span class="fa mr-3"></span>Portfolio Risk</a>
+                            </li>
+                            <li id="pf4">
+                                <a href="#"><span class="fa mr-3"></span>Markowitz Portfolio Optimization</a>
+                            </li>
+                            <li id="pf5">
+                                <a href="#"><span class="fa mr-3"></span>MonteCarlo Portfolio analyses</a>
+                            </li>
+                            <li id="pf6">
+                                <a href="#"><span class="fa mr-3"></span>Black-Scholes</a>
+                            </li>
+                        </ul>
+
+                        <div class="footer">
+                            <p><a style="color: white" target="_blank" href="https://github.com/Luca404/FinanceTools_v1">0xLika</a></p>
+                        </div>
+                    </div>
+                </nav>
+            </div>
 
             <!-- Page Content  -->
             <div id="content" class="p-4 p-md-5 pt-5" onload="loadSavedPf();">
@@ -72,11 +71,11 @@
                 <br />
                 <br />
                 <br />
-                <div id="pfPerformanceDiv">
-                    <h5>Portfolio performance</h5>
+                <div id="singlePerformanceDiv">
+                    <h5>Single Assets performance</h5>
                         <p>Period:
                             &nbsp;&nbsp;
-                            <select id="selectPeriod" onchange="setPeriod();">
+                            <select id="selectSingleAssetPeriod" onchange="setSingleAssetPeriod();">
                                 <option value="1">1Y</option>
                                 <option value="2" selected>2Y</option>                    
                                 <option value="3">5Y</option>
@@ -85,15 +84,60 @@
                             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                             Normalized:
                             &nbsp;&nbsp;
-                            <select id="selectNormalized" onchange="setNormalized();">
-                                <option selected>Yes</option>
-                                <option>No</option>
-                            </select>
+                            <input id="selectNormalized" type="checkbox" onchange="setSingleAssetNormalized();" checked>
                             
                         </p>
+                        <div id="singleCanvasDiv" display="inline-block">
+                        </div>
                 </div>                
-                <div id="canvasDiv" display="inline-block">
+                <span id="assetInfo">
+                    <h5>Assets info</h5>
+                    <table class="table" id="assetInfoTable">
+                        <thead>
+                            <tr>
+                                <th scope="col">Symbol</th>
+                                <th scope="col">Type</th>
+                                <th scope="col">Name</th>
+                                <th scope="col">Sector</th>
+                            </tr>
+                        </thead>
+                        <tbody>                            
+                        </tbody>
+                    </table>
+                </span>
+                <br />
+                <br />
+                <div id="pfPerformanceDiv">
+                    <h5>Portfolio performance</h5>
+                        <p>Period:
+                            &nbsp;&nbsp;
+                            <select id="selectPfPeriod" onchange="setPfPeriod();">
+                                <option value="1">1Y</option>
+                                <option value="2" selected>2Y</option>                    
+                                <option value="3">5Y</option>
+                                <option value="4">10Y</option>
+                            </select>
+                    <div id="pfCanvasDiv" display="inline-block">
+                    </div>
                 </div>
+                <span id="pfInfo">
+                    <h5>Portfolio info</h5>
+                    <table class="table" id="pfInfoTable">
+                        <thead>
+                            <tr>
+                                <th scope="col">Total Return</th>
+                                <th scope="col">Annual Return</th>
+                                <th scope="col">Max Drawdown</th>
+                                <th scope="col">Std Dev</th>
+                            </tr>
+                        </thead>
+                        <tbody>                            
+                        </tbody>
+                    </table>
+                </span>
+            </div>
+            <div id="profileDiv">
+                <p><a></a></p>
             </div>
 		</div>
 

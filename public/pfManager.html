@@ -51,13 +51,10 @@
                         <li id="pf6">
                             <a href="#"><span class="fa mr-3"></span>Black-Scholes</a>
                         </li>
-                        <li>
-                            <a href="#"><span class="fa mr-3"></span>SourceCode</a>
-                        </li>
 	                </ul>
 
                     <div class="footer">
-                        <p>0xLika</p>
+                        <p><a style="color: white" target="_blank" href="https://github.com/Luca404/FinanceTools_v1">0xLika</a></p>
                     </div>
 	            </div>
     	    </nav>
@@ -77,10 +74,10 @@
                     <tbody id="tbody1">
                         <tr >
                             <td colspan="4" id="addTd">
-                                <div id="addTdDiv" data-toggle="modal" data-target="#addModal">
+                                <div id="addPfDiv" data-toggle="modal" data-target="#addModal">
                                     <span class="hoverText" data-hover="Click to add a Portfolio" >Add</span>
                                 </div>
-                                <!-- Modal -->
+                                <!-- Add portfolio Modal -->
                                 <div class="modal fade" id="addModal" tabindex="-1" role="dialog" aria-labelledby="addModalLabel" aria-hidden="true">
                                     <div class="modal-dialog" role="document">
                                         <div class="modal-content">
@@ -133,11 +130,35 @@
                                                 <br />
                                                 <br />
                                                 <h5>Num of Shares:</h5>
-                                                <input id="addPfSharesInput" class="inputCheck"/>
+                                                <input id="addPfSharesNumInput" class="inputCheck" type="text"/>
                                                 </div>
                                                 <div class="modal-footer">
                                                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                                                    <button id="addPfButt" type="button" class="btn btn-primary">Save changes</button>
+                                                    <button id="saveChangesButt" type="button" class="btn btn-primary">Save changes</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- Delete portfolio Modal -->
+                                <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
+                                    <div class="modal-dialog" role="document">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title" id="deleteModalLabel">Delete Portfolio</h5>
+                                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                    <span aria-hidden="true">&times;</span></button>
+                                                </button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <br />
+                                                <br />
+                                                <h5 id="deletePfText"></h5>
+                                                <br />
+                                                <br />
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">No</button>
+                                                    <button id="deletePfButton" type="button" class="btn btn-primary">Yes</button>
                                                 </div>
                                             </div>
                                         </div>
@@ -149,7 +170,7 @@
                 </table>
             </div>
             <div id="profileDiv">
-                <p>Not logged in, <a> Login</a></p>
+                <p><a></a></p>
             </div>
             <div class="modal fade" id="loginModal" style="display: none;">
                 <div class="modal-dialog"> 

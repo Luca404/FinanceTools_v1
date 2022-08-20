@@ -1,0 +1,52 @@
+{
+    "info": [
+        {
+            "Symbol": "GOOG",
+            "Name": "Alphabet Inc.",
+            "Type": "EQUITY",
+            "Sector": "Communication Services",
+            "Industry": "Internet Content & Information",
+            "Country": "United States"
+        },
+        {
+            "Symbol": "AAPL",
+            "Name": "Apple Inc.",
+            "Type": "EQUITY",
+            "Sector": "Technology",
+            "Industry": "Consumer Electronics",
+            "Country": "United States"
+        },
+        {
+            "Symbol": "MSFT",
+            "Name": "Microsoft Corporation",
+            "Type": "EQUITY",
+            "Sector": "Technology",
+            "Industry": "Software\u2014Infrastructure",
+            "Country": "United States"
+        },
+        {
+            "Symbol": "TSLA",
+            "Name": "Tesla, Inc.",
+            "Type": "EQUITY",
+            "Sector": "Consumer Cyclical",
+            "Industry": "Auto Manufacturers",
+            "Country": "United States"
+        },
+        {
+            "Symbol": "META",
+            "Name": "Meta Platforms, Inc.",
+            "Type": "EQUITY",
+            "Sector": "Communication Services",
+            "Industry": "Internet Content & Information",
+            "Country": "United States"
+        },
+        {
+            "Symbol": "PG",
+            "Name": "The Procter & Gamble Company",
+            "Type": "EQUITY",
+            "Sector": "Consumer Defensive",
+            "Industry": "Household & Personal Products",
+            "Country": "United States"
+        }
+    ]
+}

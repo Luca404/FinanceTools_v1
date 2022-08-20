@@ -1,0 +1,28 @@
+#profileDiv{
+    position: absolute;
+    border-radius: 7px; 
+    width: 8%;
+    height: 5%;
+    margin-left: 91%;
+    margin-top: 1%;
+    justify-content: center;
+    display: flex;
+    vertical-align: center;
+    text-align: center;
+    background-color: #3445b4;
+    font-size: 15px;
+    padding-top: 10px;
+    color: white;
+}
+
+#profileDiv:hover{
+    cursor: pointer;
+}
+
+#singlePerformanceDiv{
+    text-align: center;
+}
+
+#pfPerformanceDiv{
+    text-align: center;
+}
