@@ -157,19 +157,58 @@ async def getPfData(sid, data):
         i+=1
 
     pfInfo = {}
-    pfInfo["TotRet"] = round( ((dfData["pfRet"][-1] / dfData["pfRet"][0]) - 1) * 100, 2 )
-    pfInfo["AnnualRet"] = round( ((dfData["pfRet"]/dfData["pfRet"].shift(1)) - 1).mean() * 250 * 100, 2 )
+    pfInfo, pfInfoYoY = getPfInfo( dfData["pfRet"] )
+    
+    #Send data to client
+    return { "data": dfData.to_json(), "info": pfInfo, "infoYoY": pfInfoYoY }
 
-    #calculate portfolio max drawdown
-    highwatermarks = dfData["pfRet"].cummax()
-    drawdowns = 1 - (1 + dfData["pfRet"]) / (1 + highwatermarks)
+
+def getPfInfo( pfData ):
+    pfInfo = {}
+    #portfolio Total return
+    pfInfo["TotRet"] = round( ((pfData[-1] / pfData[0]) - 1) * 100, 2 )
+
+    #portfolio Annualized Return
+    pfInfo["AnnualRet"] = round( ((pfData/pfData.shift(1)) - 1).mean() * 250 * 100, 2 )
+
+    #portfolio max drawdown
+    highwatermarks = pfData.cummax()
+    drawdowns = 1 - (1 + pfData) / (1 + highwatermarks)
     pfInfo["MDD"] = round( max(drawdowns) * 100, 2 )
 
-    pfInfo["STD"] = round((dfData["pfRet"].std() * 250) ** 0.5, 2)
+    #portfolio standard deviation
+    pfInfo["STD"] = round((pfData.std() * 250) ** 0.5, 2)
 
-    #Send data to client
-    return { "data": dfData.to_json(), "info": pfInfo }
+    #Calculate year over year info
+    dfDataYoY = pd.Series()
+    dataYoY = []
+    indexes = pfData.index.values.astype(str)
+    year = indexes[0].split("-")[0]
+    index = year
+    values = []
+    ind = 0
+    for i in pfData:
+        values.append(i)
+        year = indexes[ind].split("-")[0]
+        if( year != index ):
+            dfDataYoY[index] = values
+            values = []
+            index = year
+        ind += 1
+    if( values != [] ):
+        dfDataYoY[index] = values
 
+    pfInfoYoY = {}
+
+    for ind in dfDataYoY.index:
+        returnYoY = round( ( (dfDataYoY[ind][-1]/dfDataYoY[ind][0]) - 1 ) * 100, 2 )
+        highwatermarks = pd.Series(dfDataYoY[ind]).cummax()
+        drawdowns = 1 - (1 + pd.Series(dfDataYoY[ind])) / (1 + highwatermarks)
+        MDDYoY = round( max(drawdowns) * 100, 2 )
+        STDYoY = round((pd.Series(dfDataYoY[ind]).std() * 250) ** 0.5, 2) 
+        pfInfoYoY[ind] = {"return": returnYoY, "MDD": MDDYoY, "STD": STDYoY}
+
+    return pfInfo, pfInfoYoY
 
 def getAssetsInfo( tickers ):
     assetInfo = {}

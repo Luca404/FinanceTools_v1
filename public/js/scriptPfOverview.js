@@ -305,30 +305,46 @@ function loadPfData(){
     server.emit("getPfData", {name: pfName, tickers: pfTickers, period: sPERIOD, norm: NORMALIZED, weights: weights}, (res) =>{
         pfData = JSON.parse( res["data"] );    
         drawPfChart(pfData);
-        drawPfInfo( res["info"] )
+        drawPfInfo( res["info"], res["infoYoY"] )
     });
 }
 
-function drawPfInfo( info ){
+function drawPfInfo( info, infoYoY ){
     var pfInfoTable = document.getElementById("pfInfoTable").getElementsByTagName("tbody")[0];
     $(pfInfoTable).empty();
     var tr = document.createElement("tr");
-
     var td1 = document.createElement("td");
-    td1.appendChild(document.createTextNode(info.TotRet + " %"));
+    td1.appendChild(document.createTextNode(info.TotRet + "%"));
     tr.appendChild(td1);
-
     var td2 = document.createElement("td");
-    td2.appendChild(document.createTextNode(info.AnnualRet + " %"));
-    tr.appendChild(td2);
-    
+    td2.appendChild(document.createTextNode(info.AnnualRet + "%"));
+    tr.appendChild(td2);    
     var td3 = document.createElement("td");
-    td3.appendChild(document.createTextNode(info.MDD + " %"));
+    td3.appendChild(document.createTextNode(info.MDD + "%"));
     tr.appendChild(td3);
-
     var td4 = document.createElement("td");
-    td4.appendChild(document.createTextNode(info.STD + " %"));
+    td4.appendChild(document.createTextNode(info.STD + "%"));
     tr.appendChild(td4);
-
     pfInfoTable.appendChild(tr);
+
+    var indexes = Object.keys(infoYoY);
+    var pfInfoYoYTable = document.getElementById("pfInfoYoYTable").getElementsByTagName("tbody")[0];
+    $(pfInfoYoYTable).empty();
+    for( var i = 0; i<indexes.length; i++){
+        console.log(infoYoY);
+        var tr = document.createElement("tr");
+        var th = document.createElement("th");
+        th.appendChild( document.createTextNode(indexes[i]) )
+        tr.appendChild( th )
+        var td1 = document.createElement("td");
+        td1.appendChild(document.createTextNode(infoYoY[indexes[i]].return + "%"));
+        tr.appendChild(td1);
+        var td2 = document.createElement("td");
+        td2.appendChild(document.createTextNode(infoYoY[indexes[i]].MDD + "%"));
+        tr.appendChild(td2);    
+        var td3 = document.createElement("td");
+        td3.appendChild(document.createTextNode(infoYoY[indexes[i]].STD + "%"));
+        tr.appendChild(td3);
+        pfInfoYoYTable.appendChild(tr);
+    }
 }
