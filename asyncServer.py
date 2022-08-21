@@ -97,27 +97,11 @@ async def deletePf(sid, data):
 @server.event
 async def getSingleAssetData(sid, data):
     dfData = pd.DataFrame()
-    dataList = list(data["tickers"].split(","))
-    for ticker in dataList:
-        #Read ticker data from file if exist
-        if( os.path.isfile("./json/tickers/" + ticker + ".json") ):
-            dfData[ticker] = pd.read_json("./json/tickers/" + str(ticker) + ".json" , typ='series')            
-            
-        #Load ticker data from yahoo and save to file
-        else:
-            dfData[ticker] = loadTickerPrice( ticker )
-        
-
-    #dfData.set_index([0], inplace=True)
-    #Set Period
-    startYear = datetime.datetime.now().year - int(data["period"])
-    date = datetime.datetime.strptime( str(startYear) + '-01-01', '%Y-%m-%d')
-    #dateTs = time.mktime(date.timetuple()) * 1000
-    dfData = dfData.loc[date:]
-
+    dfData = loadPfData( data, True )
+    tickers = list(data["tickers"].split(","))
     #Normalize data to 100
     if(data["norm"]):
-        for ticker in dataList:
+        for ticker in tickers:
             dfData[ticker] = (dfData[ticker]/dfData[ticker].iloc[0] * 100)
     
     #Get single assets info
@@ -130,8 +114,25 @@ async def getSingleAssetData(sid, data):
 @server.event
 async def getPfData(sid, data):
     dfData = pd.DataFrame()
-    dataList = list(data["tickers"].split(","))
-    for ticker in dataList:
+    dfData = loadPfData( data, False )
+    pfInfo = {}
+    pfInfoYoY = {}
+    pfInfo, pfInfoYoY = getPfInfo( dfData["pfRet"] )
+    
+    #Send data to client
+    return { "data": dfData.to_json(), "info": pfInfo, "infoYoY": pfInfoYoY }
+
+@server.event
+async def getCorrData( sid, data ):
+    dfData = pd.DataFrame()
+    dfData = loadPfData( data, True )
+    corrMatrix = dfData.corr()
+    return corrMatrix.to_json()
+
+def loadPfData( data, singleAsset ):
+    dfData = pd.DataFrame()
+    tickers = list(data["tickers"].split(","))
+    for ticker in tickers:
         #Read ticker data from file if exist
         if( os.path.isfile("./json/tickers/" + ticker + ".json") ):
             dfData[ticker] = pd.read_json("./json/tickers/" + str(ticker) + ".json" , typ='series')            
@@ -139,7 +140,6 @@ async def getPfData(sid, data):
         #Load ticker data from yahoo and save to file
         else:
             dfData[ticker] = loadTickerPrice( ticker )
-        
 
     #dfData.set_index([0], inplace=True)
     #Set Period
@@ -149,19 +149,15 @@ async def getPfData(sid, data):
     dfData = dfData.loc[date:]
 
     #Calculate portfolio return
-    weights = data["weights"]
-    i = 0
-    dfData["pfRet"] = 0
-    for ticker in dataList:
-        dfData["pfRet"] = dfData["pfRet"] + dfData[ticker] * weights[i]
-        i+=1
+    if( not(singleAsset) ):
+        weights = data["weights"]
+        i = 0
+        dfData["pfRet"] = 0
+        for ticker in tickers:
+            dfData["pfRet"] = dfData["pfRet"] + dfData[ticker] * weights[i]
+            i+=1
 
-    pfInfo = {}
-    pfInfo, pfInfoYoY = getPfInfo( dfData["pfRet"] )
-    
-    #Send data to client
-    return { "data": dfData.to_json(), "info": pfInfo, "infoYoY": pfInfoYoY }
-
+    return dfData
 
 def getPfInfo( pfData ):
     pfInfo = {}
@@ -239,7 +235,6 @@ def getAssetsInfo( tickers ):
         infoData.append(assetInfo)
     
     return infoData
-
 
 def loadTickerPrice(ticker):
     data = pd.Series()
