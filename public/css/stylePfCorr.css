@@ -23,3 +23,17 @@
     text-align: center;
     font-size: 18px;
 }
+
+.bootstrap-select {
+    width: 330px !important;
+}
+
+.dropdown-menu > li > a:hover,
+.dropdown-menu > li > a:focus {
+  text-decoration: none;
+  color: #ffffff;
+  background-color: #3445b4;
+}
+.dropdown-menu > li > a.active {
+  background-color: #3445b4;
+}
