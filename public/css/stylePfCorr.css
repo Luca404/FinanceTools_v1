@@ -19,6 +19,28 @@
     cursor: pointer;
 }
 
+#corrColorLegend{
+  margin-left: 35%;
+}
+
+.corrValueLegend{
+  width:75px;
+  margin-bottom: 0px;
+}
+
+#corrColorTable{
+  display: flex;
+  padding-left: 0px;
+  width: 300px;
+  height: 30px;
+}
+
+#corrColorTable > div {
+  display: inline-block;
+  width: 100%;
+  height: 100%;
+}
+
 #corrTable{
     text-align: center;
     font-size: 18px;
