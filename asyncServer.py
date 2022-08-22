@@ -6,6 +6,7 @@ import yfinance as yf
 from pandas_datareader import data as wb
 import json
 import math
+import re
 
 server = socketio.AsyncServer(async_mode="asgi")
 app = socketio.ASGIApp(server, static_files={
@@ -134,10 +135,15 @@ async def getPfData(sid, data):
 @server.event
 async def getCorrData( sid, data ):
     dfData = pd.DataFrame()
-    dfData = loadPfData( data, True )
+    pfRet = pd.Series()
+    dfData = loadPfData( data, False )
+    pfRet = dfData["pfRet"]
+    dfData = dfData.loc[:, dfData.columns!='pfRet']
     corrMatrix = dfData.corr()
     corrMatrix = round(corrMatrix, 2)
-    return corrMatrix.to_json()
+    pfCorrData = getPfCorr( pfRet )
+    print( pfCorrData["ret"] )
+    return {"assetsCorr": corrMatrix.to_json(), "pfCorr": pfCorrData["ret"].to_json()}
 
 def loadPfData( data, singleAsset ):
     dfData = pd.DataFrame()
@@ -168,6 +174,52 @@ def loadPfData( data, singleAsset ):
             i+=1
 
     return dfData
+
+def getPfCorr( pfData ):
+    data = pd.DataFrame()
+    data["ret"] = pfData
+    startIndex = str(data["ret"].index[0]).split( " " )[0]
+    
+    #Add Gold Data
+    goldData = pd.read_json( "./json/tickers/GC=F.json", typ='series' )
+    data["gold"] = goldData[startIndex:]
+
+    #Add Inflation Data
+    inflationData = pd.Series()
+    inflationData = pd.read_csv( "./json/corr/inflation.csv" )
+    inflationData = inflationData.set_index( "DATE" )
+    inflStartIndex = re.sub(r".$", "1", startIndex)
+    inflationData = inflationData[inflStartIndex:]
+    inflIndexes = inflationData.index
+    indexes = data["ret"].index
+    k = 0
+    y = 0
+    inflData = []
+    for i in data["ret"]:
+        inflData.append( inflationData["DATA"][k] )
+        if( str(indexes[y]).split("-")[1].split("-")[0] != str(inflIndexes[k]).split("-")[1].split("-")[0] ):
+            k += 1
+        y += 1
+    
+    data["inflation"] = inflData
+    
+    #Add US Market Data
+    usData = pd.read_json( "./json/tickers/^GSPC.json", typ="series" )
+    data["US"] = usData[startIndex:]
+
+    #Add Europe Market Data
+    euData = pd.read_json( "./json/tickers/IEUR.json", typ="series" )
+    data["EU"] = euData[startIndex:]
+
+    #Add Asia Market Data
+    asiaData = pd.read_json( "./json/tickers/AAXJ.json", typ="series" )
+    data["Asia"] = asiaData[startIndex:]
+
+    #Calculate Correlation
+    corrMatrix = data.corr()
+    corrMatrix = round(corrMatrix, 2)
+
+    return corrMatrix
 
 def getPfInfo( pfData ):
     pfInfo = {}

@@ -59,6 +59,38 @@
         2,
         10
       ]
+    },
+    {
+      "userID": "Lika44",
+      "pfName": "Prova1",
+      "tickers": [
+        "GC=F",
+        "INTC",
+        "CSCO"
+      ],
+      "type": [
+        "commodities:commodities",
+        "stocks:nasdaq",
+        "stocks:nasdaq"
+      ],
+      "numShares": [
+        1,
+        2,
+        3
+      ]
+    },
+    {
+      "userID": "Lika44",
+      "pfName": "asd",
+      "tickers": [
+        "AAXJ"
+      ],
+      "type": [
+        "etf:etf"
+      ],
+      "numShares": [
+        1
+      ]
     }
   ]
 }

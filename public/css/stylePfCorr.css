@@ -24,9 +24,30 @@
     font-size: 18px;
 }
 
-.bootstrap-select {
+#pfCorrTable{
+  text-align: center;
+  font-size: 15px;
+}
+
+#savedPfMenuDiv > div {
     width: 330px !important;
 }
+
+#setPeriodDiv > div {
+  width: 70px !important;
+}
+
+#assetCorrelationDiv{
+  display: flex;
+  vertical-align: middle;
+  text-align: center;
+}
+
+#assetCorrelationDiv > p{
+  margin-top: auto;
+  margin-bottom: auto;
+}
+
 
 .dropdown-menu > li > a:hover,
 .dropdown-menu > li > a:focus {
@@ -36,4 +57,9 @@
 }
 .dropdown-menu > li > a.active {
   background-color: #3445b4;
+}
+
+.bootstrap-select>.dropdown-toggle:after {
+  color: #3445b4;
+  margin-right: 5px;
 }

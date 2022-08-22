@@ -47,6 +47,22 @@
             "Sector": "Consumer Defensive",
             "Industry": "Household & Personal Products",
             "Country": "United States"
+        },
+        {
+            "Symbol": "AMZN",
+            "Name": "Amazon.com, Inc.",
+            "Type": "EQUITY",
+            "Sector": "Consumer Cyclical",
+            "Industry": "Internet Retail",
+            "Country": "United States"
+        },
+        {
+            "Symbol": "NVDA",
+            "Name": "NVIDIA Corporation",
+            "Type": "EQUITY",
+            "Sector": "Technology",
+            "Industry": "Semiconductors",
+            "Country": "United States"
         }
     ]
 }
