@@ -44,6 +44,15 @@ async def login(sid, data):
     await server.emit("loginResult", {"status":logged,"text":text}, to=sid)
 
 @server.event
+async def registerUser( sid, data ):
+    with open( "./json/users/users.json", "r" ) as f:
+        jsonData = json.load( f )
+    jsonData["Users"].append( {"usern":data["username"], "passwd":data["password"]} )
+    with open(  "./json/users/users.json", "w" ) as f:
+        json.dump( jsonData, f )
+
+
+@server.event
 async def getTickersList(sid, data):
     tickerType = str(data["type"]).lower()
     exchange = str(data["exchange"]).lower()
@@ -127,6 +136,7 @@ async def getCorrData( sid, data ):
     dfData = pd.DataFrame()
     dfData = loadPfData( data, True )
     corrMatrix = dfData.corr()
+    corrMatrix = round(corrMatrix, 2)
     return corrMatrix.to_json()
 
 def loadPfData( data, singleAsset ):

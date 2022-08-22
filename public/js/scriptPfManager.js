@@ -60,7 +60,7 @@ function setEvent(){
 }
 
 //Show user option for disconnect
-function showUserOption(){
+function showUserOption(){registerButton2
 
 }
 

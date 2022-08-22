@@ -57,6 +57,13 @@ function fixContent(){
         content.style.marginLeft = "20px";
 }
 
+function setPeriod(){
+    var opt = document.getElementById("setPeriod");
+    var pfPeriod = opt.options[opt.selectedIndex].text;
+    PERIOD = pfPeriod.split("Y")[0];
+    loadCorrelationData();
+}
+
 function loadSavedPf(){
     portFolios = pfData;
     var savedPfMenu = document.getElementById('savedPfMenu'); 
@@ -88,12 +95,43 @@ function loadCorrelationData(){
                 corr.push( corrData[indexes[i]][indexes[i+1]] );
         }
         console.log(corr);
-        drawCorrTable( corr );
+        drawCorrTable( corr, indexes );
     });
 
     console.log(pfTickers);
 }
 
-function drawCorrTable( corr ){
-    
+function drawCorrTable( corr, indexes ){        
+    var corrTable = document.getElementById( "corrTable" );
+    var tableBody = corrTable.getElementsByTagName( "tbody" )[0];
+    $(tableBody).empty();
+    for(var i=0;i<indexes.length;i++){
+        var tr = document.createElement( "tr" );
+
+        var td1 = document.createElement( "td" );
+        td1.appendChild( document.createTextNode( indexes[i] ));
+        
+        var td2 = document.createElement( "td" );
+        if( i+1 != indexes.length )
+            td2.appendChild( document.createTextNode( indexes[i+1] ) );
+        else
+            td2.appendChild( document.createTextNode( indexes[0] ) );
+        
+        var td3 = document.createElement( "td" );
+        td3.appendChild( document.createTextNode( corr[i] ) );
+        
+        td3.style.backgroundColor = "#33673b";
+        if( corr[i] > 0.3 )
+            td3.style.backgroundColor = "#5FAD56";
+        if( corr[i] > 0.5 )
+            td3.style.backgroundColor = "#CE5374";
+        if( corr[i] > 0.85 )
+            td3.style.backgroundColor = "#ED1C24";
+        
+        tr.appendChild( td1 );
+        tr.appendChild( td2 );
+        tr.appendChild( td3 );
+        tableBody.appendChild( tr );
+    }
+
 }

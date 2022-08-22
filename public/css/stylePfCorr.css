@@ -18,3 +18,8 @@
 #profileDiv:hover{
     cursor: pointer;
 }
+
+#corrTable{
+    text-align: center;
+    font-size: 18px;
+}

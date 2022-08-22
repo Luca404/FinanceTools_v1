@@ -74,11 +74,11 @@
                 <br />
                 <br />
                 <br />
-                <div id="singlePerformanceDiv">
+                <div id="assetCorrelationDiv">
                     <h5>Assets Correlation</h5>
                         <p>Period:
                             &nbsp;&nbsp;
-                            <select id="selectSingleAssetPeriod" onchange="setSingleAssetPeriod();">
+                            <select id="setPeriod" onchange="setPeriod();">
                                 <option value="1">1Y</option>
                                 <option value="2" selected>2Y</option>                    
                                 <option value="3">5Y</option>
@@ -87,18 +87,21 @@
                             
                         </p>
                 </div>                
-                <span id="assetInfo">
-                    <table class="table" id="assetCorrTable">
+                <span id="correlationData">
+                    <table class="table" id="corrTable" >
                         <thead>
                             <tr>
-                                <th scope="col">Symbol</th>
+                                <th type="col">Asset1</th>
+                                <th type="col">Asset2</th>
+                                <th type="col">Correlation</th>
                             </tr>
                         </thead>
-                        <tbody>                            
+                        <tbody>
                         </tbody>
                     </table>
                 </span>
                 <br />
+            </div>
             <div id="profileDiv">
                 <p><a></a></p>
             </div>

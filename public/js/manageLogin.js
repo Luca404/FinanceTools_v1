@@ -163,9 +163,9 @@ function registerUser(){
 		}, 1500);
 	}
 
-	if( usrn.value != "" && passwd.value != "" && passwd.value == passwdConf.value && false ){		
+	if( usrn.value != "" && passwd.value != "" && passwd.value == passwdConf.value ){		
 		var hashPass = hash(passwd.value);
-		server.emit("register",{"username":usrn.value, "password":hashPass});
+		server.emit("registerUser",{"username":usrn.value, "password":hashPass});
 	}
 }
 
