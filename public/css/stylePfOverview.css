@@ -19,7 +19,7 @@
     cursor: pointer;
 }
 
-#singlePerformanceDiv{
+#singleAssetsDiv{
     margin-left:30%;
 }
 
@@ -27,7 +27,7 @@
     margin-top: 30px;
     margin-left:30%;
 }
-
+ 
 
 #assetPeriodDiv{
     display: flex;

@@ -47,6 +47,27 @@
     font-size: 18px;
 }
 
+#assetPeriodDiv{
+  display: flex;
+  vertical-align: middle;
+  text-align: center;
+  margin-top: 20px;
+  margin-bottom: 30px;
+}
+
+#assetPeriodDiv > p{
+  margin-top: auto;
+  margin-bottom: auto;
+  padding-left: 20px;
+  padding-right: 10px;
+}
+
+
+#singlePerformanceDiv{
+  margin-left:30%;
+}
+
+
 #pfCorrTable{
   text-align: center;
   font-size: 17px;

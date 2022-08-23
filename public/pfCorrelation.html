@@ -77,6 +77,24 @@
                     </select>
                 </div>
                 <br />
+                <div id="singlePerformanceDiv">
+                    <h5>Single Assets performance</h5>
+                        <div id="assetPeriodDiv">
+                            <p>Period:</p>
+                            <div id="setPeriodDiv">
+                                <select class="selectpicker" id="selectSingleAssetPeriod" onchange="setPeriod();">
+                                    <option value="1">1Y</option>
+                                    <option value="2" selected>2Y</option>                    
+                                    <option value="3">5Y</option>
+                                    <option value="4">10Y</option>
+                                </select>
+                            </div>
+                            <p>Normalized: </p>
+                            <input id="selectNormalized" type="checkbox" onchange="setSingleAssetNormalized();" checked>
+                        </div>
+                        <div id="singleCanvasDiv" display="inline-block">
+                        </div>
+                </div>
                 <br />
                 <div id="corrColorLegend">
                     <h6 style="margin-left:45px;color: black" ><b>Correlation Colors legend</b></h6>

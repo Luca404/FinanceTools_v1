@@ -125,6 +125,17 @@ async def getSingleAssetData(sid, data):
     return { "data": dfData.to_json(), "info": assetInfo }
 
 @server.event
+async def getSingleAssetInfo(sid, data):
+    dfData = pd.DataFrame()
+    dfData = loadPfData( data, True )
+    weights = calculateWeights( data["weights"], dfData )
+    #Get single assets info
+    assetInfo = getAssetsInfo( dfData.columns )
+
+    #Send data to client
+    return { "weights": weights, "info": assetInfo }
+
+@server.event
 async def getPfData(sid, data):
     dfData = pd.DataFrame()
     dfData = loadPfData( data, False )
@@ -150,9 +161,8 @@ async def getCorrData( sid, data ):
 @server.event
 async def getRiskData( sid, data ):
     dfData = loadPfData( data, False )
-    pfRet = pd.Series( dfData["pfRet"] )
     dfData = dfData.loc[:, dfData.columns!='pfRet']
-    weights = calculateWeights( data, dfData )
+    weights = np.array( calculateWeights( data["weights"], dfData ) )
     returns = np.log(dfData/dfData.shift(1))
 
     pfVariance = np.dot( weights.T, np.dot( returns.cov() * 250, weights ) )
@@ -173,8 +183,7 @@ async def getRiskData( sid, data ):
     return { "pfVolatility": pfVolatility, "diversRisk": diversRisk, "nonDiversRisk": nonDiversRisk}
 
 
-def calculateWeights( data, dfData ):
-    weights = data["weights"]
+def calculateWeights( weights, dfData ):
     means = dfData.mean()
     assetsValue = []
     assetsWeights = []
@@ -187,7 +196,7 @@ def calculateWeights( data, dfData ):
     for i in assetsValue:
         assetsWeights.append( i/totValue )
     
-    return np.array(assetsWeights)
+    return assetsWeights
 
 def loadPfData( data, singleAsset ):
     dfData = pd.DataFrame()

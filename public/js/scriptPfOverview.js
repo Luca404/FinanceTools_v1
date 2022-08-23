@@ -18,7 +18,7 @@ function fixContent(){
     else
         content.style.marginLeft = "20px";
 }
-
+ 
 //Show login div
 function showLoginDiv(){
 	let usern = checkIfLogged();
@@ -66,7 +66,7 @@ var NORMALIZED = true;
 var pfPERIOD = 2;
 var colorsArray = ["#17A589","#F9E79F","#EC7063","#82E0AA","#F7DC6F","#99A3A4","#B3B6B7","#A569BD","#CB4335","#196F3D"];
 
-function drawSingleAssetsChart(data) {
+function drawSingleAssetsChart(data, info) {
     //Canvas creation
     var canvasDiv = document.getElementById("singleCanvasDiv");
     if( canvasDiv.children.length > 0 ){
@@ -78,61 +78,33 @@ function drawSingleAssetsChart(data) {
     canvasSinglePerformance.height = 450;
     canvasSinglePerformance.setAttribute("style", "display: inline-block");
     canvasDiv.appendChild(canvasSinglePerformance);
-
-    //Timestamp to Date conversion
-    var tickers = Object.keys(data);
-    var datasetSingle = [];
-    var datasetPf = []
-    for(var i = 0; i < tickers.length; i++){
-        if( tickers[i] == "pfRet" ){
-            datasetPf[0] = {
-                data: Object.values(data[tickers[i]]),
-                label: "Portfolio",
-                borderColor: "#3498DB",
-                fill: false
-            };
-        }
-        else{
-            datasetSingle[i] = {
-                data: Object.values(data[tickers[i]]),
-                label: tickers[i],
-                borderColor: colorsArray[i],
-                fill: false
-            };
-        }
-    }
-    var dateArray = Object.keys(data[tickers[0]]);
-    var dateList = [];
-    for(var i = 0; i < dateArray.length; i++){
-        var date = new Date(dateArray[i] * 1);
-        var aDate = date.toLocaleDateString();
-        dateList.push(aDate);
-    }
     
-    //Single Performance Chart Draw
+    var tickers = [];
+    for( var i=0; i<info.length; i++ )
+        tickers.push( info[i]["Symbol"] )
+    
+    var dataText = [];
+    for( var i=0; i<data.length; i++ )
+        dataText.push( tickers[i] + " : " + (data[i]*100).toFixed(2) + "%" )
+    
+    //Assets pie Chart Draw
     new Chart(document.getElementById("singlePerfCanvas"), {
-        type: 'line',
+        type: 'pie',
         data: {
-            labels: dateList,
-            datasets: datasetSingle
+            labels: tickers,
+            datasets: [{
+                data: data,
+                hoverOffset: 2,
+                backgroundColor: colorsArray
+            }]
         },
         options: {
-            title: {
-                display: true,
-                text: 'Single Assets performance'
-            },
-            responsive:false,
-            elements: {
-                point:{
-                    radius: 0
-                }
-            },
-            scales: {
-                xAxes: [{
-                    ticks: {
-                        maxTicksLimit: 20
+            tooltips: {
+                callbacks: {
+                    label: function(context) {
+                        return dataText[context.index];
                     }
-                }]
+                }
             }
         }          
     });
@@ -218,15 +190,6 @@ function setSingleAssetPeriod(){
     loadSingleAssetData();
 }
 
-function setSingleAssetNormalized(){
-    var input = document.getElementById("selectNormalized");
-    if( input.checked )
-        NORMALIZED = true;
-    else
-        NORMALIZED = false;
-    loadSingleAssetData();
-}
-
 function setPfPeriod(){
     var opt = document.getElementById("selectPfPeriod");
     var pfPeriod = opt.options[opt.selectedIndex].text;
@@ -261,10 +224,14 @@ function loadSingleAssetData(){
     var pfInfo = opt.options[opt.selectedIndex].text;
     var pfName = pfInfo.split(": ")[0];
     var pfTickers = pfInfo.split(": ")[1];
+    for(var i = 0; i < portFolios.length; i++) {
+        if(portFolios[i].pfName == pfName){
+            var weights = portFolios[i].numShares;
+        }
+    }
 
-    server.emit("getSingleAssetData", {name: pfName, tickers: pfTickers, period: sPERIOD, norm: NORMALIZED}, (res) =>{
-        singleAssetData = JSON.parse( res["data"] );
-        drawSingleAssetsChart( singleAssetData );
+    server.emit("getSingleAssetInfo", {name: pfName, tickers: pfTickers, period: sPERIOD, weights: weights}, (res) =>{
+        drawSingleAssetsChart( res["weights"], res["info"] );
         drawAssetInfo( res["info"] );
     });
 }
@@ -334,7 +301,6 @@ function drawPfInfo( info, infoYoY ){
     var pfInfoYoYTable = document.getElementById("pfInfoYoYTable").getElementsByTagName("tbody")[0];
     $(pfInfoYoYTable).empty();
     for( var i = 0; i<indexes.length; i++){
-        console.log(infoYoY);
         var tr = document.createElement("tr");
         var th = document.createElement("th");
         th.appendChild( document.createTextNode(indexes[i]) )

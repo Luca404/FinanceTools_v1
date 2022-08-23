@@ -1,6 +1,8 @@
 //CONST
 var PERIOD = 2;
+var NORMALIZED = 2;
 var portFolios;
+var colorsArray = ["#17A589","#F9E79F","#EC7063","#82E0AA","#F7DC6F","#99A3A4","#B3B6B7","#A569BD","#CB4335","#196F3D"];
 
 //Connection to server
 const server = io();
@@ -58,13 +60,6 @@ function fixContent(){
         content.style.marginLeft = "20px";
 }
 
-function setPeriod(){
-    var opt = document.getElementById("setPeriod");
-    var pfPeriod = opt.options[opt.selectedIndex].text;
-    PERIOD = pfPeriod.split("Y")[0];
-    loadCorrelationData();
-}
-
 function loadSavedPf(){
     portFolios = pfData;
     var savedPfMenu = document.getElementById('savedPfMenu'); 
@@ -78,6 +73,7 @@ function loadSavedPf(){
     $("#savedPfMenu").selectpicker("refresh");
     $("#savedPfMenu").selectpicker( "val", "0" );
     $("#savedPfMenu").selectpicker("refresh");
+    loadSingleAssetData();
     loadCorrelationData(); 
 }
 
@@ -186,4 +182,106 @@ function setCorrTdColor( tds ){
             td.style.backgroundColor = "#C0392B";
         
     }
+}
+
+
+function setPeriod(){
+    var opt = document.getElementById("setPeriod");
+    var pfPeriod = opt.options[opt.selectedIndex].text;
+    PERIOD = pfPeriod.split("Y")[0];
+    loadSingleAssetData();
+    loadCorrelationData();
+}
+
+function setSingleAssetNormalized(){
+    var input = document.getElementById("selectNormalized");
+    if( input.checked )
+        NORMALIZED = true;
+    else
+        NORMALIZED = false;
+    loadSingleAssetData();
+}
+
+function loadSingleAssetData(){
+    var opt = document.getElementById("savedPfMenu");
+    var pfInfo = opt.options[opt.selectedIndex].text;
+    var pfName = pfInfo.split(": ")[0];
+    var pfTickers = pfInfo.split(": ")[1];
+
+    server.emit("getSingleAssetData", {name: pfName, tickers: pfTickers, period: PERIOD, norm: NORMALIZED}, (res) =>{
+        singleAssetData = JSON.parse( res["data"] );
+        drawSingleAssetsChart( singleAssetData );
+    });
+}
+
+function drawSingleAssetsChart(data) {
+    //Canvas creation
+    var canvasDiv = document.getElementById("singleCanvasDiv");
+    if( canvasDiv.children.length > 0 ){
+        canvasDiv.removeChild( document.getElementById("singlePerfCanvas") );
+    }
+    var canvasSinglePerformance = document.createElement("canvas");
+    canvasSinglePerformance.id = "singlePerfCanvas";
+    canvasSinglePerformance.width = 700;
+    canvasSinglePerformance.height = 450;
+    canvasSinglePerformance.setAttribute("style", "display: inline-block");
+    canvasDiv.appendChild(canvasSinglePerformance);
+
+    //Timestamp to Date conversion
+    var tickers = Object.keys(data);
+    var datasetSingle = [];
+    var datasetPf = []
+    for(var i = 0; i < tickers.length; i++){
+        if( tickers[i] == "pfRet" ){
+            datasetPf[0] = {
+                data: Object.values(data[tickers[i]]),
+                label: "Portfolio",
+                borderColor: "#3498DB",
+                fill: false
+            };
+        }
+        else{
+            datasetSingle[i] = {
+                data: Object.values(data[tickers[i]]),
+                label: tickers[i],
+                borderColor: colorsArray[i],
+                fill: false
+            };
+        }
+    }
+    var dateArray = Object.keys(data[tickers[0]]);
+    var dateList = [];
+    for(var i = 0; i < dateArray.length; i++){
+        var date = new Date(dateArray[i] * 1);
+        var aDate = date.toLocaleDateString();
+        dateList.push(aDate);
+    }
+    
+    //Single Performance Chart Draw
+    new Chart(document.getElementById("singlePerfCanvas"), {
+        type: 'line',
+        data: {
+            labels: dateList,
+            datasets: datasetSingle
+        },
+        options: {
+            title: {
+                display: true,
+                text: 'Single Assets performance'
+            },
+            responsive:false,
+            elements: {
+                point:{
+                    radius: 0
+                }
+            },
+            scales: {
+                xAxes: [{
+                    ticks: {
+                        maxTicksLimit: 20
+                    }
+                }]
+            }
+        }          
+    });
 }
