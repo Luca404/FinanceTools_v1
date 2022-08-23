@@ -11,6 +11,7 @@ import re
 server = socketio.AsyncServer(async_mode="asgi")
 app = socketio.ASGIApp(server, static_files={
     '/': './public/pfManager.html',
+    '/cane':"./public/pfOverview.html",
     "/static": "./public/",
 })
  
@@ -142,7 +143,6 @@ async def getCorrData( sid, data ):
     corrMatrix = dfData.corr()
     corrMatrix = round(corrMatrix, 2)
     pfCorrData = getPfCorr( pfRet )
-    print( pfCorrData["ret"] )
     return {"assetsCorr": corrMatrix.to_json(), "pfCorr": pfCorrData["ret"].to_json()}
 
 def loadPfData( data, singleAsset ):

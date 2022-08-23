@@ -63,6 +63,22 @@
             "Sector": "Technology",
             "Industry": "Semiconductors",
             "Country": "United States"
+        },
+        {
+            "Symbol": "ADI",
+            "Name": "Analog Devices, Inc.",
+            "Type": "EQUITY",
+            "Sector": "Technology",
+            "Industry": "Semiconductors",
+            "Country": "United States"
+        },
+        {
+            "Symbol": "MDLZ",
+            "Name": "Mondelez International, Inc.",
+            "Type": "EQUITY",
+            "Sector": "Consumer Defensive",
+            "Industry": "Confectioners",
+            "Country": "United States"
         }
     ]
 }

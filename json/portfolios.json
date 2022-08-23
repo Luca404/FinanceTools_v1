@@ -91,6 +91,25 @@
       "numShares": [
         1
       ]
+    },
+    {
+      "userID": "Lika44",
+      "pfName": "PortFolio1",
+      "tickers": [
+        "ADI",
+        "META",
+        "MDLZ"
+      ],
+      "type": [
+        "stocks:nasdaq",
+        "stocks:nasdaq",
+        "stocks:nasdaq"
+      ],
+      "numShares": [
+        2,
+        5,
+        1
+      ]
     }
   ]
 }

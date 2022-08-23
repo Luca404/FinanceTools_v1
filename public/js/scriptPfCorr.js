@@ -181,9 +181,9 @@ function setCorrTdColor( tds ){
         if( td.innerText > -0.5 )
             td.style.backgroundColor = "#5FAD56";
         if( td.innerText > 0 )
-            td.style.backgroundColor = "#CE5374";
+            td.style.backgroundColor = "#E74C3C";
         if( td.innerText > 0.5 )
-            td.style.backgroundColor = "#ED1C24";
+            td.style.backgroundColor = "#C0392B";
         
     }
 }

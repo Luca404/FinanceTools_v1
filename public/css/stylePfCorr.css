@@ -20,11 +20,12 @@
 }
 
 #corrColorLegend{
-  margin-left: 35%;
+  margin-top: -7%;
+  margin-left: 78%;
 }
 
 .corrValueLegend{
-  width:75px;
+  min-width:75px;
   margin-bottom: 0px;
 }
 
@@ -48,7 +49,7 @@
 
 #pfCorrTable{
   text-align: center;
-  font-size: 15px;
+  font-size: 17px;
 }
 
 #savedPfMenuDiv > div {
