@@ -51,15 +51,6 @@
   text-align: center;
   font-size: 17px;
 }
-
-#savedPfMenuDiv > div {
-    width: 330px !important;
-}
-
-#setPeriodDiv > div {
-  width: 70px !important;
-}
-
 #assetCorrelationDiv{
   display: flex;
   vertical-align: middle;
@@ -71,6 +62,16 @@
   margin-bottom: auto;
 }
 
+
+
+/* Set size and color of bootstrap-select */
+#savedPfMenuDiv > div {
+  width: 330px !important;
+}
+
+#setPeriodDiv > div {
+  width: 70px !important;
+}
 
 .dropdown-menu > li > a:hover,
 .dropdown-menu > li > a:focus {

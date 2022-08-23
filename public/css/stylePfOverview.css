@@ -20,9 +20,51 @@
 }
 
 #singlePerformanceDiv{
-    text-align: center;
+    margin-left:30%;
 }
 
 #pfPerformanceDiv{
-    text-align: center;
+    margin-top: 30px;
+    margin-left:30%;
 }
+
+
+#assetPeriodDiv{
+    display: flex;
+    vertical-align: middle;
+    text-align: center;
+    margin-top: 20px;
+    margin-bottom: 30px;
+}
+
+#assetPeriodDiv > p{
+    margin-top: auto;
+    margin-bottom: auto;
+    padding-left: 20px;
+    padding-right: 10px;
+}
+
+/* Set size and color of bootstrap-select */
+#savedPfMenuDiv > div {
+    width: 330px !important;
+}
+
+#setPeriodDiv > div {
+    width: 70px !important;
+}
+
+.dropdown-menu > li > a:hover,
+.dropdown-menu > li > a:focus {
+    text-decoration: none;
+    color: #ffffff;
+    background-color: #3445b4;
+}
+.dropdown-menu > li > a.active {
+    background-color: #3445b4;
+}
+
+.bootstrap-select>.dropdown-toggle:after {
+    color: #3445b4;
+    margin-right: 5px;
+}
+

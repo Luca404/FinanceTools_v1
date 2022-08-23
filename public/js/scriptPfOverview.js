@@ -249,6 +249,9 @@ function loadSavedPf(){
         opt.appendChild(document.createTextNode(" " + portFolios[i].tickers));
         savedPfMenu.appendChild(opt);
     }
+    $("#savedPfMenu").selectpicker("refresh");
+    $("#savedPfMenu").selectpicker( "val", "0" );
+    $("#savedPfMenu").selectpicker("refresh");
     loadSingleAssetData();
     loadPfData(); 
 }
