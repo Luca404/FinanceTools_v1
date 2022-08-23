@@ -20,8 +20,8 @@
 }
 
 #corrColorLegend{
-  margin-top: -7%;
-  margin-left: 78%;
+  margin-top: 6%;
+  margin-left: 43%;
 }
 
 .corrValueLegend{
@@ -43,8 +43,12 @@
 }
 
 #corrTable{
+    width: 100%;
     text-align: center;
     font-size: 18px;
+}
+#correlationData{
+  margin-top: 40px;
 }
 
 #assetPeriodDiv{
@@ -52,6 +56,7 @@
   vertical-align: middle;
   text-align: center;
   margin-top: 20px;
+  margin-left: -1%;
   margin-bottom: 30px;
 }
 
@@ -64,7 +69,18 @@
 
 
 #singlePerformanceDiv{
-  margin-left:30%;
+  margin-top: 20px;
+  margin-left: 5%;
+}
+
+#singleAssetsCorrDiv{
+  width: 100%;
+  margin-top: 20px;
+  margin-left: 5%;
+}
+
+#firstRowDiv{
+  display: flex;
 }
 
 

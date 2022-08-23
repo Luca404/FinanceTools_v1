@@ -85,7 +85,7 @@ function drawSingleAssetsChart(data, info) {
     
     var dataText = [];
     for( var i=0; i<data.length; i++ )
-        dataText.push( tickers[i] + " : " + (data[i]*100).toFixed(2) + "%" )
+        dataText.push( tickers[i] + ": " + (data[i]*100).toFixed(2) + "%" )
     
     //Assets pie Chart Draw
     new Chart(document.getElementById("singlePerfCanvas"), {
@@ -183,13 +183,6 @@ function drawPfChart(data) {
 }
 
 
-function setSingleAssetPeriod(){
-    var opt = document.getElementById("selectSingleAssetPeriod");
-    var pfPeriod = opt.options[opt.selectedIndex].text;
-    sPERIOD = pfPeriod.split("Y")[0];
-    loadSingleAssetData();
-}
-
 function setPfPeriod(){
     var opt = document.getElementById("selectPfPeriod");
     var pfPeriod = opt.options[opt.selectedIndex].text;
@@ -230,7 +223,7 @@ function loadSingleAssetData(){
         }
     }
 
-    server.emit("getSingleAssetInfo", {name: pfName, tickers: pfTickers, period: sPERIOD, weights: weights}, (res) =>{
+    server.emit("getSingleAssetInfo", {name: pfName, tickers: pfTickers, period: 10, weights: weights}, (res) =>{
         drawSingleAssetsChart( res["weights"], res["info"] );
         drawAssetInfo( res["info"] );
     });

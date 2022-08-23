@@ -186,7 +186,7 @@ function setCorrTdColor( tds ){
 
 
 function setPeriod(){
-    var opt = document.getElementById("setPeriod");
+    var opt = document.getElementById("selectSingleAssetPeriod");
     var pfPeriod = opt.options[opt.selectedIndex].text;
     PERIOD = pfPeriod.split("Y")[0];
     loadSingleAssetData();
@@ -229,25 +229,15 @@ function drawSingleAssetsChart(data) {
 
     //Timestamp to Date conversion
     var tickers = Object.keys(data);
+    console.log( tickers );
     var datasetSingle = [];
-    var datasetPf = []
     for(var i = 0; i < tickers.length; i++){
-        if( tickers[i] == "pfRet" ){
-            datasetPf[0] = {
-                data: Object.values(data[tickers[i]]),
-                label: "Portfolio",
-                borderColor: "#3498DB",
-                fill: false
-            };
-        }
-        else{
-            datasetSingle[i] = {
-                data: Object.values(data[tickers[i]]),
-                label: tickers[i],
-                borderColor: colorsArray[i],
-                fill: false
-            };
-        }
+        datasetSingle[i] = {
+            data: Object.values(data[tickers[i]]),
+            label: tickers[i],
+            borderColor: colorsArray[i],
+            fill: false
+        };
     }
     var dateArray = Object.keys(data[tickers[0]]);
     var dateList = [];

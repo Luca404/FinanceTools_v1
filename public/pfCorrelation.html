@@ -73,29 +73,65 @@
                 <h2 class="mb-4">Portfolio Correlation</h2>
                 <h4>Select saved portfolio: </h4>
                 <div id="savedPfMenuDiv">
-                    <select class="selectpicker" id="savedPfMenu" onchange="loadCorrelationData();">
+                    <select class="selectpicker" id="savedPfMenu" onchange="setPeriod();">
                     </select>
                 </div>
                 <br />
-                <div id="singlePerformanceDiv">
-                    <h5>Single Assets performance</h5>
-                        <div id="assetPeriodDiv">
-                            <p>Period:</p>
-                            <div id="setPeriodDiv">
-                                <select class="selectpicker" id="selectSingleAssetPeriod" onchange="setPeriod();">
-                                    <option value="1">1Y</option>
-                                    <option value="2" selected>2Y</option>                    
-                                    <option value="3">5Y</option>
-                                    <option value="4">10Y</option>
-                                </select>
+                <div id="firstRowDiv">
+                    <div id="singlePerformanceDiv">
+                        <h5>Single Assets performance</h5>
+                            <div id="assetPeriodDiv">
+                                <p>Period:</p>
+                                <div id="setPeriodDiv">
+                                    <select class="selectpicker" id="selectSingleAssetPeriod" onchange="setPeriod();">
+                                        <option value="1">1Y</option>
+                                        <option value="2" selected>2Y</option>                    
+                                        <option value="3">5Y</option>
+                                        <option value="4">10Y</option>
+                                    </select>
+                                </div>
+                                <p>Normalized: </p>
+                                <input id="selectNormalized" type="checkbox" onchange="setSingleAssetNormalized();" checked>
                             </div>
-                            <p>Normalized: </p>
-                            <input id="selectNormalized" type="checkbox" onchange="setSingleAssetNormalized();" checked>
+                            <div id="singleCanvasDiv" display="inline-block">
+                            </div>
+                    </div>
+                    <div id="singleAssetsCorrDiv">
+                        <h5>Assets Correlation</h5>         
+                        <div id="correlationData">
+                            <table class="table table-borderless" id="corrTable" >
+                                <thead>
+                                    <tr>
+                                        <th type="col">Asset1</th>
+                                        <th type="col">Asset2</th>
+                                        <th type="col">Correlation</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                </tbody>
+                            </table>
                         </div>
-                        <div id="singleCanvasDiv" display="inline-block">
-                        </div>
+                    </div>
                 </div>
                 <br />
+                <br />
+                <br />
+                <h5>Portfolio Correlation</h5>
+                <br />
+                <span id="pfCorrelationData">
+                    <table class="table table-borderless" id="pfCorrTable" >
+                        <thead>
+                            <th type="col">Assets Correlation</th>
+                            <th type="col">Gold Correlation</th>
+                            <th type="col">Inflation Correlation</th>
+                            <th type="col">US Market Correlation</th>
+                            <th type="col">EU Market Correlation</th>
+                            <th type="col">ASIA Market Correlation</th>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                </span>
                 <div id="corrColorLegend">
                     <h6 style="margin-left:45px;color: black" ><b>Correlation Colors legend</b></h6>
                     <div style="display: flex;font-size:20px;">
@@ -116,54 +152,6 @@
                         </div>
                     </div>
                 </div>
-                <br />
-                <h5>Assets Correlation</h5>
-                <div id="assetCorrelationDiv">
-                    <p>Period:
-                        &nbsp;&nbsp;
-                        <div id="setPeriodDiv">
-                            <select class="selectpicker" id="setPeriod" onchange="setPeriod();">
-                                <option value="1">1Y</option>
-                                <option value="2" selected>2Y</option>                    
-                                <option value="3">5Y</option>
-                                <option value="4">10Y</option>
-                            </select>
-                        </div>                         
-                    </p>
-                </div>
-                <br />              
-                <span id="correlationData">
-                    <table class="table table-borderless" id="corrTable" >
-                        <thead>
-                            <tr>
-                                <th type="col">Asset1</th>
-                                <th type="col">Asset2</th>
-                                <th type="col">Correlation</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                        </tbody>
-                    </table>
-                </span>
-                <br />
-                <br />
-                <br />
-                <h5>Portfolio Correlation</h5>
-                <br />
-                <span id="pfCorrelationData">
-                    <table class="table table-borderless" id="pfCorrTable" >
-                        <thead>
-                            <th type="col">Assets Correlation</th>
-                            <th type="col">Gold Correlation</th>
-                            <th type="col">Inflation Correlation</th>
-                            <th type="col">US Market Correlation</th>
-                            <th type="col">EU Market Correlation</th>
-                            <th type="col">ASIA Market Correlation</th>
-                        </thead>
-                        <tbody>
-                        </tbody>
-                    </table>
-                </span>
             </div>
             <div id="profileDiv">
                 <p><a></a></p>

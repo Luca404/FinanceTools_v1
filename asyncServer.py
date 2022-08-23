@@ -116,13 +116,9 @@ async def getSingleAssetData(sid, data):
     if(data["norm"]):
         for ticker in tickers:
             dfData[ticker] = (dfData[ticker]/dfData[ticker].iloc[0] * 100)
-    
-    #Get single assets info
-    assetInfo = {}
-    assetInfo = getAssetsInfo( dfData.columns )
 
     #Send data to client
-    return { "data": dfData.to_json(), "info": assetInfo }
+    return { "data": dfData.to_json() }
 
 @server.event
 async def getSingleAssetInfo(sid, data):
