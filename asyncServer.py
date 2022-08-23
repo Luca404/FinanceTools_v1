@@ -11,7 +11,8 @@ import re
 server = socketio.AsyncServer(async_mode="asgi")
 app = socketio.ASGIApp(server, static_files={
     '/': './public/pfManager.html',
-    '/cane':"./public/pfOverview.html",
+    '/overview':"./public/pfOverview.html",
+    '/correlation':"./public/pfCorrelation.html",
     "/static": "./public/",
 })
  
