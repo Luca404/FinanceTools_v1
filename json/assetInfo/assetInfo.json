@@ -79,6 +79,22 @@
             "Sector": "Consumer Defensive",
             "Industry": "Confectioners",
             "Country": "United States"
+        },
+        {
+            "Symbol": "F",
+            "Name": "Ford Motor Company",
+            "Type": "EQUITY",
+            "Sector": "Consumer Cyclical",
+            "Industry": "Auto Manufacturers",
+            "Country": "United States"
+        },
+        {
+            "Symbol": "GE",
+            "Name": "General Electric Company",
+            "Type": "EQUITY",
+            "Sector": "Industrials",
+            "Industry": "Specialty Industrial Machinery",
+            "Country": "United States"
         }
     ]
 }

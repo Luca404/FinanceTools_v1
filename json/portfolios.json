@@ -94,20 +94,23 @@
     },
     {
       "userID": "Lika44",
-      "pfName": "PortFolio1",
+      "pfName": "testPf",
       "tickers": [
-        "ADI",
-        "META",
-        "MDLZ"
+        "PG",
+        "F",
+        "GE",
+        "MSFT"
       ],
       "type": [
-        "stocks:nasdaq",
-        "stocks:nasdaq",
+        "stocks:nyse",
+        "stocks:nyse",
+        "stocks:nyse",
         "stocks:nasdaq"
       ],
       "numShares": [
-        2,
-        5,
+        1,
+        1,
+        1,
         1
       ]
     }

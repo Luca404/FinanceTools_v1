@@ -2,6 +2,7 @@ import socketio
 import os
 import datetime
 import pandas as pd
+import numpy as np
 import yfinance as yf
 from pandas_datareader import data as wb
 import json
@@ -13,6 +14,7 @@ app = socketio.ASGIApp(server, static_files={
     '/': './public/pfManager.html',
     '/overview':"./public/pfOverview.html",
     '/correlation':"./public/pfCorrelation.html",
+    '/risk':"./public/pfRisk.html",
     "/static": "./public/",
 })
  
@@ -53,7 +55,6 @@ async def registerUser( sid, data ):
     jsonData["Users"].append( {"usern":data["username"], "passwd":data["password"]} )
     with open(  "./json/users/users.json", "w" ) as f:
         json.dump( jsonData, f )
-
 
 @server.event
 async def getTickersList(sid, data):
@@ -145,6 +146,48 @@ async def getCorrData( sid, data ):
     corrMatrix = round(corrMatrix, 2)
     pfCorrData = getPfCorr( pfRet )
     return {"assetsCorr": corrMatrix.to_json(), "pfCorr": pfCorrData["ret"].to_json()}
+
+@server.event
+async def getRiskData( sid, data ):
+    dfData = loadPfData( data, False )
+    pfRet = pd.Series( dfData["pfRet"] )
+    dfData = dfData.loc[:, dfData.columns!='pfRet']
+    weights = calculateWeights( data, dfData )
+    returns = np.log(dfData/dfData.shift(1))
+
+    pfVariance = np.dot( weights.T, np.dot( returns.cov() * 250, weights ) )
+    pfVolatility = pfVariance ** 0.5
+    diversRisk = pfVariance
+    print( pfVariance )
+    k = 0
+    for weight in weights:
+        assetVariance = returns[ returns.columns[k] ].var() * 250
+        print( assetVariance )
+        diversRisk = diversRisk - ( (weight)**2 * assetVariance )
+        k += 1
+    nonDiversRisk = pfVariance - diversRisk
+
+    pfVolatility = round( pfVolatility * 100, 2 )
+    diversRisk = round( diversRisk * 100, 2 )
+    nonDiversRisk = round( nonDiversRisk * 100, 2 ) 
+    return { "pfVolatility": pfVolatility, "diversRisk": diversRisk, "nonDiversRisk": nonDiversRisk}
+
+
+def calculateWeights( data, dfData ):
+    weights = data["weights"]
+    means = dfData.mean()
+    assetsValue = []
+    assetsWeights = []
+    totValue = 0
+    k = 0
+    for i in means:
+        assetsValue.append( i * weights[k] )
+        totValue = totValue + i * weights[k]
+        k += 1
+    for i in assetsValue:
+        assetsWeights.append( i/totValue )
+    
+    return np.array(assetsWeights)
 
 def loadPfData( data, singleAsset ):
     dfData = pd.DataFrame()
