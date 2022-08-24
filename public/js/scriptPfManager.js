@@ -56,7 +56,8 @@ function setEvent(){
 	$("#profileDiv").click( showUserOption );
 	$("#saveChangesButt").click( saveChangesButton );
 	$("#deletePfButton").click( deletePfButt );
-	$("#addPfSharesNumInput").keypress( filterLetters );
+	$("#addPfTickersInput").change( addInputNumShares );
+	$("#addSharesNumInput").keypress( filterLetters );
 }
 
 //Show user option for disconnect
@@ -139,6 +140,39 @@ async function showTickersInInput(data){
 	multipleSelect.setChoices( tickersData, "value", "label", "placeholderValue");
 }
 
+function addInputNumShares(event){
+	var pfTickerSelect = document.getElementById("addPfTickersInput");
+	var pfTickerOptions = pfTickerSelect.getElementsByTagName("option");
+	var tickers = []
+	for( var i=0; i < pfTickerOptions.length; i++ ){
+		tickers.push( pfTickerOptions[i].innerText );
+	}
+	drawNumSharesInput( tickers.at(-1) );
+}
+
+function drawNumSharesInput( ticker ){
+	var numSharesDiv = document.getElementById("pfSharesNumDiv");
+	var numSharesInputs = numSharesDiv.getElementsByTagName("input");
+
+	var newDiv = document.createElement("div");
+	newDiv.style.display = "flex";
+	newDiv.style.marginLeft = "12%";
+	newDiv.style.marginTop = "3%";
+
+	var newH = document.createElement("h6");
+	newH.innerText = ticker + ":  ";
+	newDiv.appendChild( newH );
+	
+	var newInput = document.createElement("input");
+	newInput.className = "addSharesNumInput";
+	$(newInput).keypress( filterLetters );
+	newInput.innerText = ticker;
+	newInput.type = "text";
+
+	newDiv.appendChild( newInput );
+	numSharesDiv.appendChild( newDiv );
+}
+
 //Load table with portfolios
 function loadTable1(data){
 	var portFolios = data;
@@ -210,7 +244,9 @@ async function modifyPf(item){
 	var pfNum = item.id.toString();
 	pfNum = pfNum.split("modifyButt")[1];
 	$("#addPfNameInput").val(pfData[pfNum].pfName);
+
 	$("#addPfSharesNumInput").val(pfData[pfNum].numShares);
+
 	console.log(pfData[pfNum]);
 	var inputTickerType = document.getElementById("tickerTypeInput");
 	var selectedType = inputTickerType.options[inputTickerType.selectedIndex].value;
@@ -283,7 +319,7 @@ function deletePfButt(){
 		}
 	});
 }
-
+ 
 function addPf(){
 	multipleSelect.clearStore();
 	$("#addModalLabel").text("Add Portfolio");	
@@ -339,14 +375,13 @@ function saveChangesButton(){
 	}
 
 	//Check numbers of shares
-	let pfSharesInput = document.getElementById("addPfSharesNumInput");
-	let pfSharesValue = pfSharesInput.value.replace(/\s+/g, '');
-	let pfSharesNum = pfSharesValue.split(",");
-	let done = true;
-	for(let i = 0 ; i < pfSharesNum.length; i++){
-		pfShares.push( parseInt(pfSharesNum[i]) );
-		if( pfSharesNum[i] == "" )
-			done = false;
+	let pfSharesDiv = document.getElementById( "pfSharesNumDiv" );
+	let pfSharesInputs = pfSharesDiv.getElementsByTagName( "input" );
+
+	for(let i = 0 ; i < pfSharesInputs.length; i++){
+		pfShares.push( parseInt( pfSharesInputs[i].value ) );
+		if( pfSharesInputs[i].value == "" )
+			check = false;
 	}
 	console.log( pfShares );
 	if( pfSharesValue == "" ){
@@ -411,7 +446,7 @@ function saveChangesButton(){
 
 function filterLetters(evt){
 	var hold = String.fromCharCode(evt.which);  
-	if((/[a-z A-Z*!@#$%^&*()_/[\]}=+><{?":;.'"|]/.test(hold))){  
+	if((/[a-z A-Z*!@#$%^&*()_/[\]}=+><{?",:;'"|]/.test(hold))){  
 	  evt.preventDefault();  
 	}
 }

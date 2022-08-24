@@ -11,6 +11,30 @@ body{
     background-color: white;
 }
 
+#pfSharesNumDiv{
+    display: flex;
+    color: black;
+    font-size: 10px;
+    margin-bottom: 30px;
+    margin-top: 20px;
+    flex-wrap: wrap;
+}
+
+.pfSharesNumDiv > div {
+    flex: 1 1 150px;
+}
+
+#pfSharesNumDiv > div > h6{
+    margin-top: 3%;
+}
+
+.addSharesNumInput{
+    margin-left: 10%;
+    font-size: 15px;
+    width: 40px;
+    height: 25px;
+}
+
 #addPfTickersDiv{
     position: relative;
     max-width: 500px;
@@ -42,7 +66,7 @@ body{
     padding-top: 10px;
     color: white;
 }
-
+ 
 #profileDiv:hover{
     cursor: pointer;
 }
