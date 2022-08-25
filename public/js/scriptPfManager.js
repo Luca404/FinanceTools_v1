@@ -4,6 +4,7 @@ import * as login from './manageLogin.js';
 var pfData = [];
 var userName = "";
 var pfDeleteNum = 0;
+var tickersList = [];
 
 var multiSelectOption = {
 	removeItemButton: true,
@@ -51,8 +52,8 @@ function setEvent(){
 	$("#registerButton2").click( login.registerUser );
 	$("#loginButton2").click( showLoginModal );
 	$("#addPfDiv").click( addPf );		
-	$("#tickerTypeInput").change( showTickerExchange );	
-	$("#tickerExchangeInput").change( showTickerExchange );
+	$("#tickerTypeInput").change( showTickersInInput );	
+	$("#tickerExchangeInput").change( showTickersInInput );
 	$("#profileDiv").click( showUserOption );
 	$("#saveChangesButt").click( saveChangesButton );
 	$("#deletePfButton").click( deletePfButt );
@@ -65,12 +66,9 @@ function showUserOption(){registerButton2
 
 }
 
-//Draw profile div
-function drawProfileDiv( username ){
-	let profileDiv = document.getElementById("profileDiv");
-	let profileP = profileDiv.getElementsByTagName("p")[0];
-	profileP.innerText = "User:    " + username;
-	server.emit("getPfList",{"username":username}, (data) => {
+//Get pf list from server
+function getPfList( usrn ){
+	server.emit("getPfList",{"username":usrn}, (data) => {
 		pfData = [];
 		if( data.length > 0 ){
 			pfData = data;
@@ -80,6 +78,25 @@ function drawProfileDiv( username ){
 			console.log("No saved Portfolio for logged user!");
 		}
 	});
+}
+
+//Get Tickers list from server
+function getTickersList(){
+	server.emit( "getTickersList", (result) => {
+		console.log( result["data"] );
+		tickersList = result["data"];
+		showTickersInInput();
+	});
+}
+
+
+//Draw profile div
+function drawProfileDiv( username ){
+	let profileDiv = document.getElementById("profileDiv");
+	let profileP = profileDiv.getElementsByTagName("p")[0];
+	profileP.innerText = "User:    " + username;
+	getPfList( username );
+	getTickersList();
 }
 
 //Show modal for login
@@ -97,45 +114,26 @@ function showLoginModal(){
 	}
 }
 
-//Function for showing tickers exchange
-function showTickerExchange(){
-	var inputTickerType = document.getElementById("tickerTypeInput");
-	let selectedType = inputTickerType.options[inputTickerType.selectedIndex].text;
-	var inputExchange = document.getElementById("tickerExchangeInput");
-	let selectedExchange = inputExchange.options[inputExchange.selectedIndex].text;
-	console.log( selectedExchange );
-	if( selectedType == "Stocks" )
-		inputExchange.style.display = "inline-block";
-	else{
-		inputExchange.style.display = "none";
-		selectedExchange = selectedType;
-	}
-	server.emit( "getTickersList", {"type": selectedType, "exchange": selectedExchange}, (result) => {
-		showTickersInInput(result);
-	});
-}
-
-//Function to change selected ticker type and exchange
-async function changeSelectedExchange( type, exchange ){
-	var inputTickerType = document.getElementById("tickerTypeInput");
-	inputTickerType.value = type;
-	let selectedType = inputTickerType.options[inputTickerType.selectedIndex].text;
-	if( selectedType == "Stocks" ){
-		var inputExchange = document.getElementById("tickerExchangeInput");
-		inputExchange.value = exchange;
-		inputExchange.style.display = "inline-block";
-	}
-	else{
-		inputExchange.style.display = "none";
-	}
-}
-
 //Show dropdown menu with the tickers list from the server
-async function showTickersInInput(data){
+function showTickersInInput(){
+	var inputTickerType = document.getElementById("tickerTypeInput");
+	let selectedType = inputTickerType.options[inputTickerType.selectedIndex].text;	
+	var inputExchange = document.getElementById("tickerExchangeInput");
+	
+	if( selectedType == "Stocks" ){
+		let selectedExchange = inputExchange.options[inputExchange.selectedIndex].text;
+		var tickersType = selectedExchange.toLowerCase();;
+		inputExchange.style.display = "inline-block";
+	}
+	else{
+		inputExchange.style.display = "none";
+		var tickersType = selectedType.toLowerCase();
+	}
 	var tickersData = [];
-	for( var i = 0; i < data.data.length; i++ ){
+	var tickersDataList = tickersList[tickersType];
+	for( var i = 0; i < tickersDataList.length; i++ ){
 		//tickersData[i] = {value: data[i].s, label: data[i].n + " (" + data[i].s + ")", title: data[i].n};
-		tickersData[i] = {value: data.type + ":" + data.exchange, label: data.data[i].s, placeholderValue: data.data[i].n };
+		tickersData[i] = {value: selectedType + ":" + tickersType, label: tickersDataList[i].s, placeholderValue: tickersDataList[i].n };
 	}
 	multipleSelect.setChoices( tickersData, "value", "label", "placeholderValue");
 }
@@ -239,7 +237,7 @@ function loadTable1(data){
 //Function for modify a portfolio
 async function modifyPf(item){
 	multipleSelect.clearStore();
-	showTickerExchange();
+	showTickersInInput();
 	$("#addModalLabel").text("Modify Portfolio");
 	var pfNum = item.id.toString();
 	pfNum = pfNum.split("modifyButt")[1];
@@ -264,7 +262,7 @@ async function modifyPf(item){
 			console.log("typeDiverso:", pfData[pfNum].tickers[i]);
 			server.emit( "getTickersList", {"type": type, "exchange": exch}, (result) => {		
 				showTickersInInput(result);
-				changeSelectedExchange(type, exch);					
+				//changeSelectedExchange(type, exch);					
 				multipleSelect.setChoiceByValue(pfData[pfNum].tickers[i]);
 			});	
 		}
@@ -283,7 +281,7 @@ function deletePf(item){
 	var text = "Are you sure you want to delete '" + pfData[pfDeleteNum].pfName + "' ?";
 	h5.innerText = text;
 }
-
+ 
 //Function for delete a portfolio
 function deletePfButt(){
 	server.emit( "deletePf", pfData[pfDeleteNum], (result) => {
@@ -325,7 +323,7 @@ function addPf(){
 	$("#addModalLabel").text("Add Portfolio");	
 	$("#addPfNameInput").val("");
 	$("#addPfSharesNumInput").val("");	
-	showTickerExchange();
+	showTickersInInput();
 }
 
 //Function to add a portFolio

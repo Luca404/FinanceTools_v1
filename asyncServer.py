@@ -1,3 +1,4 @@
+from fileinput import filename
 import socketio
 import os
 import datetime
@@ -57,13 +58,15 @@ async def registerUser( sid, data ):
         json.dump( jsonData, f )
 
 @server.event
-async def getTickersList(sid, data):
-    tickerType = str(data["type"]).lower()
-    exchange = str(data["exchange"]).lower()
-    with open( "./json/tickersList/" + tickerType + "/" + exchange + ".json" ) as f:
-        jsonData = json.load(f)
-    tickersList = jsonData["data"]
-    return {"data": tickersList, "type":tickerType, "exchange":exchange}
+async def getTickersList(sid):
+    files = os.listdir("./json/tickersList/")
+    tickersList = {}
+    for file in files:
+        fileName = file.split( ".json" )[0]
+        with open( "./json/tickersList/" + file ) as f:
+            jsonData = json.load(f)
+        tickersList[fileName] = jsonData["data"]
+    return {"data": tickersList}
 
 @server.event
 async def getPfList(sid, data):
