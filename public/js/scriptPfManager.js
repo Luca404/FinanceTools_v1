@@ -1,10 +1,10 @@
-import * as login from './manageLogin.js';
-
 //CONST
 var pfData = [];
 var userName = "";
 var pfDeleteNum = 0;
+var selectedTickers = [];
 var tickersList = [];
+var punto = false;
 
 var multiSelectOption = {
 	removeItemButton: true,
@@ -35,34 +35,16 @@ server.on("disconnect", () => {
 
 server.on("loginResult", (data) => {
 	if( data["status"] ){
-		login.successLogin( data["text"] );
+		successLogin( data["text"] );
 		drawProfileDiv( data["text"] );
 	}
 	else
-		login.failedLogin( data["text"] );
+		failedLogin( data["text"] );
 });
 
-//Add onload function to body
-document.getElementById("corpo").addEventListener("load", setEvent(), false);
-
-//Set event
-function setEvent(){
-	$("#registerButton").click( login.showRegisterModal );
-	$("#loginButton").click( login.checkLogin );
-	$("#registerButton2").click( login.registerUser );
-	$("#loginButton2").click( showLoginModal );
-	$("#addPfDiv").click( addPf );		
-	$("#tickerTypeInput").change( showTickersInInput );	
-	$("#tickerExchangeInput").change( showTickersInInput );
-	$("#profileDiv").click( showUserOption );
-	$("#saveChangesButt").click( saveChangesButton );
-	$("#deletePfButton").click( deletePfButt );
-	$("#addPfTickersInput").change( addInputNumShares );
-	$("#addSharesNumInput").keypress( filterLetters );
-}
 
 //Show user option for disconnect
-function showUserOption(){registerButton2
+function showUserOption(){
 
 }
 
@@ -101,7 +83,7 @@ function drawProfileDiv( username ){
 
 //Show modal for login
 function showLoginModal(){
-	let usern = login.checkIfLogged()
+	let usern = checkIfLogged()
 	userName = usern;
 	if( usern == "" ){
 		$("#content").css("filter", "blur(5px)");
@@ -119,7 +101,7 @@ function showTickersInInput(){
 	var inputTickerType = document.getElementById("tickerTypeInput");
 	let selectedType = inputTickerType.options[inputTickerType.selectedIndex].text;	
 	var inputExchange = document.getElementById("tickerExchangeInput");
-	
+
 	if( selectedType == "Stocks" ){
 		let selectedExchange = inputExchange.options[inputExchange.selectedIndex].text;
 		var tickersType = selectedExchange.toLowerCase();;
@@ -131,26 +113,50 @@ function showTickersInInput(){
 	}
 	var tickersData = [];
 	var tickersDataList = tickersList[tickersType];
-	for( var i = 0; i < tickersDataList.length; i++ ){
-		//tickersData[i] = {value: data[i].s, label: data[i].n + " (" + data[i].s + ")", title: data[i].n};
+	for( var i = 0; i < tickersDataList.length; i++ )
 		tickersData[i] = {value: selectedType + ":" + tickersType, label: tickersDataList[i].s, placeholderValue: tickersDataList[i].n };
-	}
+	
 	multipleSelect.setChoices( tickersData, "value", "label", "placeholderValue");
+
+	var els = document.querySelectorAll('.choices__input--cloned');
+    els.forEach((el, n) => {
+        el.setAttribute('autocomplete', 'one-time-code');
+    });
 }
 
 function addInputNumShares(event){
 	var pfTickerSelect = document.getElementById("addPfTickersInput");
 	var pfTickerOptions = pfTickerSelect.getElementsByTagName("option");
+	console.log( pfTickerOptions );
 	var tickers = []
 	for( var i=0; i < pfTickerOptions.length; i++ ){
 		tickers.push( pfTickerOptions[i].innerText );
 	}
-	drawNumSharesInput( tickers.at(-1) );
+	console.log( tickers );
+	if( selectedTickers.length > tickers.length ){
+		let diff = tickers.filter(x => !selectedTickers.includes(x)).concat(selectedTickers.filter(x => !tickers.includes(x)));
+		console.log( diff );
+		removeNumShares( diff );
+	}
+	else
+		addNumShares( tickers.at(-1) );
+	
+	selectedTickers = tickers;
 }
 
-function drawNumSharesInput( ticker ){
+function removeNumShares( name ){
 	var numSharesDiv = document.getElementById("pfSharesNumDiv");
-	var numSharesInputs = numSharesDiv.getElementsByTagName("input");
+	var numSharesDivs = numSharesDiv.getElementsByTagName("div");
+	console.log( numSharesDivs );
+	for( var i=0;i<numSharesDivs.length;i++ ){
+		let numSharesText = numSharesDivs[i].getElementsByTagName("input")[0].label;
+		if( numSharesText == name )
+			numSharesDiv.removeChild( numSharesDivs[i] );
+	}
+}
+
+function addNumShares( ticker ){
+	var numSharesDiv = document.getElementById("pfSharesNumDiv");
 
 	var newDiv = document.createElement("div");
 	newDiv.style.display = "flex";
@@ -163,8 +169,11 @@ function drawNumSharesInput( ticker ){
 	
 	var newInput = document.createElement("input");
 	newInput.className = "addSharesNumInput";
-	$(newInput).keypress( filterLetters );
-	newInput.innerText = ticker;
+	$(newInput).on("keypress", ( filterLetters ));
+	newInput.label = ticker;
+	newInput.id = ticker + "NumShares";
+	newInput.name = ticker + "NumShares";
+	newInput.autocomplete = "one-time-code";
 	newInput.type = "text";
 
 	newDiv.appendChild( newInput );
@@ -444,7 +453,179 @@ function saveChangesButton(){
 
 function filterLetters(evt){
 	var hold = String.fromCharCode(evt.which);  
-	if((/[a-z A-Z*!@#$%^&*()_/[\]}=+><{?",:;'"|]/.test(hold))){  
-	  evt.preventDefault();  
+	if( (/[a-z A-Z*!@#$%^&*()_/[\]}=+><{?",:;'"|]/.test(hold)))
+		evt.preventDefault();
+	  
+	if( hold == "." && evt.target.value.indexOf(".") != -1 )
+		evt.preventDefault();
+	if( hold == "." && evt.target.value=="" )
+		evt.preventDefault();
+}
+
+
+//Login Functions Section
+
+//Function to check if still logged
+function checkIfLogged(){
+	let decodedCookie = decodeURIComponent(document.cookie);
+	let cookie = decodedCookie.split(';');
+	let cookieName = "username=";
+	for(let i = 0; i <cookie.length; i++) {
+		let c = cookie[i];
+		while (c.charAt(0) == ' ') {
+		  c = c.substring(1);
+		}
+		if (c.indexOf(cookieName) == 0) {
+		  return c.substring(cookieName.length, c.length);
+		}
+	}
+	return "";
+}
+
+//Show modal for registration
+function showRegisterModal(){
+	$('#registrationModal').modal({backdrop: 'static', keyboard: false, show: true});
+	$("#loginModal").modal("hide");	
+	$('#loginModal').data('bs.modal',null);
+}
+
+//Call server and check if login is ok
+function checkLogin(){
+	var usrn = document.getElementById("usernInput");
+	var passwd = document.getElementById("passwdInput");
+	if(usrn.value == ""){
+		usrn.style.animation = "0.25s linear 0s 1 normal forwards running error";
+		usrn.placeholder = "Insert username";
+		setTimeout(() => {
+			usrn.style.animation = "";
+		}, 250);
+		setTimeout(() => {
+			usrn.placeholder = "";
+		}, 1500);
+	}
+	if(passwd.value == ""){
+		passwd.style.animation = "0.25s linear 0s 1 normal forwards running error";
+		passwd.placeholder = "Insert password";
+		setTimeout(() => {
+			passwd.style.animation = ""
+		}, 250);
+		setTimeout(() => {
+			passwd.placeholder = "";
+		}, 1500);
+	}
+	
+	if( usrn.value != "" && passwd.value != "" ){		
+		var hashPass = hash(passwd.value);
+		server.emit("login",{"username":usrn.value, "password":hashPass});
 	}
 }
+
+//If login is successful
+function successLogin( usern ){
+	var loginModal = document.getElementById("loginModal");
+	var content = loginModal.getElementsByClassName("modal-content")[0];
+	content.style = "filter: blur(10px)";
+	var divSuccess = document.createElement("div");
+	divSuccess.appendChild(document.createTextNode("Successfully logged in!"));
+	divSuccess.id = "successLoginDiv";
+	loginModal.appendChild(divSuccess);
+	content.style.pointerEvents = "none";
+	loginModal.style.userSelect = "none";
+	setTimeout(() => {
+		$("#loginModal").modal("hide");
+		$("#content").css("filter", "");
+	}, 1500);
+	setCookie("username",usern,5);
+}
+
+//Save cookies function
+function setCookie(cname, cvalue, exdays) {
+	const d = new Date();
+	d.setTime(d.getTime() + (exdays*24*60*60*1000));
+	let expires = "expires="+ d.toUTCString();
+	document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
+}
+
+//If login is unsuccessful
+function failedLogin( error ){
+	var usrn = document.getElementById("usernInput");
+	var passwd = document.getElementById("passwdInput");
+	if( error == "Wrong Password" ){
+		passwd.value = "";
+		passwd.style.animation = "0.25s linear 0s 1 normal forwards running error";
+		passwd.placeholder = "Wrong password";
+		setTimeout(() => {
+			passwd.style.animation = ""
+		}, 250);
+		setTimeout(() => {
+			passwd.placeholder = "";
+		}, 2000);
+	}
+	else{
+		usrn.value = "";
+		passwd.value = "";
+		usrn.style.animation = "0.25s linear 0s 1 normal forwards running error";
+		usrn.placeholder = "Account doesnt exist";
+		setTimeout(() => {
+			usrn.style.animation = "";
+		}, 250);
+		setTimeout(() => {
+			usrn.placeholder = "";
+		}, 2000);
+	}
+}
+
+//function for register a user
+function registerUser(){
+	var usrn = document.getElementById("usernInputReg");
+	var passwd = document.getElementById("passwdInputReg");
+	var passwdConf = document.getElementById("passwdInputConf");
+	if(usrn.value == ""){
+		usrn.style.animation = "0.25s linear 0s 1 normal forwards running error";
+		usrn.placeholder = "Insert username";
+		setTimeout(() => {
+			usrn.style.animation = "";
+		}, 250);
+		setTimeout(() => {
+			usrn.placeholder = "";
+		}, 1500);
+	}
+	if(passwd.value == ""){
+		passwd.style.animation = "0.25s linear 0s 1 normal forwards running error";
+		passwd.placeholder = "Insert password";
+		setTimeout(() => {
+			passwd.style.animation = ""
+		}, 250);
+		setTimeout(() => {
+			passwd.placeholder = "";
+		}, 1500);
+	}
+	if(passwdConf.value == ""){
+		passwdConf.style.animation = "0.25s linear 0s 1 normal forwards running error";
+		passwdConf.placeholder = "Confirm password";
+		setTimeout(() => {
+			passwdConf.style.animation = ""
+		}, 250);
+		setTimeout(() => {
+			passwdConf.placeholder = "";
+		}, 1500);
+	}
+	if(passwd.value != passwdConf.value){
+		passwdConf.style.animation = "0.25s linear 0s 1 normal forwards running error";
+		passwdConf.value = "";
+		passwdConf.placeholder = "Passwords dont match";
+		setTimeout(() => {
+			passwdConf.style.animation = ""
+		}, 250);
+		setTimeout(() => {
+			passwdConf.placeholder = "";
+		}, 1500);
+	}
+
+	if( usrn.value != "" && passwd.value != "" && passwd.value == passwdConf.value ){		
+		var hashPass = hash(passwd.value);
+		server.emit("registerUser",{"username":usrn.value, "password":hashPass});
+	}
+}
+
+function hash(e){for(var r=0,i=0;i<e.length;i++)r=(r<<5)-r+e.charCodeAt(i),r&=r;return r};
