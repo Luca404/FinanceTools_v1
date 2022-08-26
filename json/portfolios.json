@@ -2,116 +2,124 @@
   "PortFolios": [
     {
       "userID": "Lika44",
-      "pfName": "StocksPortfolio",
-      "tickers": [
-        "GOOG",
-        "AAPL",
-        "MSFT"
-      ],
-      "type": [
-        "stocks:nasdaq",
-        "stocks:nasdaq",
-        "stocks:nasdaq"
-      ],
-      "numShares": [
-        1,
-        3,
-        4
-      ]
-    },
-    {
-      "userID": "Lika44",
-      "pfName": "StocksPortfolio2",
-      "tickers": [
-        "TSLA",
-        "META",
-        "PG"
-      ],
-      "type": [
-        "stocks:nasdaq",
-        "stocks:nasdaq",
-        "stocks:nyse"
-      ],
-      "numShares": [
-        1,
-        3,
-        10
-      ]
-    },
-    {
-      "userID": "Lika44",
-      "pfName": "TechShares",
-      "tickers": [
-        "AMZN",
-        "TSLA",
-        "META",
-        "NVDA"
-      ],
-      "type": [
-        "stocks:nasdaq",
-        "stocks:nasdaq",
-        "stocks:nasdaq",
-        "stocks:nasdaq"
-      ],
-      "numShares": [
-        1,
-        5,
-        2,
-        10
-      ]
-    },
-    {
-      "userID": "Lika44",
-      "pfName": "Prova1",
-      "tickers": [
-        "GC=F",
-        "INTC",
-        "CSCO"
-      ],
-      "type": [
-        "commodities:commodities",
-        "stocks:nasdaq",
-        "stocks:nasdaq"
-      ],
-      "numShares": [
-        1,
-        2,
-        3
-      ]
-    },
-    {
-      "userID": "Lika44",
-      "pfName": "asd",
-      "tickers": [
-        "AAXJ"
-      ],
-      "type": [
-        "etf:etf"
-      ],
-      "numShares": [
-        1
-      ]
-    },
-    {
-      "userID": "Lika44",
-      "pfName": "testPf",
-      "tickers": [
-        "PG",
-        "F",
-        "GE",
-        "MSFT"
-      ],
-      "type": [
-        "stocks:nyse",
-        "stocks:nyse",
-        "stocks:nyse",
-        "stocks:nasdaq"
-      ],
-      "numShares": [
-        1,
-        1,
-        1,
-        1
+      "pfData": [
+        {
+          "pfName": "StocksPortfolio",
+          "tickers": [
+            "GOOG",
+            "AAPL",
+            "MSFT"
+          ],
+          "type": [
+            "stocks:nasdaq",
+            "stocks:nasdaq",
+            "stocks:nasdaq"
+          ],
+          "numShares": [
+            1,
+            3,
+            4
+          ]
+        },
+        {
+          "pfName": "StocksPortfolio2",
+          "tickers": [
+            "TSLA",
+            "META",
+            "PG"
+          ],
+          "type": [
+            "stocks:nasdaq",
+            "stocks:nasdaq",
+            "stocks:nyse"
+          ],
+          "numShares": [
+            1,
+            3,
+            10
+          ]
+        },
+        {
+          "pfName": "TechShares",
+          "tickers": [
+            "AMZN",
+            "TSLA",
+            "META",
+            "NVDA"
+          ],
+          "type": [
+            "stocks:nasdaq",
+            "stocks:nasdaq",
+            "stocks:nasdaq",
+            "stocks:nasdaq"
+          ],
+          "numShares": [
+            1,
+            5,
+            2,
+            10
+          ]
+        },
+        {
+          "pfName": "Prova1",
+          "tickers": [
+            "GC=F",
+            "INTC",
+            "CSCO"
+          ],
+          "type": [
+            "commodities:commodities",
+            "stocks:nasdaq",
+            "stocks:nasdaq"
+          ],
+          "numShares": [
+            1,
+            2,
+            3
+          ]
+        },
+        {
+          "pfName": "testPf",
+          "tickers": [
+            "PG",
+            "F",
+            "GE",
+            "MSFT"
+          ],
+          "type": [
+            "stocks:nyse",
+            "stocks:nyse",
+            "stocks:nyse",
+            "stocks:nasdaq"
+          ],
+          "numShares": [
+            1,
+            1,
+            1,
+            1
+          ]
+        },
+        {
+          "pfName": "aaaaab",
+          "tickers": [
+            "JNJ",
+            "UNH",
+            "XOM",
+            "V"
+          ],
+          "type": [
+            "stocks:nyse",
+            "stocks:nyse",
+            "stocks:nyse",
+            "stocks:nyse"
+          ],
+          "numShares": [
+            10,
+            20,
+            10,
+            10
+          ]
+        }
       ]
     }
   ]

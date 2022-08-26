@@ -70,15 +70,9 @@ async def getTickersList(sid):
 
 @server.event
 async def getPfList(sid, data):
-    pfData = []
-    username = data["username"]
-    with open("./json/portfolios.json") as f:
-        data = json.load(f)
-    for pf in data["PortFolios"]:
-        if( pf["userID"] == username ):
-            pfData.append(pf)
-    
-    return pfData  
+    pfList = []
+    pfList = loadPfList( data["username"] )
+    return {"data": pfList}
 
 @server.event
 async def savePf(sid, data):
@@ -86,29 +80,68 @@ async def savePf(sid, data):
         pfData = []
         with open("./json/portfolios.json") as f:
             pfData = json.load(f)
-        pfData["PortFolios"].append( data )
+        
+        k = 0
+        for pf in pfData["PortFolios"]:
+            if( pf["userID"] == data["user"] ):
+                pfData["PortFolios"][k]["pfData"].append( data )
+            k += 1
+        
         with open("./json/portfolios.json", "w") as f:
             json.dump( pfData, f, indent=2 )
-        return 1
+        
+        pfList = loadPfList( data["user"] )
+        return {"data": pfList}
     except:
         return 0
 
 @server.event
+async def modifyPf(sid, data):
+    pfData = []
+    with open("./json/portfolios.json") as f:
+        pfData = json.load(f)
+    
+    c = 0
+    k = 0
+    for pf in pfData["PortFolios"]:
+        if( pf["userID"] == data["user"] ):
+            print( "Pollo" )
+            for i in pf["pfData"]:
+                if( k == int(data["pfNum"]) ):
+                    pfData["PortFolios"][c]["pfData"][k] = data["data"]
+                    break
+                k += 1
+        c += 1
+    
+    with open("./json/portfolios.json", "w") as f:
+        json.dump( pfData, f, indent=2 )
+    
+    pfList = loadPfList( data["user"] )
+    return {"data": pfList}
+
+
+@server.event
 async def deletePf(sid, data):
-    try:
-        pfData = []
-        with open("./json/portfolios.json") as f:
-            pfData = json.load(f)
-        k = 0
-        for i in pfData["PortFolios"]:
-            if( i == data ):
-                del pfData["PortFolios"][k]
-            k += 1
-        with open("./json/portfolios.json", "w") as f:
-            json.dump( pfData, f, indent=2 )
-        return 1
-    except:
-        return 0
+    pfData = []
+    with open("./json/portfolios.json") as f:
+        pfData = json.load(f)
+
+    c = 0
+    k = 0
+    for pf in pfData["PortFolios"]:
+        if( pf["userID"] == data["user"] ):
+            for i in pf["pfData"]:
+                if( i == data["data"] ):
+                    del pfData["PortFolios"][c]["pfData"][k]
+                    break
+                k += 1
+        c += 1
+
+    with open("./json/portfolios.json", "w") as f:
+        json.dump( pfData, f, indent=2 )
+
+    pfList = loadPfList( data["user"] )
+    return {"data": pfList}
 
 @server.event
 async def getSingleAssetData(sid, data):
@@ -181,6 +214,18 @@ async def getRiskData( sid, data ):
     nonDiversRisk = round( nonDiversRisk * 100, 2 ) 
     return { "pfVolatility": pfVolatility, "diversRisk": diversRisk, "nonDiversRisk": nonDiversRisk}
 
+
+
+
+#Server's functions
+def loadPfList( usrn ):
+    pfData = []
+    with open("./json/portfolios.json") as f:
+        data = json.load(f)
+    for pf in data["PortFolios"]:
+        if( pf["userID"] == usrn ):
+            pfData.append(pf["pfData"])
+    return pfData[0]
 
 def calculateWeights( weights, dfData ):
     means = dfData.mean()

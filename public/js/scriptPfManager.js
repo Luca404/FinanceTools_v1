@@ -2,6 +2,7 @@
 var pfData = [];
 var userName = "";
 var pfDeleteNum = 0;
+var pfNum;
 var selectedTickers = [];
 var tickersList = [];
 var punto = false;
@@ -52,9 +53,9 @@ function showUserOption(){
 function getPfList( usrn ){
 	server.emit("getPfList",{"username":usrn}, (data) => {
 		pfData = [];
-		if( data.length > 0 ){
-			pfData = data;
-			loadTable1(data);
+		if( data["data"].length > 0 ){
+			pfData = data["data"];
+			loadTable1(pfData);
 		}
 		else{
 			console.log("No saved Portfolio for logged user!");
@@ -98,25 +99,25 @@ function showLoginModal(){
 //Show dropdown menu with the tickers list from the server
 function showTickersInInput(){
 	var inputTickerType = document.getElementById("tickerTypeInput");
-	let selectedType = inputTickerType.options[inputTickerType.selectedIndex].text;	
+	let selectedType = inputTickerType.options[inputTickerType.selectedIndex].text.toLowerCase();	
 	var inputExchange = document.getElementById("tickerExchangeInput");
 	
-	if( selectedType == "Stocks" ){
-		let selectedExchange = inputExchange.options[inputExchange.selectedIndex].text;
-		var tickersType = selectedExchange.toLowerCase();
+	if( selectedType == "stocks" ){
+		let selectedExchange = inputExchange.options[inputExchange.selectedIndex].text.toLowerCase();
+		var tickersType = selectedExchange;
 		inputExchange.style.display = "inline-block";
 	}
 	else{
 		inputExchange.style.display = "none";
-		var tickersType = selectedType.toLowerCase();
+		var tickersType = selectedType;
 	}
 
 	var tickersData = [];
 	var tickersDataList = tickersList[tickersType];
 	for( var i = 0; i < tickersDataList.length; i++ )
-		tickersData[i] = {value: tickersDataList[i].s, label: tickersDataList[i].s, placeholderValue: tickersDataList[i].n };
+		tickersData[i] = { value: tickersDataList[i].s, label:tickersDataList[i].s, customProperties:selectedType + ":" + tickersType };
 	
-	multipleSelect.setChoices( tickersData, "value", "label", "placeholderValue");
+	multipleSelect.setChoices( tickersData, "value", "label");
 
 	var els = document.querySelectorAll('.choices__input--cloned');
     els.forEach((el, n) => {
@@ -124,15 +125,14 @@ function showTickersInInput(){
     });
 }
 
-function addInputNumShares(event){
+//Function triggered on change of choicesJS tickers select
+function changeInputNumShares(event){
 	var pfTickerSelect = document.getElementById("addPfTickersInput");
 	var pfTickerOptions = pfTickerSelect.getElementsByTagName("option");
-	console.log( pfTickerOptions );
 	var tickers = []
 	for( var i=0; i < pfTickerOptions.length; i++ ){
 		tickers.push( pfTickerOptions[i].innerText );
 	}
-	console.log( tickers );
 	if( selectedTickers.length > tickers.length ){
 		let diff = tickers.filter(x => !selectedTickers.includes(x)).concat(selectedTickers.filter(x => !tickers.includes(x)));
 		removeNumShares( diff );
@@ -143,10 +143,10 @@ function addInputNumShares(event){
 	selectedTickers = tickers;
 }
 
+//Remove a number shares input 
 function removeNumShares( name ){
 	var numSharesDiv = document.getElementById("pfSharesNumDiv");
 	var numSharesDivs = numSharesDiv.getElementsByTagName("div");
-	console.log( numSharesDivs );
 	for( var i=0;i<numSharesDivs.length;i++ ){
 		let numSharesText = numSharesDivs[i].getElementsByTagName("input")[0].label;
 		if( numSharesText == name )
@@ -154,12 +154,13 @@ function removeNumShares( name ){
 	}
 }
 
+//Add a number shares input 
 function addNumShares( ticker ){
 	var numSharesDiv = document.getElementById("pfSharesNumDiv");
 
 	var newDiv = document.createElement("div");
 	newDiv.style.display = "flex";
-	newDiv.style.marginLeft = "12%";
+	newDiv.style.marginLeft = "8%";
 	newDiv.style.marginTop = "3%";
 
 	var newH = document.createElement("h6");
@@ -167,7 +168,7 @@ function addNumShares( ticker ){
 	newDiv.appendChild( newH );
 	
 	var newInput = document.createElement("input");
-	newInput.className = "addSharesNumInput";
+	newInput.className = "addSharesNumInput inputCheck";
 	$(newInput).on("keypress", ( filterLetters ));
 	newInput.label = ticker;
 	newInput.id = ticker + "NumShares";
@@ -246,17 +247,12 @@ function loadTable1(data){
 function modifyPf(item){
 	multipleSelect.clearStore();
 	$("#pfSharesNumDiv").empty();
-	showTickersInInput();
 	$("#addModalLabel").text("Modify Portfolio");
 
-	var pfNum = item.id.toString();
+	pfNum = item.id.toString();
 	pfNum = pfNum.split("modifyButt")[1];
 
 	$("#addPfNameInput").val(pfData[pfNum].pfName);
-
-	var numSharesDiv = document.getElementById( "pfSharesNumDiv" );
-	var numSharesDivs = numSharesDiv.getElementsByTagName( "div" );
-	$("#addPfSharesNumInput").val(pfData[pfNum].numShares);
 
 	var inputTickerType = document.getElementById("tickerTypeInput");
 	var inputExchange = document.getElementById("tickerExchangeInput");
@@ -267,7 +263,6 @@ function modifyPf(item){
 		var selectedExchange = inputExchange.options[inputExchange.selectedIndex].value.toLowerCase();
 		var type = pfData[pfNum].type[i].split(":")[0];
 		var exch = pfData[pfNum].type[i].split(":")[1];
-
 		if( type == selectedType ){
 			if( selectedExchange != exch )
 				$("#tickerExchangeInput").val( exch );				
@@ -275,7 +270,6 @@ function modifyPf(item){
 		else
 			$("#tickerTypeInput").val( type );
 		
-	
 		showTickersInInput();
 		multipleSelect.setChoiceByValue( pfData[pfNum].tickers[i] );
 
@@ -298,8 +292,8 @@ function deletePf(item){
  
 //Function for delete a portfolio
 function deletePfButt(){
-	server.emit( "deletePf", pfData[pfDeleteNum], (result) => {
-		if( result ){
+	server.emit( "deletePf", {"data": pfData[pfDeleteNum], "user":userName }, (result) => {
+		if( result != 0 ){
 			let delModal = document.getElementById("deleteModal");
 			let content = delModal.getElementsByClassName("modal-content")[0];
 			content.style = "filter: blur(10px)";
@@ -315,16 +309,8 @@ function deletePfButt(){
 				$("#successDeleteDiv").remove();
 				content.style = "filter: blur(0px)";
 			}, 1500);
-			server.emit("getPfList",{"username":userName}, (data) =>{ 
-				pfData = [];
-				if( data.length > 0 ){
-					pfData = data;
-					loadTable1(data);
-				}
-				else{
-					console.log("Error");
-				}
-			});
+			pfData = result["data"];
+			loadTable1(pfData);
 		}
 		else{
 			alert("Error with the server");
@@ -371,7 +357,7 @@ function saveChangesButton(){
 	let tickersNum = $('#addPfTickersInput option').length;
 	for( let i = 0; i < tickersNum; i++ ){
 		pfTickers.push( pfTickersOpt[i].label );
-		pfTypes.push( pfTickersOpt[i].value );
+		pfTypes.push( pfTickersOpt[i].dataset.customProperties );
 	}
 	if( tickersNum == 0 ){
 		choicesDiv.style.animation = "0.25s linear 0s 1 normal forwards running error";
@@ -393,68 +379,76 @@ function saveChangesButton(){
 
 	for(let i = 0 ; i < pfSharesInputs.length; i++){
 		pfShares.push( parseInt( pfSharesInputs[i].value ) );
-		if( pfSharesInputs[i].value == "" )
+		if( pfSharesInputs[i].value == "" ){
+			pfSharesInputs[i].style.animation = "0.25s linear 0s 1 normal forwards running error";
+			pfSharesInputs[i].value = "";
+			pfSharesInputs[i].color = "red";
+			pfSharesInputs[i].placeholder = "Error";
+			setTimeout(() => {
+				pfSharesInputs[i].style.animation = "";
+			}, 250);
+			setTimeout(() => {
+				pfSharesInputs[i].placeholder = "";
+			}, 1500);
 			check = false;
+		}
 	}
-	console.log( pfShares );
-	if( pfSharesValue == "" ){
-		pfSharesInput.style.animation = "0.25s linear 0s 1 normal forwards running error";
-		pfSharesInput.value = "";
-		pfSharesInput.placeholder = "Insert Num of Shares";
-		setTimeout(() => {
-			pfSharesInput.style.animation = "";
-		}, 250);
-		setTimeout(() => {
-			pfSharesInput.placeholder = "";
-		}, 1500);
-		check = false;
+
+	if( check ){
+		var modalName = document.getElementById( "addModalLabel" ).innerText.split(" ")[0];
+
+		if( modalName == "Add" ){
+			server.emit( "savePf", { "data": { pfName: pfNameValue, tickers: pfTickers, type: pfTypes, numShares: pfShares }, "user": userName }, (result) => {
+				if( result != 0 ){
+					let addModal = document.getElementById("addModal");
+					let content = addModal.getElementsByClassName("modal-content")[0];
+					content.style = "filter: blur(10px)";
+					var divSuccess = document.createElement("div");
+					divSuccess.appendChild(document.createTextNode("Portfolio added successfully"));
+					divSuccess.id = "successSavedDiv";
+					addModal.appendChild(divSuccess);
+					content.style.pointerEvents = "none";
+					addModal.style.userSelect = "none";
+					setTimeout(() => {
+						$("#addModal").modal("hide");
+						$("#successSavedDiv").remove();
+						content.style = "filter: blur(0px)";
+					}, 1500);
+					pfData = result["data"];
+					loadTable1( pfData );
+				}
+				else{
+					alert("Error with server");
+				}
+			});
+		}
+		else if( modalName == "Modify" ){
+			server.emit( "modifyPf", { "data": { pfName: pfNameValue, tickers: pfTickers, type: pfTypes, numShares: pfShares }, "pfNum": pfNum, "user": userName }, (result) => {
+				console.log( result );
+				if( result != 0 ){
+					let addModal = document.getElementById("addModal");
+					let content = addModal.getElementsByClassName("modal-content")[0];
+					content.style = "filter: blur(10px)";
+					var divSuccess = document.createElement("div");
+					divSuccess.appendChild(document.createTextNode("Portfolio modified successfully"));
+					divSuccess.id = "successSavedDiv";
+					addModal.appendChild(divSuccess);
+					content.style.pointerEvents = "none";
+					addModal.style.userSelect = "none";
+					setTimeout(() => {
+						$("#addModal").modal("hide");
+						$("#successSavedDiv").remove();
+						content.style = "filter: blur(0px)";
+					}, 1500);
+					pfData = result["data"];
+					loadTable1( pfData );
+				}
+				else{
+					alert("Error with server");
+				}
+			});
+		}
 	}
-	if( pfSharesNum.length != tickersNum || !done ){
-		pfSharesInput.style.animation = "0.25s linear 0s 1 normal forwards running error";
-		let text = pfSharesInput.value;
-		pfSharesInput.value = "";
-		pfSharesInput.placeholder = "Insert a number for symbol";
-		setTimeout(() => {
-			pfSharesInput.style.animation = "";
-		}, 250);
-		setTimeout(() => {
-			pfSharesInput.placeholder = "";
-			pfSharesInput.value = text;
-		}, 1500);
-		check = false;
-	}
-	if( check )
-		server.emit( "savePf", {userID: userName, pfName: pfNameValue, tickers: pfTickers, type: pfTypes, numShares: pfShares }, (result) => {
-			if( result ){
-				let addModal = document.getElementById("addModal");
-				let content = addModal.getElementsByClassName("modal-content")[0];
-				content.style = "filter: blur(10px)";
-				var divSuccess = document.createElement("div");
-				divSuccess.appendChild(document.createTextNode("Portfolio added successfully"));
-				divSuccess.id = "successSavedDiv";
-				addModal.appendChild(divSuccess);
-				content.style.pointerEvents = "none";
-				addModal.style.userSelect = "none";
-				setTimeout(() => {
-					$("#addModal").modal("hide");
-					$("#successSavedDiv").remove();
-					content.style = "filter: blur(0px)";
-				}, 1500);
-				server.emit("getPfList",{"username":userName}, (data) => {
-					pfData = [];
-					if( data.length > 0 ){
-						pfData = data;
-						loadTable1(data);
-					}
-					else{
-						console.log("Error!!");
-					}
-				});
-			}
-			else{
-				alert("Error with server");
-			}
-		});
 }
 
 function filterLetters(evt){

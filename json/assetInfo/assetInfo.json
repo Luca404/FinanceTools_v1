@@ -95,6 +95,30 @@
             "Sector": "Industrials",
             "Industry": "Specialty Industrial Machinery",
             "Country": "United States"
+        },
+        {
+            "Symbol": "JNJ",
+            "Name": "Johnson & Johnson",
+            "Type": "EQUITY",
+            "Sector": "Healthcare",
+            "Industry": "Drug Manufacturers\u2014General",
+            "Country": "United States"
+        },
+        {
+            "Symbol": "UNH",
+            "Name": "UnitedHealth Group Incorporated",
+            "Type": "EQUITY",
+            "Sector": "Healthcare",
+            "Industry": "Healthcare Plans",
+            "Country": "United States"
+        },
+        {
+            "Symbol": "XOM",
+            "Name": "Exxon Mobil Corporation",
+            "Type": "EQUITY",
+            "Sector": "Energy",
+            "Industry": "Oil & Gas Integrated",
+            "Country": "United States"
         }
     ]
 }

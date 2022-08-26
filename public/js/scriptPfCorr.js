@@ -24,8 +24,8 @@ function showLoginDiv(){
 	profileP.innerText = "User:    " + usern;
 	server.emit("getPfList",{"username":usern}, (data) =>{ 
         pfData = [];
-        if( data.length > 0 ){
-            pfData = data;
+        if( data["data"].length > 0 ){
+            pfData = data["data"];
             loadSavedPf();
         }
         else
