@@ -65,7 +65,6 @@ function getPfList( usrn ){
 //Get Tickers list from server
 function getTickersList(){
 	server.emit( "getTickersList", (result) => {
-		console.log( result["data"] );
 		tickersList = result["data"];
 		showTickersInInput();
 	});
@@ -101,20 +100,21 @@ function showTickersInInput(){
 	var inputTickerType = document.getElementById("tickerTypeInput");
 	let selectedType = inputTickerType.options[inputTickerType.selectedIndex].text;	
 	var inputExchange = document.getElementById("tickerExchangeInput");
-
+	
 	if( selectedType == "Stocks" ){
 		let selectedExchange = inputExchange.options[inputExchange.selectedIndex].text;
-		var tickersType = selectedExchange.toLowerCase();;
+		var tickersType = selectedExchange.toLowerCase();
 		inputExchange.style.display = "inline-block";
 	}
 	else{
 		inputExchange.style.display = "none";
 		var tickersType = selectedType.toLowerCase();
 	}
+
 	var tickersData = [];
 	var tickersDataList = tickersList[tickersType];
 	for( var i = 0; i < tickersDataList.length; i++ )
-		tickersData[i] = {value: selectedType + ":" + tickersType, label: tickersDataList[i].s, placeholderValue: tickersDataList[i].n };
+		tickersData[i] = {value: tickersDataList[i].s, label: tickersDataList[i].s, placeholderValue: tickersDataList[i].n };
 	
 	multipleSelect.setChoices( tickersData, "value", "label", "placeholderValue");
 
@@ -135,7 +135,6 @@ function addInputNumShares(event){
 	console.log( tickers );
 	if( selectedTickers.length > tickers.length ){
 		let diff = tickers.filter(x => !selectedTickers.includes(x)).concat(selectedTickers.filter(x => !tickers.includes(x)));
-		console.log( diff );
 		removeNumShares( diff );
 	}
 	else
@@ -244,41 +243,47 @@ function loadTable1(data){
 }
 
 //Function for modify a portfolio
-async function modifyPf(item){
+function modifyPf(item){
 	multipleSelect.clearStore();
+	$("#pfSharesNumDiv").empty();
 	showTickersInInput();
 	$("#addModalLabel").text("Modify Portfolio");
+
 	var pfNum = item.id.toString();
 	pfNum = pfNum.split("modifyButt")[1];
+
 	$("#addPfNameInput").val(pfData[pfNum].pfName);
 
+	var numSharesDiv = document.getElementById( "pfSharesNumDiv" );
+	var numSharesDivs = numSharesDiv.getElementsByTagName( "div" );
 	$("#addPfSharesNumInput").val(pfData[pfNum].numShares);
 
-	console.log(pfData[pfNum]);
 	var inputTickerType = document.getElementById("tickerTypeInput");
-	var selectedType = inputTickerType.options[inputTickerType.selectedIndex].value;
 	var inputExchange = document.getElementById("tickerExchangeInput");
-	var selectedExchange = inputExchange.options[inputExchange.selectedIndex].value;
+
+	selectedTickers = [];
 	for( let i = 0; i<pfData[pfNum].tickers.length; i++ ){
-		selectedType = inputTickerType.options[inputTickerType.selectedIndex].value;
-		selectedExchange = inputExchange.options[inputExchange.selectedIndex].value;
+		var selectedType = inputTickerType.options[inputTickerType.selectedIndex].value.toLowerCase();
+		var selectedExchange = inputExchange.options[inputExchange.selectedIndex].value.toLowerCase();
 		var type = pfData[pfNum].type[i].split(":")[0];
 		var exch = pfData[pfNum].type[i].split(":")[1];
-		console.log( "selectedExch: ", selectedExchange );
-		console.log( "tickerExch: ", exch );
-		await new Promise(r => setTimeout(r, 200));
-		if( selectedType.toLowerCase() != type || selectedExchange.toLowerCase() != exch ){
-			console.log("typeDiverso:", pfData[pfNum].tickers[i]);
-			server.emit( "getTickersList", {"type": type, "exchange": exch}, (result) => {		
-				showTickersInInput(result);
-				//changeSelectedExchange(type, exch);					
-				multipleSelect.setChoiceByValue(pfData[pfNum].tickers[i]);
-			});	
+
+		if( type == selectedType ){
+			if( selectedExchange != exch )
+				$("#tickerExchangeInput").val( exch );				
 		}
-		else{
-			console.log("typeUguale: ", pfData[pfNum].tickers[i]);
-			multipleSelect.setChoiceByValue(pfData[pfNum].tickers[i]);
-		}
+		else
+			$("#tickerTypeInput").val( type );
+		
+	
+		showTickersInInput();
+		multipleSelect.setChoiceByValue( pfData[pfNum].tickers[i] );
+
+		selectedTickers.push( pfData[pfNum].tickers[i] );
+		addNumShares( pfData[pfNum].tickers[i] );
+		var numSharesInput = document.getElementById( pfData[pfNum].tickers[i] + "NumShares" );
+		$( numSharesInput ).val( pfData[pfNum].numShares[i] );
+
 	}
 }
 
@@ -458,7 +463,7 @@ function filterLetters(evt){
 		evt.preventDefault();	  
 	if( hold == "." && evt.target.value.indexOf(".") != -1 )
 		evt.preventDefault();
-	if( hold == "." && evt.target.value=="" )
+	if( (hold == "." || hold == "0") && evt.target.value=="" )
 		evt.preventDefault();
 	var afterPunto = evt.target.value.split(".")
 	if( afterPunto[1] )
