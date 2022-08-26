@@ -331,7 +331,8 @@ function addPf(){
 	multipleSelect.clearStore();
 	$("#addModalLabel").text("Add Portfolio");	
 	$("#addPfNameInput").val("");
-	$("#addPfSharesNumInput").val("");	
+	$("#pfSharesNumDiv").empty();
+	selectedTickers = [];
 	showTickersInInput();
 }
 
@@ -454,12 +455,15 @@ function saveChangesButton(){
 function filterLetters(evt){
 	var hold = String.fromCharCode(evt.which);  
 	if( (/[a-z A-Z*!@#$%^&*()_/[\]}=+><{?",:;'"|]/.test(hold)))
-		evt.preventDefault();
-	  
+		evt.preventDefault();	  
 	if( hold == "." && evt.target.value.indexOf(".") != -1 )
 		evt.preventDefault();
 	if( hold == "." && evt.target.value=="" )
 		evt.preventDefault();
+	var afterPunto = evt.target.value.split(".")
+	if( afterPunto[1] )
+		if( afterPunto[1].length > 1 )
+			evt.preventDefault();
 }
 
 
