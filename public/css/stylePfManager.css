@@ -100,6 +100,16 @@ body{
     z-index: 1041;
 }
 
+#errorSavedDiv{
+    position: relative;
+    width: 100%;
+    color: red;
+    font-size: 20px;    
+    margin-top: -25%;
+    margin-left: 0.7em;    
+    z-index: 1041;
+}
+
 .modal-body{
     padding-left:20px;
     padding-top: 5%;

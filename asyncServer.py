@@ -84,7 +84,7 @@ async def savePf(sid, data):
         k = 0
         for pf in pfData["PortFolios"]:
             if( pf["userID"] == data["user"] ):
-                pfData["PortFolios"][k]["pfData"].append( data )
+                pfData["PortFolios"][k]["pfData"].append( data["data"] )
             k += 1
         
         with open("./json/portfolios.json", "w") as f:

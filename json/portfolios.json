@@ -104,11 +104,9 @@
           "tickers": [
             "JNJ",
             "UNH",
-            "XOM",
-            "V"
+            "XOM"
           ],
           "type": [
-            "stocks:nyse",
             "stocks:nyse",
             "stocks:nyse",
             "stocks:nyse"
@@ -116,8 +114,25 @@
           "numShares": [
             10,
             20,
-            10,
             10
+          ]
+        },
+        {
+          "pfName": "abab",
+          "tickers": [
+            "UNH",
+            "V",
+            "JNJ"
+          ],
+          "type": [
+            "stocks:nyse",
+            "stocks:nyse",
+            "stocks:nyse"
+          ],
+          "numShares": [
+            2,
+            3,
+            1
           ]
         }
       ]

@@ -246,8 +246,8 @@ function loadTable1(data){
 //Function for modify a portfolio
 function modifyPf(item){
 	multipleSelect.clearStore();
-	$("#pfSharesNumDiv").empty();
 	$("#addModalLabel").text("Modify Portfolio");
+	$("#pfSharesNumDiv").empty();
 
 	pfNum = item.id.toString();
 	pfNum = pfNum.split("modifyButt")[1];
@@ -259,10 +259,10 @@ function modifyPf(item){
 
 	selectedTickers = [];
 	for( let i = 0; i<pfData[pfNum].tickers.length; i++ ){
-		var selectedType = inputTickerType.options[inputTickerType.selectedIndex].value.toLowerCase();
-		var selectedExchange = inputExchange.options[inputExchange.selectedIndex].value.toLowerCase();
-		var type = pfData[pfNum].type[i].split(":")[0];
-		var exch = pfData[pfNum].type[i].split(":")[1];
+		let selectedType = inputTickerType.options[inputTickerType.selectedIndex].value.toLowerCase();
+		let selectedExchange = inputExchange.options[inputExchange.selectedIndex].value.toLowerCase();
+		let type = pfData[pfNum].type[i].split(":")[0];
+		let exch = pfData[pfNum].type[i].split(":")[1];
 		if( type == selectedType ){
 			if( selectedExchange != exch )
 				$("#tickerExchangeInput").val( exch );				
@@ -272,10 +272,10 @@ function modifyPf(item){
 		
 		showTickersInInput();
 		multipleSelect.setChoiceByValue( pfData[pfNum].tickers[i] );
-
+		
 		selectedTickers.push( pfData[pfNum].tickers[i] );
 		addNumShares( pfData[pfNum].tickers[i] );
-		var numSharesInput = document.getElementById( pfData[pfNum].tickers[i] + "NumShares" );
+		let numSharesInput = document.getElementById( pfData[pfNum].tickers[i] + "NumShares" );
 		$( numSharesInput ).val( pfData[pfNum].numShares[i] );
 
 	}
@@ -423,30 +423,48 @@ function saveChangesButton(){
 			});
 		}
 		else if( modalName == "Modify" ){
-			server.emit( "modifyPf", { "data": { pfName: pfNameValue, tickers: pfTickers, type: pfTypes, numShares: pfShares }, "pfNum": pfNum, "user": userName }, (result) => {
-				console.log( result );
-				if( result != 0 ){
-					let addModal = document.getElementById("addModal");
-					let content = addModal.getElementsByClassName("modal-content")[0];
-					content.style = "filter: blur(10px)";
-					var divSuccess = document.createElement("div");
-					divSuccess.appendChild(document.createTextNode("Portfolio modified successfully"));
-					divSuccess.id = "successSavedDiv";
-					addModal.appendChild(divSuccess);
-					content.style.pointerEvents = "none";
-					addModal.style.userSelect = "none";
-					setTimeout(() => {
-						$("#addModal").modal("hide");
-						$("#successSavedDiv").remove();
-						content.style = "filter: blur(0px)";
-					}, 1500);
-					pfData = result["data"];
-					loadTable1( pfData );
-				}
-				else{
-					alert("Error with server");
-				}
-			});
+			var data = { pfName: pfNameValue, tickers: pfTickers, type: pfTypes, numShares: pfShares };
+			if( JSON.stringify(pfData[pfNum]) === JSON.stringify(data) ){
+				let addModal = document.getElementById("addModal");
+				let content = addModal.getElementsByClassName("modal-content")[0];
+				content.style = "filter: blur(10px)";
+				var divError = document.createElement("div");
+				divError.appendChild(document.createTextNode("No Changes"));
+				divError.id = "errorSavedDiv";
+				addModal.appendChild(divError);
+				content.style.pointerEvents = "none";
+				addModal.style.userSelect = "none";
+				setTimeout(() => {
+					$("#errorSavedDiv").remove();
+					content.style = "filter: blur(0px)";
+				}, 2000);
+			}
+			else{
+				server.emit( "modifyPf", { "data": data, "pfNum": pfNum, "user": userName }, (result) => {
+					console.log( result );
+					if( result != 0 ){
+						let addModal = document.getElementById("addModal");
+						let content = addModal.getElementsByClassName("modal-content")[0];
+						content.style = "filter: blur(10px)";
+						var divSuccess = document.createElement("div");
+						divSuccess.appendChild(document.createTextNode("Portfolio modified successfully"));
+						divSuccess.id = "successSavedDiv";
+						addModal.appendChild(divSuccess);
+						content.style.pointerEvents = "none";
+						addModal.style.userSelect = "none";
+						setTimeout(() => {
+							$("#addModal").modal("hide");
+							$("#successSavedDiv").remove();
+							content.style = "filter: blur(0px)";
+						}, 1500);
+						pfData = result["data"];
+						loadTable1( pfData );
+					}
+					else{
+						alert("Error with server");
+					}
+				});
+			}
 		}
 	}
 }

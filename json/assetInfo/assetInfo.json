@@ -119,6 +119,22 @@
             "Sector": "Energy",
             "Industry": "Oil & Gas Integrated",
             "Country": "United States"
+        },
+        {
+            "Symbol": "V",
+            "Name": "Visa Inc.",
+            "Type": "EQUITY",
+            "Sector": "Financial Services",
+            "Industry": "Credit Services",
+            "Country": "United States"
+        },
+        {
+            "Symbol": "TSM",
+            "Name": "Taiwan Semiconductor Manufacturing Company Limited",
+            "Type": "EQUITY",
+            "Sector": "Technology",
+            "Industry": "Semiconductors",
+            "Country": "Taiwan"
         }
     ]
 }
