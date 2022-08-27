@@ -7,21 +7,6 @@ var selectedTickers = [];
 var tickersList = [];
 var punto = false;
 
-var multiSelectOption = {
-	removeItemButton: true,
-	addItems: true,
-	loadingText: 'Loading...',
-	noResultsText: 'No results found',
-	noChoicesText: 'No choices',
-    searchFields: ['label', 'value'],
-	shouldSort: false,
-	placeholder: true,
-    shouldSortItems: false,
-	searchResultLimit: 6,
-	//itemSelectText: 'Press to select',
-};
-var multipleSelect = new Choices('#addPfTickersInput', multiSelectOption );
-
 
 //Connection to server
 const server = io();
@@ -120,35 +105,35 @@ function showTickersInInput(){
 		var tickersType = selectedType;
 	}
 
-	var tickersData = [];
+    $("#addPfTickersInput").selectpicker('deselectAll');
+    $("#addPfTickersInput").find('option').remove();
+    $("#addPfTickersInput").find('li').remove();
+    $("#addPfTickersInput").selectpicker('refresh');
+
 	var tickersDataList = tickersList[tickersType];
 	for( var i = 0; i < tickersDataList.length; i++ )
-		tickersData[i] = { value: tickersDataList[i].s, label:tickersDataList[i].s, customProperties:selectedType + ":" + tickersType };
+		$("#addPfTickersInput").append( `<option onclick="selectTicker();" value="${tickersDataList[i].s}" data-subtext="${tickersDataList[i].n}" name="${selectedType + ':' + tickersType}">${tickersDataList[i].s}</option>` );
 	
-	multipleSelect.setChoices( tickersData, "value", "label");
+	$("#addPfTickersInput").on("changed.bs.select", selectTicker)
+	$("#addPfTickersInput").selectpicker( "refresh" );
 
-	var els = document.querySelectorAll('.choices__input--cloned');
-    els.forEach((el, n) => {
-        el.setAttribute('autocomplete', 'one-time-code');
-    });
+}
+
+function selectTicker(){	
+	$('#addPfTickersInput option:selected').remove();
+	$('#addPfTickersInput').selectpicker('refresh');
 }
 
 //Function triggered on change of choicesJS tickers select
 function changeInputNumShares(event){
-	var pfTickerSelect = document.getElementById("addPfTickersInput");
-	var pfTickerOptions = pfTickerSelect.getElementsByTagName("option");
-	var tickers = []
-	for( var i=0; i < pfTickerOptions.length; i++ ){
-		tickers.push( pfTickerOptions[i].innerText );
-	}
-	if( selectedTickers.length > tickers.length ){
-		let diff = tickers.filter(x => !selectedTickers.includes(x)).concat(selectedTickers.filter(x => !tickers.includes(x)));
-		removeNumShares( diff );
-	}
-	else
-		addNumShares( tickers.at(-1) );
-	
-	selectedTickers = tickers;
+	var ticker = $('#addPfTickersInput').val();
+	var type = $('#addPfTickersInput option:selected').attr("name");
+	addNumShares( ticker, type );
+	selectedTickers.push( ticker );
+}
+
+function removeTicker(elem){
+	removeNumShares( elem.id );
 }
 
 //Remove a number shares input 
@@ -157,19 +142,22 @@ function removeNumShares( name ){
 	var numSharesDivs = numSharesDiv.getElementsByTagName("div");
 	for( var i=0;i<numSharesDivs.length;i++ ){
 		let numSharesText = numSharesDivs[i].getElementsByTagName("input")[0].label;
-		if( numSharesText == name )
+		if( numSharesText == name ){
 			numSharesDiv.removeChild( numSharesDivs[i] );
+			let index = selectedTickers.indexOf( numSharesText );
+			selectedTickers.splice( index, 1 );
+		}
 	}
 }
 
 //Add a number shares input 
-function addNumShares( ticker ){
+function addNumShares( ticker, type ){
 	var numSharesDiv = document.getElementById("pfSharesNumDiv");
 
 	var newDiv = document.createElement("div");
 	newDiv.style.display = "flex";
-	newDiv.style.marginLeft = "8%";
-	newDiv.style.marginTop = "3%";
+	newDiv.style.marginLeft = "15%";
+	newDiv.style.marginTop = "5%";
 
 	var newH = document.createElement("h6");
 	newH.innerText = ticker + ":  ";
@@ -180,11 +168,21 @@ function addNumShares( ticker ){
 	$(newInput).on("keypress", ( filterLetters ));
 	newInput.label = ticker;
 	newInput.id = ticker + "NumShares";
-	newInput.name = ticker + "NumShares";
+	newInput.name = type;
 	newInput.autocomplete = "one-time-code";
 	newInput.type = "text";
-
 	newDiv.appendChild( newInput );
+
+	var newButt = document.createElement("button");
+	newButt.onclick = function() { removeTicker(this); };
+	newButt.className = "btn btn-primary";
+	newButt.id = ticker;
+	newButt.style.marginTop = "-6.5px";
+	newButt.style.marginLeft = "7px";
+	newButt.style.fontSize = "15px";
+	newButt.innerText = "X";
+	newDiv.appendChild( newButt );
+
 	numSharesDiv.appendChild( newDiv );
 }
 
@@ -253,7 +251,6 @@ function loadTable1(data){
 
 //Function for modify a portfolio
 function modifyPf(item){
-	multipleSelect.clearStore();
 	$("#addModalLabel").text("Modify Portfolio");
 	$("#pfSharesNumDiv").empty();
 
@@ -278,15 +275,16 @@ function modifyPf(item){
 		else
 			$("#tickerTypeInput").val( type );
 		
-		showTickersInInput();
-		multipleSelect.setChoiceByValue( pfData[pfNum].tickers[i] );
+		//showTickersInInput();
 		
 		selectedTickers.push( pfData[pfNum].tickers[i] );
 		addNumShares( pfData[pfNum].tickers[i] );
 		let numSharesInput = document.getElementById( pfData[pfNum].tickers[i] + "NumShares" );
 		$( numSharesInput ).val( pfData[pfNum].numShares[i] );
-
 	}
+	$("#addPfTickersInput").selectpicker( "refresh" );
+	$("#addPfTickersInput").selectpicker( "val", pfData[pfNum].tickers );
+	$("#addPfTickersInput").selectpicker( "refresh" );
 }
 
 //Function for show modal to delete a portfolio
@@ -327,20 +325,18 @@ function deletePfButt(){
 }
  
 function addPf(){
-	multipleSelect.clearStore();
+	$('#addPfTickersInput').selectpicker('deselectAll');
 	$("#addModalLabel").text("Add Portfolio");	
 	$("#addPfNameInput").val("");
 	$("#pfSharesNumDiv").empty();
 	selectedTickers = [];
-	showTickersInInput();
 }
 
 //Function to add a portFolio
 function saveChangesButton(){
 	let check = true;
 	var pfName = document.getElementById("addPfNameInput");
-	var pfTickersOpt = $('#addPfTickersInput option');
-	var pfTickers = [];
+	var pfTickers = selectedTickers;
 	var pfTypes = [];
 	var pfShares = [];
 
@@ -360,51 +356,42 @@ function saveChangesButton(){
 	}
 
 	//Check Pf tickers
-	var choicesDiv = document.getElementsByClassName("choices__inner")[0];
-	let choicesInput = choicesDiv.getElementsByTagName("input")[0];
-	let tickersNum = $('#addPfTickersInput option').length;
-	for( let i = 0; i < tickersNum; i++ ){
-		pfTickers.push( pfTickersOpt[i].label );
-		pfTypes.push( pfTickersOpt[i].dataset.customProperties );
-	}
-	if( tickersNum == 0 ){
-		choicesDiv.style.animation = "0.25s linear 0s 1 normal forwards running error";
-		choicesInput.placeholder = "Insert Symbol";
-		choicesInput.classList.add("selectCheck");
-		setTimeout(() => {
-			choicesDiv.style.animation = "";
-		}, 250);
-		setTimeout(() => {
-			choicesInput.classList.remove("selectCheck");
-			choicesInput.placeholder = "Select Symbols";
-		}, 1500);
-		check = false;
-	}
-
 	//Check numbers of shares
 	let pfSharesDiv = document.getElementById( "pfSharesNumDiv" );
 	let pfSharesInputs = pfSharesDiv.getElementsByTagName( "input" );
-
-	for(let i = 0 ; i < pfSharesInputs.length; i++){
-		pfShares.push( parseInt( pfSharesInputs[i].value ) );
-		if( pfSharesInputs[i].value == "" ){
-			pfSharesInputs[i].style.animation = "0.25s linear 0s 1 normal forwards running error";
-			pfSharesInputs[i].value = "";
-			pfSharesInputs[i].color = "red";
-			pfSharesInputs[i].placeholder = "Error";
-			setTimeout(() => {
-				pfSharesInputs[i].style.animation = "";
-			}, 250);
-			setTimeout(() => {
-				pfSharesInputs[i].placeholder = "";
-			}, 1500);
-			check = false;
+	console.log( pfSharesInputs.length );
+	if( pfSharesInputs.length == 0 ){
+		console.log( "Error" );
+		var title = document.getElementsByClassName( "filter-option-inner-inner" )[2];
+		title.innerText = 'Insert Ticker';
+		title.style.color = "red";
+		setTimeout(() => {	
+			title.innerText = "Select Ticker";
+			title.style.color = "grey";
+		}, 1500);
+		check = false;
+	}
+	else{
+		for(let i = 0 ; i < pfSharesInputs.length; i++){
+			pfShares.push( parseInt( pfSharesInputs[i].value ) );
+			pfTypes.push( pfSharesInputs[i].name )
+			if( pfSharesInputs[i].value == "" ){
+				pfSharesInputs[i].style.animation = "0.25s linear 0s 1 normal forwards running error";
+				pfSharesInputs[i].value = "";
+				pfSharesInputs[i].color = "red";
+				pfSharesInputs[i].placeholder = "Error";
+				setTimeout(() => {
+					pfSharesInputs[i].style.animation = "";
+				}, 250);
+				setTimeout(() => {
+					pfSharesInputs[i].placeholder = "";
+				}, 1500);
+				check = false;
+			}
 		}
 	}
-
 	if( check ){
 		var modalName = document.getElementById( "addModalLabel" ).innerText.split(" ")[0];
-
 		if( modalName == "Add" ){
 			server.emit( "savePf", { "data": { pfName: pfNameValue, tickers: pfTickers, type: pfTypes, numShares: pfShares }, "user": userName }, (result) => {
 				if( result != 0 ){
