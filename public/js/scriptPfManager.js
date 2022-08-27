@@ -43,6 +43,14 @@ server.on("loginResult", (data) => {
 		failedLogin( data["text"] );
 });
 
+function fixContent(){
+    var sideBar = document.getElementById("sidebar");
+    var content = document.getElementById("content");
+    if( sideBar.classList[0] == "active" )
+        content.style.marginLeft = "300px";
+    else
+        content.style.marginLeft = "20px";
+}
 
 //Show user option for disconnect
 function showUserOption(){
