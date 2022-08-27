@@ -16,7 +16,7 @@ server.on("disconnect", () => {
 
 //Show login div
 function showLoginDiv(){
-	let usern = checkIfLogged();
+	let usern = getCookie( "username" );
     userName = usern;
     let profileDiv = document.getElementById("profileDiv");
 	let profileP = profileDiv.getElementsByTagName("p")[0];
@@ -32,11 +32,18 @@ function showLoginDiv(){
     });
 }
 
-//Function to check if still logged
-function checkIfLogged(){
+//Save cookies function
+function setCookie(cname, cvalue, exdays) {
+	const d = new Date();
+	d.setTime(d.getTime() + (exdays*24*60*60*1000));
+	let expires = "expires="+ d.toUTCString();
+	document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
+}
+
+function getCookie( cname ){
 	let decodedCookie = decodeURIComponent(document.cookie);
 	let cookie = decodedCookie.split(';');
-	let cookieName = "username=";
+	let cookieName = cname + "=";
 	for(let i = 0; i <cookie.length; i++) {
 		let c = cookie[i];
 		while (c.charAt(0) == ' ') {
@@ -59,7 +66,21 @@ function fixContent(){
         content.style.marginLeft = "20px";
 }
 
+function saveSelectedPf(){
+    var opt = document.getElementById("savedPfMenu");
+    var pfInfo = opt.options[opt.selectedIndex].text;
+    var pfName = pfInfo.split(": ")[0];
+    var pfTickers = pfInfo.split(": ")[1];
+    var k = 0;
+    for(var i = 0; i < portFolios.length; i++) {
+        if(portFolios[i].pfName == pfName && portFolios[i].tickers == pfTickers )
+            k = i;
+    }
+    setCookie( "selectedPf", k, 5 );
+}
+
 function loadSelectedPf(){
+    saveSelectedPf();
     loadRiskData();
 }
 
@@ -81,7 +102,12 @@ function loadSavedPf(){
         savedPfMenu.appendChild(opt);
     }
     $("#savedPfMenu").selectpicker("refresh");
-    $("#savedPfMenu").selectpicker( "val", "0" );
+    if( getCookie( "selectedPf" ) != "" )
+        $("#savedPfMenu").selectpicker( "val", getCookie( "selectedPf" ) );
+    else{
+        $("#savedPfMenu").selectpicker( "val", "0" );
+        setCookie( "selectedPf", k, 0 );
+    }
     $("#savedPfMenu").selectpicker("refresh");
     loadRiskData(); 
 }

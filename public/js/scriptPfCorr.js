@@ -17,7 +17,7 @@ server.on("disconnect", () => {
 
 //Show login div
 function showLoginDiv(){
-	let usern = checkIfLogged();
+	let usern = getCookie( "username" );
     userName = usern;
     let profileDiv = document.getElementById("profileDiv");
 	let profileP = profileDiv.getElementsByTagName("p")[0];
@@ -33,11 +33,29 @@ function showLoginDiv(){
     });
 }
 
-//Function to check if still logged
-function checkIfLogged(){
+ 
+//Fix SideBar
+function fixContent(){
+    var sideBar = document.getElementById("sidebar");
+    var content = document.getElementById("content");
+    if( sideBar.classList[0] == "active" )
+        content.style.marginLeft = "300px";
+    else
+        content.style.marginLeft = "20px";
+}
+
+//Save cookies function
+function setCookie(cname, cvalue, exdays) {
+	const d = new Date();
+	d.setTime(d.getTime() + (exdays*24*60*60*1000));
+	let expires = "expires="+ d.toUTCString();
+	document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
+}
+
+function getCookie( cname ){
 	let decodedCookie = decodeURIComponent(document.cookie);
 	let cookie = decodedCookie.split(';');
-	let cookieName = "username=";
+	let cookieName = cname + "=";
 	for(let i = 0; i <cookie.length; i++) {
 		let c = cookie[i];
 		while (c.charAt(0) == ' ') {
@@ -48,16 +66,6 @@ function checkIfLogged(){
 		}
 	}
 	return "";
-}
-
-//Fix SideBar
-function fixContent(){
-    var sideBar = document.getElementById("sidebar");
-    var content = document.getElementById("content");
-    if( sideBar.classList[0] == "active" )
-        content.style.marginLeft = "300px";
-    else
-        content.style.marginLeft = "20px";
 }
 
 function loadSavedPf(){
@@ -71,11 +79,66 @@ function loadSavedPf(){
         savedPfMenu.appendChild(opt);
     }
     $("#savedPfMenu").selectpicker("refresh");
-    $("#savedPfMenu").selectpicker( "val", "0" );
+    if( getCookie( "selectedPf" ) != "" )
+        $("#savedPfMenu").selectpicker( "val", getCookie( "selectedPf" ) );
+    else{
+        $("#savedPfMenu").selectpicker( "val", "0" );
+        setCookie( "selectedPf", k, 0 );
+    }
     $("#savedPfMenu").selectpicker("refresh");
     loadSingleAssetData();
     loadCorrelationData(); 
 }
+
+function saveSelectedPf(){
+    var opt = document.getElementById("savedPfMenu");
+    var pfInfo = opt.options[opt.selectedIndex].text;
+    var pfName = pfInfo.split(": ")[0];
+    var pfTickers = pfInfo.split(": ")[1];
+    var k = 0;
+    for(var i = 0; i < portFolios.length; i++) {
+        if(portFolios[i].pfName == pfName && portFolios[i].tickers == pfTickers )
+            k = i;
+    }
+    setCookie( "selectedPf", k, 5 );
+}
+
+function loadSelectedPf(){
+    saveSelectedPf();
+    loadSingleAssetData();
+    loadCorrelationData();
+}
+
+function setPeriod(){
+    var opt = document.getElementById("selectSingleAssetPeriod");
+    var pfPeriod = opt.options[opt.selectedIndex].text;
+    PERIOD = pfPeriod.split("Y")[0];
+    loadSingleAssetData();
+    loadCorrelationData();
+}
+
+function setSingleAssetNormalized(){
+    var input = document.getElementById("selectNormalized");
+    if( input.checked )
+        NORMALIZED = true;
+    else
+        NORMALIZED = false;
+    loadSingleAssetData();
+}
+
+function loadSingleAssetData(){
+    var opt = document.getElementById("savedPfMenu");
+    var pfInfo = opt.options[opt.selectedIndex].text;
+    var pfName = pfInfo.split(": ")[0];
+    var pfTickers = pfInfo.split(": ")[1];
+
+    server.emit("getSingleAssetData", {name: pfName, tickers: pfTickers, period: PERIOD, norm: NORMALIZED}, (res) =>{
+        singleAssetData = JSON.parse( res["data"] );
+        drawSingleAssetsChart( singleAssetData );
+    });
+}
+
+
 
 function loadCorrelationData(){
     var opt = document.getElementById("savedPfMenu");
@@ -182,36 +245,6 @@ function setCorrTdColor( tds ){
             td.style.backgroundColor = "#C0392B";
         
     }
-}
-
-
-function setPeriod(){
-    var opt = document.getElementById("selectSingleAssetPeriod");
-    var pfPeriod = opt.options[opt.selectedIndex].text;
-    PERIOD = pfPeriod.split("Y")[0];
-    loadSingleAssetData();
-    loadCorrelationData();
-}
-
-function setSingleAssetNormalized(){
-    var input = document.getElementById("selectNormalized");
-    if( input.checked )
-        NORMALIZED = true;
-    else
-        NORMALIZED = false;
-    loadSingleAssetData();
-}
-
-function loadSingleAssetData(){
-    var opt = document.getElementById("savedPfMenu");
-    var pfInfo = opt.options[opt.selectedIndex].text;
-    var pfName = pfInfo.split(": ")[0];
-    var pfTickers = pfInfo.split(": ")[1];
-
-    server.emit("getSingleAssetData", {name: pfName, tickers: pfTickers, period: PERIOD, norm: NORMALIZED}, (res) =>{
-        singleAssetData = JSON.parse( res["data"] );
-        drawSingleAssetsChart( singleAssetData );
-    });
 }
 
 function drawSingleAssetsChart(data) {
