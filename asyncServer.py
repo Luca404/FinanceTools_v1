@@ -215,6 +215,33 @@ async def getRiskData( sid, data ):
     nonDiversRisk = round( nonDiversRisk * 100, 2 ) 
     return { "pfVolatility": pfVolatility, "diversRisk": diversRisk, "nonDiversRisk": nonDiversRisk}
 
+@server.event
+async def getMarkowitzData( sid, data ):
+    dfData = loadPfData( data, True )
+    weights = np.array( calculateWeights( data["weights"], dfData ) )
+    logReturns = np.log(dfData / dfData.shift(1))
+    nAsset = len(weights)
+    iteration = data["iter"]
+
+    pFolioReturns = []
+    pFolioVolatility = []
+    weightsArray = []
+
+    for x in range(iteration):
+        weights = np.random.random(nAsset)
+        weights /= np.sum(weights)
+        weightsArray.append(weights)
+        pFolioReturns.append(np.sum(weights * logReturns.mean()) * 250)
+        pFolioVolatility.append(np.sqrt(np.dot(weights.T, np.dot(logReturns.cov() * 250, weights))))
+
+    pFolioReturns = np.array(pFolioReturns)
+    pFolioVolatility = np.array(pFolioVolatility)
+    weightsArray = np.array(weightsArray)
+
+    pFolios = pd.DataFrame({"return": pFolioReturns, "volatility": pFolioVolatility})
+    pFolioW = pd.DataFrame(weightsArray * 100, columns=logReturns.columns.tolist())
+
+    return { "data": pFolios.to_json(), "weights": pFolioW.to_json() }
 
 
 
@@ -245,7 +272,7 @@ def calculateWeights( weights, dfData ):
 
 def loadPfData( data, singleAsset ):
     dfData = pd.DataFrame()
-    tickers = list(data["tickers"].split(","))
+    tickers = list(data["tickers"])
     for ticker in tickers:
         #Read ticker data from file if exist
         if( os.path.isfile("./json/tickers/" + ticker + ".json") ):

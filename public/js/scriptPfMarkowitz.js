@@ -1,6 +1,8 @@
 //CONST
 var pfData;
+var selectedPf;
 var PERIOD = 2;
+var ITERATION = 1000;
 var portFolios;
 
 //Connection to server
@@ -25,7 +27,7 @@ function showLoginDiv(){
         pfData = [];
         if( data["data"].length > 0 ){
             pfData = data["data"];
-            loadSavedPf();
+            loadSavedPf(portFolios);
         }
         else
             console.log("No saved Portfolio for logged user!");
@@ -77,6 +79,7 @@ function saveSelectedPf(){
             k = i;
     }
     setCookie( "selectedPf", k, 5 );
+    selectedPf = k;
 }
 
 function loadSelectedPf(){
@@ -113,17 +116,74 @@ function loadSavedPf(){
 }
 
 function loadMarkowitzData(){
-    var opt = document.getElementById("savedPfMenu");
-    var pfInfo = opt.options[opt.selectedIndex].text;
-    var pfName = pfInfo.split(": ")[0];
-    var pfTickers = pfInfo.split(": ")[1];
-    for(var i = 0; i < portFolios.length; i++) {
-        if(portFolios[i].pfName == pfName)
-            var weights = portFolios[i].numShares;
-    }
-    /*
-    server.emit("getRiskData", {name: pfName, tickers: pfTickers, period: PERIOD, weights: weights}, (res) =>{
-        drawRiskTable( res )
-    });*/
+    selectedPf = getCookie( "selectedPf" );
+    if( selectedPf == "" )
+        selectedPf = 0;
+    var pfName = portFolios[selectedPf].pfName;
+    var pfTickers = portFolios[selectedPf].tickers;
+    var weights = portFolios[selectedPf].numShares;
+    
+    server.emit("getMarkowitzData", {name: pfName, tickers: pfTickers, period: PERIOD, weights: weights, iter: ITERATION}, (res) =>{
+        var pfRetAndVol = JSON.parse( res["data"] );
+        var pfWeights = JSON.parse( res["weights"] );
+        drawMarkowitzTable( pfRetAndVol, pfWeights );
+    })
 }
 
+function drawMarkowitzTable( data, weights ){
+    var pfReturn = Object.values( data["return"] );
+    var pfVol = Object.values( data["volatility"] );
+    var pfWeights = Object.values( weights );
+
+    console.log( weights );
+    //Canvas creation
+    var canvasDiv = document.getElementById("markowitzCanvasDiv");
+    if( canvasDiv.children.length > 0 ){
+        canvasDiv.removeChild( document.getElementById("singlePerfCanvas") );
+    }
+    var canvasMarkowitz = document.createElement("canvas");
+    canvasMarkowitz.id = "singlePerfCanvas";
+    canvasMarkowitz.width = 700;
+    canvasMarkowitz.height = 450;
+    canvasMarkowitz.setAttribute("style", "display: inline-block");
+    canvasDiv.appendChild(canvasMarkowitz);
+
+    var dataList = []
+    for( var i = 0; i<pfReturn.length; i++ )
+        dataList[i] = {
+            x: parseFloat( pfVol[i] ), 
+            y: parseFloat( pfReturn[i] )
+        };
+
+    console.log( dataList );
+
+    //Markowitz chart Draw
+    new Chart(document.getElementById("singlePerfCanvas"), {
+        type: 'scatter',
+        data: {
+            datasets:[{
+                label: "Markowitz Efficient Frontier",
+                data: dataList,
+                fill: false,
+                pointBackgroundColor: 'black',       
+                showLine: false
+            }]
+        },
+        options: {
+            scales: {
+                xAxes: [{
+                    scaleLabel: {
+                        display: true,
+                        labelString: 'Volatility'
+                    }
+                }],
+                yAxes: [{
+                    scaleLabel: {
+                      display: true,
+                      labelString: 'Return'
+                    }
+                  }]
+            }
+        }          
+    });
+}

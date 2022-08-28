@@ -6,10 +6,13 @@ import time
 
 def getPrice( tickers ):
     prices = []
-    data = yf.download( tickers=tickers, period="1d" )
+    data = yf.download( tickers=list(tickers), period="1d", threads=True )
     for ticker in data["Adj Close"]:
-        prices.append( { ticker: round(data["Adj Close"][ticker][-1], 2) } )
+        price = data["Adj Close"][ticker][-1]
+        print( price )
+        prices.append( { ticker: round(price, 2) } )
     print( prices )
+    time.sleep( 1000 )
     return prices
 
 
