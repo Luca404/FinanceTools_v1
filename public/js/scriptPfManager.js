@@ -60,7 +60,6 @@ function getPfList( usrn ){
 function getTickersList(){
 	server.emit( "getTickersList", (result) => {
 		tickersList = result["data"];
-		showTickersInInput();
 	});
 }
 
@@ -91,21 +90,17 @@ function showLoginModal(){
 
 //Show dropdown menu with the tickers list from the server
 function showTickersInInput(){
-	var inputTickerType = document.getElementById("tickerTypeInput");
-	let selectedType = inputTickerType.options[inputTickerType.selectedIndex].text.toLowerCase();	
-	var inputExchange = document.getElementById("tickerExchangeInput");
-	
+	let selectedType = $("#tickerTypeInput").val();
 	if( selectedType == "stocks" ){
-		let selectedExchange = inputExchange.options[inputExchange.selectedIndex].text.toLowerCase();
+		let selectedExchange = $("#tickerExchangeInput").val();
 		var tickersType = selectedExchange;
-		inputExchange.style.display = "inline-block";
+		$("#tickerExchangeInput").selectpicker("show");
 	}
 	else{
-		inputExchange.style.display = "none";
+		$("#tickerExchangeInput").selectpicker("hide");
 		var tickersType = selectedType;
 	}
 
-    $("#addPfTickersInput").selectpicker('deselectAll');
     $("#addPfTickersInput").find('option').remove();
     $("#addPfTickersInput").find('li').remove();
     $("#addPfTickersInput").selectpicker('refresh');
@@ -114,6 +109,7 @@ function showTickersInInput(){
 	for( var i = 0; i < tickersDataList.length; i++ )
 		$("#addPfTickersInput").append( `<option onclick="selectTicker();" value="${tickersDataList[i].s}" data-subtext="${tickersDataList[i].n}" name="${selectedType + ':' + tickersType}">${tickersDataList[i].s}</option>` );
 	
+
 	$("#addPfTickersInput").on("changed.bs.select", selectTicker)
 	$("#addPfTickersInput").selectpicker( "refresh" );
 
@@ -128,7 +124,8 @@ function selectTicker(){
 function changeInputNumShares(event){
 	var ticker = $('#addPfTickersInput').val();
 	var type = $('#addPfTickersInput option:selected').attr("name");
-	addNumShares( ticker, type );
+	var name = $('#addPfTickersInput option:selected').attr("data-subtext");
+	addNumShares( ticker, type, name );
 	selectedTickers.push( ticker );
 }
 
@@ -151,16 +148,17 @@ function removeNumShares( name ){
 }
 
 //Add a number shares input 
-function addNumShares( ticker, type ){
+function addNumShares( ticker, type, name ){
 	var numSharesDiv = document.getElementById("pfSharesNumDiv");
 
 	var newDiv = document.createElement("div");
 	newDiv.style.display = "flex";
-	newDiv.style.marginLeft = "15%";
-	newDiv.style.marginTop = "5%";
+	newDiv.style.marginTop = "2%";
+	newDiv.style.marginBottom = "5%";
 
 	var newH = document.createElement("h6");
-	newH.innerText = ticker + ":  ";
+	newH.style.fontSize = "13px";
+	newH.innerText = name + "  (" + ticker + ")";
 	newDiv.appendChild( newH );
 	
 	var newInput = document.createElement("input");
@@ -259,13 +257,10 @@ function modifyPf(item){
 
 	$("#addPfNameInput").val(pfData[pfNum].pfName);
 
-	var inputTickerType = document.getElementById("tickerTypeInput");
-	var inputExchange = document.getElementById("tickerExchangeInput");
-
 	selectedTickers = [];
 	for( let i = 0; i<pfData[pfNum].tickers.length; i++ ){
-		let selectedType = inputTickerType.options[inputTickerType.selectedIndex].value.toLowerCase();
-		let selectedExchange = inputExchange.options[inputExchange.selectedIndex].value.toLowerCase();
+		let selectedType = $("#tickerTypeInput").val();		
+		let selectedExchange = $("#tickerExchangeInput").val();
 		let type = pfData[pfNum].type[i].split(":")[0];
 		let exch = pfData[pfNum].type[i].split(":")[1];
 		if( type == selectedType ){
@@ -276,9 +271,14 @@ function modifyPf(item){
 			$("#tickerTypeInput").val( type );
 		
 		//showTickersInInput();
-		
+		if( type == "stocks" )
+			var tickerType = exch;
+		else
+			var tickerType = type;
+
 		selectedTickers.push( pfData[pfNum].tickers[i] );
-		addNumShares( pfData[pfNum].tickers[i] );
+		console.log( tickersList );
+		addNumShares( pfData[pfNum].tickers[i], pfData[pfNum].type[i] );
 		let numSharesInput = document.getElementById( pfData[pfNum].tickers[i] + "NumShares" );
 		$( numSharesInput ).val( pfData[pfNum].numShares[i] );
 	}
@@ -325,7 +325,7 @@ function deletePfButt(){
 }
  
 function addPf(){
-	$('#addPfTickersInput').selectpicker('deselectAll');
+	showTickersInInput();
 	$("#addModalLabel").text("Add Portfolio");	
 	$("#addPfNameInput").val("");
 	$("#pfSharesNumDiv").empty();
