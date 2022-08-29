@@ -80,21 +80,36 @@
                 <br />
                 <h5>Markowitz Portfolio Optimization</h5>
                 <br />
-                <div id="assetMarkowitzDiv">
-                    <p>Period:
-                        &nbsp;&nbsp;
-                        <div id="setPeriodDiv">
-                            <select class="selectpicker" id="setPeriod" onchange="setPeriod();">
-                                <option value="1">1Y</option>
-                                <option value="2" selected>2Y</option>                    
-                                <option value="3">5Y</option>
-                                <option value="4">10Y</option>
-                            </select>
-                        </div>                         
-                    </p>
+                <div id="settingsDiv">
+                    <p>Period:</p>
+                    <div id="setPeriodDiv">
+                        <select class="selectpicker" id="setPeriod" onchange="setPeriod();">
+                            <option value="1">1Y</option>
+                            <option value="2" selected>2Y</option>                    
+                            <option value="3">5Y</option>
+                            <option value="4">10Y</option>
+                        </select>
+                    </div>
+                    <p style="margin-left:30px;" >Iterations: </p>
+                    <input id="iterationsInput" type="text" class="form-control border" aria-describedby="iterationButton" oninput="changeIterations();" >
+                    <div class="input-group-append">
+                        <button class="btn btn-outline-secondary" type="button" id="iterationButton" style="display:none;" onclick="setIterations();">Done</button>
+                    </div>
                 </div>
                 <br />              
                 <div id="markowitzCanvasDiv">
+                </div>
+                <br />
+                <br />
+                <div id="assetMarkowitzDiv">
+                    <div id="actualWeightsDiv" class="weightsDiv">
+                        <h6>Actual Weights: </h6>
+                        <input id="actualWeightsInput" class="weightsInput" disabled>
+                    </div>
+                    <div id="selectedWeightsDiv" class="weightsDiv">
+                        <h6>Selected Weights: </h6>
+                        <input id="selectedWeightsInput" class="weightsInput" disabled>
+                    </div>
                 </div>
             </div>
             <div id="profileDiv">

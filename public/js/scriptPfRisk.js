@@ -1,6 +1,7 @@
 //CONST
 var pfData;
 var PERIOD = 2;
+var selectedPf = 0;
 var portFolios;
 
 //Connection to server
@@ -77,6 +78,7 @@ function saveSelectedPf(){
             k = i;
     }
     setCookie( "selectedPf", k, 5 );
+    selectedPf = k;
 }
 
 function loadSelectedPf(){
@@ -109,21 +111,19 @@ function loadSavedPf(){
         setCookie( "selectedPf", k, 0 );
     }
     $("#savedPfMenu").selectpicker("refresh");
-    loadRiskData(); 
+    loadRiskData();
 }
 
 function loadRiskData(){
-    var opt = document.getElementById("savedPfMenu");
-    var pfInfo = opt.options[opt.selectedIndex].text;
-    var pfName = pfInfo.split(": ")[0];
-    var pfTickers = pfInfo.split(": ")[1];
-    for(var i = 0; i < portFolios.length; i++) {
-        if(portFolios[i].pfName == pfName)
-            var weights = portFolios[i].numShares;
-    }
+    selectedPf = getCookie( "selectedPf" );
+    if( selectedPf == "" )
+        selectedPf = 0;
+    var pfName = portFolios[selectedPf].pfName;
+    var pfTickers = portFolios[selectedPf].tickers;
+    var weights = portFolios[selectedPf].numShares;
 
     server.emit("getRiskData", {name: pfName, tickers: pfTickers, period: PERIOD, weights: weights}, (res) =>{
-        drawRiskTable( res )
+        drawRiskTable( res );
     });
 }
 

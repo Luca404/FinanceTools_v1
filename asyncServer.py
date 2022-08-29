@@ -148,7 +148,7 @@ async def deletePf(sid, data):
 async def getSingleAssetData(sid, data):
     dfData = pd.DataFrame()
     dfData = loadPfData( data, True )
-    tickers = list(data["tickers"].split(","))
+    tickers = list(data["tickers"])
     #Normalize data to 100
     if(data["norm"]):
         for ticker in tickers:
@@ -218,30 +218,37 @@ async def getRiskData( sid, data ):
 @server.event
 async def getMarkowitzData( sid, data ):
     dfData = loadPfData( data, True )
-    weights = np.array( calculateWeights( data["weights"], dfData ) )
+    pfWeights = np.array( calculateWeights( data["weights"], dfData ) )
     logReturns = np.log(dfData / dfData.shift(1))
-    nAsset = len(weights)
+    nAsset = len(pfWeights)
+    maxShares = data["maxShares"]
     iteration = data["iter"]
+
+    pfVariance = np.dot( pfWeights.T, np.dot( logReturns.cov() * 250, pfWeights ) )
+    pfVolatility = pfVariance ** 0.5
+    pfReturn = np.sum(pfWeights * logReturns.mean()) * 250
 
     pFolioReturns = []
     pFolioVolatility = []
     weightsArray = []
+    sharesArray = []
 
     for x in range(iteration):
-        weights = np.random.random(nAsset)
+        shares = np.random.randint(1, maxShares, size=nAsset)
+        sharesArray.append( shares )
+        weights = calculateWeights( shares, dfData )
         weights /= np.sum(weights)
-        weightsArray.append(weights)
         pFolioReturns.append(np.sum(weights * logReturns.mean()) * 250)
         pFolioVolatility.append(np.sqrt(np.dot(weights.T, np.dot(logReturns.cov() * 250, weights))))
 
     pFolioReturns = np.array(pFolioReturns)
     pFolioVolatility = np.array(pFolioVolatility)
-    weightsArray = np.array(weightsArray)
+    sharesArray = np.array(sharesArray)
 
     pFolios = pd.DataFrame({"return": pFolioReturns, "volatility": pFolioVolatility})
-    pFolioW = pd.DataFrame(weightsArray * 100, columns=logReturns.columns.tolist())
+    pFolioW = pd.DataFrame(weightsArray, columns=logReturns.columns.tolist())
 
-    return { "data": pFolios.to_json(), "weights": pFolioW.to_json() }
+    return { "data": pFolios.to_json(), "weights": sharesArray.tolist(), "pfData":[float(pfVolatility), float(pfReturn)] }
 
 
 

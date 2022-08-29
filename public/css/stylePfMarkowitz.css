@@ -1,17 +1,16 @@
 #profileDiv{
     position: absolute;
     border-radius: 7px; 
-    width: 8%;
-    height: 5%;
+    width: auto;
+    padding: 10px 0px 10px 0px;
+    height: 40px;
     margin-left: 91%;
     margin-top: 1%;
-    justify-content: center;
     display: flex;
-    vertical-align: center;
-    text-align: center;
+    justify-content: center;
+    align-items: center;
     background-color: #3445b4;
     font-size: 15px;
-    padding-top: 10px;
     color: white;
 }
 
@@ -19,25 +18,55 @@
     cursor: pointer;
 }
 
-#pfRiskTable{
-    text-align: center;
-    font-size: 13px;
-}
 
-
-#assetRiskDiv{
+#assetMarkowitzDiv{
     display: flex;
-    vertical-align: middle;
+    justify-content: center;
     text-align: center;
 }
-#assetRiskDiv > p{
-    margin-top: auto;
-    margin-bottom: auto;
+
+.weightsDiv{
+  display: flex;
+  margin-left: 10%;
 }
+
+.weightsDiv > h6{
+  display: flex;
+  margin-top: auto;
+}
+
+#weightsInput{
+  margin-top: auto;
+  margin-left: 10px;
+}
+
 
 /* Set size and color of bootstrap-select */
 #savedPfMenuDiv > div {
   width: 330px !important;
+}
+
+#settingsDiv{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#settingsDiv > input {
+  margin-left: 10px;
+}
+
+#settingsDiv > p {
+  margin-top: auto;
+  margin-bottom: auto;
+}
+
+#iterationsDiv{
+  display: flex;
+}
+
+#iterationsInput{
+  width: 70px;
 }
 
 #setPeriodDiv > div {

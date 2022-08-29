@@ -3,6 +3,7 @@ var pfData;
 var selectedPf;
 var PERIOD = 2;
 var ITERATION = 1000;
+var MAX_SHARES = 10;
 var portFolios;
 
 //Connection to server
@@ -94,6 +95,25 @@ function setPeriod(){
     loadMarkowitzData();
 }
 
+function changeIterations(){
+    var iter = $("#iterationsInput").val();
+    if( iter != ITERATION ){
+        $("#iterationButton").show();
+    }
+    else{
+        $("#iterationButton").hide();
+    }
+}
+
+
+function setIterations(){
+    var iter = $("#iterationsInput").val();
+    ITERATION = parseInt(iter);
+    loadMarkowitzData();
+    changeIterations();
+}
+
+
 function loadSavedPf(){
     portFolios = pfData;
     var savedPfMenu = document.getElementById('savedPfMenu'); 
@@ -112,6 +132,8 @@ function loadSavedPf(){
         setCookie( "selectedPf", k, 0 );
     }
     $("#savedPfMenu").selectpicker("refresh");
+    $("#iterationsInput").on("keypress", ( filterLetters ));
+    $("#iterationsInput").val( ITERATION );
     loadMarkowitzData(); 
 }
 
@@ -123,19 +145,25 @@ function loadMarkowitzData(){
     var pfTickers = portFolios[selectedPf].tickers;
     var weights = portFolios[selectedPf].numShares;
     
-    server.emit("getMarkowitzData", {name: pfName, tickers: pfTickers, period: PERIOD, weights: weights, iter: ITERATION}, (res) =>{
+    var weightsInput = document.getElementById( "actualWeightsInput" );
+    var text = ""
+    for( var i = 0; i<weights.length; i++ )
+        text = text + pfTickers[i] + ": " + weights[i] + "    ";
+    weightsInput.value = text;
+
+    server.emit("getMarkowitzData", {name: pfName, tickers: pfTickers, period: PERIOD, weights: weights, iter: ITERATION, maxShares: MAX_SHARES}, (res) =>{
         var pfRetAndVol = JSON.parse( res["data"] );
-        var pfWeights = JSON.parse( res["weights"] );
-        drawMarkowitzTable( pfRetAndVol, pfWeights );
+        var pfWeights = res["weights"];
+        var pfData = res["pfData"];
+        drawMarkowitzChart( pfRetAndVol, pfWeights, pfData, pfTickers );
     })
 }
 
-function drawMarkowitzTable( data, weights ){
+function drawMarkowitzChart( data, weights, pfData, tickers ){
     var pfReturn = Object.values( data["return"] );
     var pfVol = Object.values( data["volatility"] );
     var pfWeights = Object.values( weights );
 
-    console.log( weights );
     //Canvas creation
     var canvasDiv = document.getElementById("markowitzCanvasDiv");
     if( canvasDiv.children.length > 0 ){
@@ -152,24 +180,36 @@ function drawMarkowitzTable( data, weights ){
     for( var i = 0; i<pfReturn.length; i++ )
         dataList[i] = {
             x: parseFloat( pfVol[i] ), 
-            y: parseFloat( pfReturn[i] )
+            y: parseFloat( pfReturn[i] ),
+            id: i
         };
-
-    console.log( dataList );
 
     //Markowitz chart Draw
     new Chart(document.getElementById("singlePerfCanvas"), {
         type: 'scatter',
         data: {
-            datasets:[{
+            datasets:[  
+            {
+                label: "Actual Weights",
+                data: [{ x: pfData[0], y: pfData[1] }],
+                fill: false,
+                pointBackgroundColor: 'grey',       
+                showLine: false,
+                pointRadius: 5,
+                pointHoverRadius: 7
+            },
+            {
                 label: "Markowitz Efficient Frontier",
                 data: dataList,
                 fill: false,
-                pointBackgroundColor: 'black',       
+                pointBackgroundColor: 'blue',       
                 showLine: false
             }]
         },
         options: {
+            tooltips: {
+                enabled: false
+            },
             scales: {
                 xAxes: [{
                     scaleLabel: {
@@ -183,7 +223,37 @@ function drawMarkowitzTable( data, weights ){
                       labelString: 'Return'
                     }
                   }]
+            },
+            hover: {
+                mode: 'nearest',
+                intersect: true,
+                onHover: function (e, item) {
+                    if (item.length) {
+                        var weightsInput = document.getElementById( "selectedWeightsInput" );
+                        var actualWeights = document.getElementById( "actualWeightsInput" );
+                        var text = "";
+                        if( item[0]._datasetIndex == 1 ){
+                            var data = item[0]._chart.config.data.datasets[1].data[item[0]._index];
+                            var id = data.id;
+                            var k = 0;
+                            for( var i = 0; i<tickers.length; i++ ){
+                                text = text + tickers[i] + ": " + pfWeights[id][k] + "    ";
+                                k++;
+                            }
+                            weightsInput.value = text;   
+                        }
+                        else{
+                            weightsInput.value = actualWeights.value; 
+                        }
+                    }
+                }
             }
         }          
     });
+}
+
+function filterLetters(evt){
+	var hold = String.fromCharCode(evt.which);  
+	if( (/[a-z A-Z*!@#$%^&*()_/[\]}=+><{?",:.;'"|]/.test(hold)))
+		evt.preventDefault();
 }

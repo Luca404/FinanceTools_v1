@@ -101,6 +101,7 @@ function saveSelectedPf(){
             k = i;
     }
     setCookie( "selectedPf", k, 5 );
+    selectedPf = k;
 }
 
 function loadSelectedPf(){
@@ -127,10 +128,11 @@ function setSingleAssetNormalized(){
 }
 
 function loadSingleAssetData(){
-    var opt = document.getElementById("savedPfMenu");
-    var pfInfo = opt.options[opt.selectedIndex].text;
-    var pfName = pfInfo.split(": ")[0];
-    var pfTickers = pfInfo.split(": ")[1];
+    selectedPf = getCookie( "selectedPf" );
+    if( selectedPf == "" )
+        selectedPf = 0;
+    var pfName = portFolios[selectedPf].pfName;
+    var pfTickers = portFolios[selectedPf].tickers;
 
     server.emit("getSingleAssetData", {name: pfName, tickers: pfTickers, period: PERIOD, norm: NORMALIZED}, (res) =>{
         singleAssetData = JSON.parse( res["data"] );
@@ -141,14 +143,12 @@ function loadSingleAssetData(){
 
 
 function loadCorrelationData(){
-    var opt = document.getElementById("savedPfMenu");
-    var pfInfo = opt.options[opt.selectedIndex].text;
-    var pfName = pfInfo.split(": ")[0];
-    var pfTickers = pfInfo.split(": ")[1];
-    for(var i = 0; i < portFolios.length; i++) {
-        if(portFolios[i].pfName == pfName)
-            var weights = portFolios[i].numShares;
-    }
+    selectedPf = getCookie( "selectedPf" );
+    if( selectedPf == "" )
+        selectedPf = 0;
+    var pfName = portFolios[selectedPf].pfName;
+    var pfTickers = portFolios[selectedPf].tickers;
+    var weights = portFolios[selectedPf].numShares;
 
     server.emit("getCorrData", {name: pfName, tickers: pfTickers, period: PERIOD, weights: weights}, (res) =>{
         var corrData = JSON.parse( res["assetsCorr"] );
