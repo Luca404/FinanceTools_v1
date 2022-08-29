@@ -98,10 +98,12 @@ function setPeriod(){
 function changeIterations(){
     var iter = $("#iterationsInput").val();
     if( iter != ITERATION ){
-        $("#iterationButton").show();
+        $("#iterationButton").css( "opacity", 1 );
+        $("#iterationButton").prop( "disabled", false );
     }
     else{
-        $("#iterationButton").hide();
+        $("#iterationButton").css( "opacity", 0.2 );
+        $("#iterationButton").prop( "disabled", true );
     }
 }
 
@@ -111,6 +113,25 @@ function setIterations(){
     ITERATION = parseInt(iter);
     loadMarkowitzData();
     changeIterations();
+}
+
+function changeMaxShares(){
+    var maxShares = $("#maxSharesInput").val();
+    if( maxShares != MAX_SHARES ){
+        $("#maxSharesButton").css("opacity", 1);
+        $("#maxSharesButton").prop("disabled", false);
+    }
+    else{
+        $("#maxSharesButton").css("opacity", 0.2);
+        $("#maxSharesButton").prop("disabled", true);
+    }
+}
+
+function setMaxShares(){
+    var maxShares = $("#maxSharesInput").val();
+    MAX_SHARES = parseInt(maxShares);
+    loadMarkowitzData();
+    changeMaxShares();
 }
 
 
@@ -134,6 +155,8 @@ function loadSavedPf(){
     $("#savedPfMenu").selectpicker("refresh");
     $("#iterationsInput").on("keypress", ( filterLetters ));
     $("#iterationsInput").val( ITERATION );
+    $("#maxSharesInput").on("keypress", ( filterLetters ));
+    $("#maxSharesInput").val( MAX_SHARES );
     loadMarkowitzData(); 
 }
 
@@ -208,7 +231,17 @@ function drawMarkowitzChart( data, weights, pfData, tickers ){
         },
         options: {
             tooltips: {
-                enabled: false
+                callbacks: {
+                    label: function(tooltipItem, data) {
+                        return ["Return: " + tooltipItem.yLabel.toFixed(2), "Volatility: " + tooltipItem.xLabel.toFixed(2)];
+                    }
+                  },
+                  backgroundColor: '#FFF',
+                  titleFontSize: 16,
+                  titleFontColor: '#0066ff',
+                  bodyFontColor: '#000',
+                  bodyFontSize: 14,
+                  displayColors: false
             },
             scales: {
                 xAxes: [{
@@ -254,6 +287,6 @@ function drawMarkowitzChart( data, weights, pfData, tickers ){
 
 function filterLetters(evt){
 	var hold = String.fromCharCode(evt.which);  
-	if( (/[a-z A-Z*!@#$%^&*()_/[\]}=+><{?",:.;'"|]/.test(hold)))
+	if( !(/[0-9]/.test(hold)) )
 		evt.preventDefault();
 }

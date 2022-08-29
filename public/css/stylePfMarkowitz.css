@@ -69,6 +69,14 @@
   width: 70px;
 }
 
+#maxSharesDiv{
+  display: flex;
+}
+
+#maxSharesInput{
+  width: 70px;
+}
+
 #setPeriodDiv > div {
   width: 70px !important;
 }

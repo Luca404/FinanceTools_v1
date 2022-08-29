@@ -90,11 +90,19 @@
                             <option value="4">10Y</option>
                         </select>
                     </div>
+
                     <p style="margin-left:30px;" >Iterations: </p>
                     <input id="iterationsInput" type="text" class="form-control border" aria-describedby="iterationButton" oninput="changeIterations();" >
                     <div class="input-group-append">
-                        <button class="btn btn-outline-secondary" type="button" id="iterationButton" style="display:none;" onclick="setIterations();">Done</button>
+                        <button class="btn btn-outline-secondary" type="button" id="iterationButton" style="opacity:0.2;" disabled onclick="setIterations();">Done</button>
                     </div>
+
+                    <p style="margin-left:30px;" >Max Shares: </p>
+                    <input id="maxSharesInput" type="text" class="form-control border" aria-describedby="maxSharesButton" oninput="changeMaxShares();" >
+                    <div class="input-group-append">
+                        <button class="btn btn-outline-secondary" type="button" id="maxSharesButton" style="opacity:0.2;" disabled onclick="setMaxShares();">Done</button>
+                    </div>
+
                 </div>
                 <br />              
                 <div id="markowitzCanvasDiv">

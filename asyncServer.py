@@ -245,10 +245,10 @@ async def getMarkowitzData( sid, data ):
     pFolioVolatility = np.array(pFolioVolatility)
     sharesArray = np.array(sharesArray)
 
-    pFolios = pd.DataFrame({"return": pFolioReturns, "volatility": pFolioVolatility})
+    pFolios = pd.DataFrame({"return": pFolioReturns*100, "volatility": pFolioVolatility*100})
     pFolioW = pd.DataFrame(weightsArray, columns=logReturns.columns.tolist())
 
-    return { "data": pFolios.to_json(), "weights": sharesArray.tolist(), "pfData":[float(pfVolatility), float(pfReturn)] }
+    return { "data": pFolios.to_json(), "weights": sharesArray.tolist(), "pfData":[float(pfVolatility*100), float(pfReturn*100)] }
 
 
 
