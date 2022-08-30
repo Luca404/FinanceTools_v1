@@ -209,7 +209,12 @@ function loadTable1(data){
 		tr.appendChild(td3);
 
 		var td4 = document.createElement("td");
-		td4.className = "modifyTd"
+		td4.className = "itemTd"
+		td4.appendChild(document.createTextNode(portFolios[i].pfValue));
+		tr.appendChild(td4);
+
+		var td5 = document.createElement("td");
+		td5.className = "modifyTd"
 		
 		//Add modify button
 		var modifyButton = document.createElement("button");
@@ -238,10 +243,10 @@ function loadTable1(data){
 		deleteImg.src = "static/img/delete-icon-1.png";
 		deleteButton.append(deleteImg);
 
-        td4.appendChild(modifyButton);
-		td4.appendChild(deleteButton);
+        td5.appendChild(modifyButton);
+		td5.appendChild(deleteButton);
 
-		tr.appendChild(td4);
+		tr.appendChild(td5);
 
 		tbody.insertBefore( tr, tbody.lastElementChild);
 	}

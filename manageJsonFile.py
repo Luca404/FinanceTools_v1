@@ -18,9 +18,7 @@ def getPrice( tickers ):
     time.sleep( 10 )
     return prices
 
-
-
-if __name__ == "__main__":
+def changeFilesAndAddPrices():
     files = os.listdir("./json/tickersList/")
     tickersList = {}
     tickers = []
@@ -51,3 +49,18 @@ if __name__ == "__main__":
         tickersList[fileName] = newJsonData["data"]
     
     print( tickersList )
+
+def addPfPrices( user ):
+    pfData = []
+    with open("./json/portfolios.json") as f:
+        data = json.load(f)
+   
+    for i in range(0, len(data["PortFolios"]) ):
+        if( data["PortFolios"][i]["userID"] == user ):
+            for k in range(0, len(data["PortFolios"][i]["pfData"]) ):
+                print( data["PortFolios"][i]["pfData"][k] )
+                time.sleep(100)
+
+if __name__ == "__main__":
+    addPfPrices( "Lika44" )
+    

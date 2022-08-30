@@ -35,9 +35,11 @@
   margin-top: auto;
 }
 
-#weightsInput{
+
+.weightsInput{
   margin-top: auto;
   margin-left: 10px;
+  width: 200px;
 }
 
 

@@ -60,11 +60,11 @@ async def registerUser( sid, data ):
 
 @server.event
 async def getTickersList(sid):
-    files = os.listdir("./json/tickersList/")
+    files = os.listdir("./json/tickersList/tickers/")
     tickersList = {}
     for file in files:
         fileName = file.split( ".json" )[0]
-        with open( "./json/tickersList/" + file ) as f:
+        with open( "./json/tickersList/tickers/" + file ) as f:
             jsonData = json.load(f)
         tickersList[fileName] = jsonData["data"]
     return {"data": tickersList}

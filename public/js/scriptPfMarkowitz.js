@@ -150,7 +150,7 @@ function loadSavedPf(){
         $("#savedPfMenu").selectpicker( "val", getCookie( "selectedPf" ) );
     else{
         $("#savedPfMenu").selectpicker( "val", "0" );
-        setCookie( "selectedPf", k, 0 );
+        setCookie( "selectedPf", 0 );
     }
     $("#savedPfMenu").selectpicker("refresh");
     $("#iterationsInput").on("keypress", ( filterLetters ));
