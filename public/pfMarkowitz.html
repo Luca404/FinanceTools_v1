@@ -92,15 +92,21 @@
                     </div>
 
                     <p style="margin-left:30px;" >Iterations: </p>
-                    <input id="iterationsInput" type="text" class="form-control border" aria-describedby="iterationButton" oninput="changeIterations();" >
+                    <input id="iterationsInput" class="settingsInput" type="text" class="form-control border" aria-describedby="iterationButton" oninput="changeIterations();" >
                     <div class="input-group-append">
                         <button class="btn btn-outline-secondary" type="button" id="iterationButton" style="opacity:0.2;" disabled onclick="setIterations();">Done</button>
                     </div>
 
                     <p style="margin-left:30px;" >Max Shares: </p>
-                    <input id="maxSharesInput" type="text" class="form-control border" aria-describedby="maxSharesButton" oninput="changeMaxShares();" >
+                    <input id="maxSharesInput" class="settingsInput" type="text" class="form-control border" aria-describedby="maxSharesButton" oninput="changeMaxShares();" >
                     <div class="input-group-append">
                         <button class="btn btn-outline-secondary" type="button" id="maxSharesButton" style="opacity:0.2;" disabled onclick="setMaxShares();">Done</button>
+                    </div>
+
+                    <p style="margin-left:30px;" >Max Values: </p>
+                    <input id="maxValuesInput" class="settingsInput" type="text" class="form-control border" aria-describedby="maxValuesButton" oninput="changeMaxValues();" >
+                    <div class="input-group-append">
+                        <button class="btn btn-outline-secondary" type="button" id="maxValuesButton" style="opacity:0.2;" disabled onclick="setMaxValues();">Done</button>
                     </div>
 
                 </div>
@@ -109,14 +115,27 @@
                 </div>
                 <br />
                 <br />
-                <div id="assetMarkowitzDiv"> 
-                    <div id="actualWeightsDiv" class="weightsDiv">
-                        <h6>Actual Weights: </h6>
-                        <input id="actualWeightsInput" class="weightsInput" disabled>
+                <div class="dataContDiv">
+                    <div id="actualDiv"> 
+                        <div id="actualWeightsDiv" class="dataDiv">
+                            <h6>Actual Weights: </h6>
+                            <input id="actualWeightsInput" class="dataInput" disabled>
+                        </div>
+                        <div id="actualValueDiv" class="dataDiv">
+                            <h6>Actual Value: </h6>
+                            <input id="actualValueInput" class="dataInput" style="text-align:center;" disabled>
+                        </div>
                     </div>
-                    <div id="selectedWeightsDiv" class="weightsDiv">
-                        <h6>Selected Weights: </h6>
-                        <input id="selectedWeightsInput" class="weightsInput" disabled>
+                
+                    <div id="selectedDiv">
+                        <div id="selectedWeightsDiv" class="dataDiv">
+                            <h6>Selected Weights: </h6>
+                            <input id="selectedWeightsInput" class="dataInput" disabled>
+                        </div>
+                        <div id="selectedValueDiv" class="dataDiv">
+                            <h6>Selected Value: </h6>
+                            <input id="selectedValueInput" class="dataInput" style="text-align:center;" disabled>
+                        </div>
                     </div>
                 </div>
             </div>

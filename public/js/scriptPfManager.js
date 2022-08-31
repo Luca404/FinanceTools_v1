@@ -194,23 +194,27 @@ function loadTable1(data){
 		tr.className = "itemTabella";
 
 		var td1 = document.createElement("td");
-		td1.className = "itemTd"
+		td1.className = "itemTd";
 		td1.appendChild(document.createTextNode(portFolios[i].pfName));
 		tr.appendChild(td1);
 
 		var td2 = document.createElement("td");
-		td2.className = "itemTd"
+		td2.className = "itemTd";
 		td2.appendChild(document.createTextNode(portFolios[i].tickers));
 		tr.appendChild(td2);
 
 		var td3 = document.createElement("td");
-		td3.className = "itemTd"
+		td3.className = "itemTd";
 		td3.appendChild(document.createTextNode(portFolios[i].numShares));
 		tr.appendChild(td3);
 
+		var pfValue = 0;
+		for( var k = 0; k < portFolios[i].prices.length; k++ )
+			pfValue = pfValue + ( portFolios[i].prices[k] * portFolios[i].numShares[k] );
+		
 		var td4 = document.createElement("td");
-		td4.className = "itemTd"
-		td4.appendChild(document.createTextNode(portFolios[i].pfValue));
+		td4.className = "itemTd";
+		td4.appendChild(document.createTextNode( parseInt(pfValue).toString() + "$" ));
 		tr.appendChild(td4);
 
 		var td5 = document.createElement("td");

@@ -4,6 +4,7 @@ var selectedPf;
 var PERIOD = 2;
 var ITERATION = 1000;
 var MAX_SHARES = 10;
+var MAX_VALUES = 10000;
 var portFolios;
 
 //Connection to server
@@ -134,6 +135,25 @@ function setMaxShares(){
     changeMaxShares();
 }
 
+function changeMaxValues(){
+    var maxValues = $("#maxValuesInput").val();
+    if( maxValues != MAX_VALUES ){
+        $("#maxValuesButton").css("opacity", 1);
+        $("#maxValuesButton").prop("disabled", false);
+    }
+    else{
+        $("#maxValuesButton").css("opacity", 0.2);
+        $("#maxValuesButton").prop("disabled", true);
+    }
+}
+
+function setMaxValues(){
+    var maxValues = $("#maxValuesInput").val();
+    MAX_VALUES = parseInt(maxValues);
+    loadMarkowitzData();
+    changeMaxValues();
+}
+
 
 function loadSavedPf(){
     portFolios = pfData;
@@ -157,6 +177,8 @@ function loadSavedPf(){
     $("#iterationsInput").val( ITERATION );
     $("#maxSharesInput").on("keypress", ( filterLetters ));
     $("#maxSharesInput").val( MAX_SHARES );
+    $("#maxValuesInput").on("keypress", ( filterLetters ));
+    $("#maxValuesInput").val( MAX_VALUES);
     loadMarkowitzData(); 
 }
 
@@ -168,21 +190,28 @@ function loadMarkowitzData(){
     var pfTickers = portFolios[selectedPf].tickers;
     var weights = portFolios[selectedPf].numShares;
     
-    var weightsInput = document.getElementById( "actualWeightsInput" );
+    var actualWeights = document.getElementById( "actualWeightsInput" );
     var text = ""
     for( var i = 0; i<weights.length; i++ )
         text = text + pfTickers[i] + ": " + weights[i] + "    ";
-    weightsInput.value = text;
+    actualWeights.value = text;
 
-    server.emit("getMarkowitzData", {name: pfName, tickers: pfTickers, period: PERIOD, weights: weights, iter: ITERATION, maxShares: MAX_SHARES}, (res) =>{
+    var actualValue = document.getElementById( "actualValueInput" );
+    var text = ""
+    var value = 0;
+    for( var i = 0; i<weights.length; i++ )
+        value = value + portFolios[selectedPf].prices[i] * weights[i];
+    actualValue.value = parseInt(value).toString() + "$";
+
+    server.emit("getMarkowitzData", {name: pfName, tickers: pfTickers, period: PERIOD, weights: weights, iter: ITERATION, maxShares: MAX_SHARES, maxValues: MAX_VALUES, prices:portFolios[selectedPf].prices}, (res) =>{
         var pfRetAndVol = JSON.parse( res["data"] );
         var pfWeights = res["weights"];
         var pfData = res["pfData"];
-        drawMarkowitzChart( pfRetAndVol, pfWeights, pfData, pfTickers );
+        drawMarkowitzChart( pfRetAndVol, pfWeights, pfData, pfTickers, portFolios[selectedPf].prices );
     })
 }
 
-function drawMarkowitzChart( data, weights, pfData, tickers ){
+function drawMarkowitzChart( data, weights, pfData, tickers, prices ){
     var pfReturn = Object.values( data["return"] );
     var pfVol = Object.values( data["volatility"] );
     var pfWeights = Object.values( weights );
@@ -194,9 +223,6 @@ function drawMarkowitzChart( data, weights, pfData, tickers ){
     }
     var canvasMarkowitz = document.createElement("canvas");
     canvasMarkowitz.id = "singlePerfCanvas";
-    canvasMarkowitz.width = 700;
-    canvasMarkowitz.height = 450;
-    canvasMarkowitz.setAttribute("style", "display: inline-block");
     canvasDiv.appendChild(canvasMarkowitz);
 
     var dataList = []
@@ -230,6 +256,8 @@ function drawMarkowitzChart( data, weights, pfData, tickers ){
             }]
         },
         options: {
+            responsive: true,
+            maintainAspectRatio: true,
             tooltips: {
                 callbacks: {
                     label: function(tooltipItem, data) {
@@ -262,22 +290,32 @@ function drawMarkowitzChart( data, weights, pfData, tickers ){
                 intersect: true,
                 onHover: function (e, item) {
                     if (item.length) {
-                        var weightsInput = document.getElementById( "selectedWeightsInput" );
+                        var selectedWeights = document.getElementById( "selectedWeightsInput" );
                         var actualWeights = document.getElementById( "actualWeightsInput" );
                         var text = "";
                         if( item[0]._datasetIndex == 1 ){
                             var data = item[0]._chart.config.data.datasets[1].data[item[0]._index];
                             var id = data.id;
-                            var k = 0;
-                            for( var i = 0; i<tickers.length; i++ ){
-                                text = text + tickers[i] + ": " + pfWeights[id][k] + "    ";
-                                k++;
-                            }
-                            weightsInput.value = text;   
+                            for( var i = 0; i<tickers.length; i++ )
+                                text = text + tickers[i] + ": " + pfWeights[id][i] + "    ";
+                            selectedWeights.value = text;   
                         }
-                        else{
-                            weightsInput.value = actualWeights.value; 
+                        else
+                            selectedWeights.value = actualWeights.value; 
+
+                        var selectedValue = document.getElementById( "selectedValueInput" );
+                        var actualValue = document.getElementById( "actualValueInput" );
+                        var value = 0;
+                        if( item[0]._datasetIndex == 1 ){
+                            var data = item[0]._chart.config.data.datasets[1].data[item[0]._index];
+                            var id = data.id;
+                            for( var i = 0; i<tickers.length; i++ )
+                                value = value + prices[i] * pfWeights[id][i];
+                            selectedValue.value = parseInt(value).toString() + "$";   
                         }
+                        else
+                            selectedValue.value = actualValue.value; 
+                        
                     }
                 }
             }

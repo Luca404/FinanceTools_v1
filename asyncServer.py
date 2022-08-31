@@ -221,7 +221,9 @@ async def getMarkowitzData( sid, data ):
     pfWeights = np.array( calculateWeights( data["weights"], dfData ) )
     logReturns = np.log(dfData / dfData.shift(1))
     nAsset = len(pfWeights)
+    prices = data["prices"]
     maxShares = data["maxShares"]
+    maxValues = data["maxValues"]
     iteration = data["iter"]
 
     pfVariance = np.dot( pfWeights.T, np.dot( logReturns.cov() * 250, pfWeights ) )
@@ -233,13 +235,19 @@ async def getMarkowitzData( sid, data ):
     weightsArray = []
     sharesArray = []
 
-    for x in range(iteration):
+    x = 0
+    while( x<iteration ):
         shares = np.random.randint(1, maxShares, size=nAsset)
-        sharesArray.append( shares )
-        weights = calculateWeights( shares, dfData )
-        weights /= np.sum(weights)
-        pFolioReturns.append(np.sum(weights * logReturns.mean()) * 250)
-        pFolioVolatility.append(np.sqrt(np.dot(weights.T, np.dot(logReturns.cov() * 250, weights))))
+        value = 0
+        for i in range( 0, len(shares) ):
+            value = value + prices[i] * shares[i]
+        if( value < maxValues and not( isAllEven( shares ) ) ):
+            sharesArray.append( shares )
+            weights = calculateWeights( shares, dfData )
+            weights /= np.sum(weights)
+            pFolioReturns.append(np.sum(weights * logReturns.mean()) * 250)
+            pFolioVolatility.append(np.sqrt(np.dot(weights.T, np.dot(logReturns.cov() * 250, weights))))
+            x += 1
 
     pFolioReturns = np.array(pFolioReturns)
     pFolioVolatility = np.array(pFolioVolatility)
@@ -251,8 +259,14 @@ async def getMarkowitzData( sid, data ):
     return { "data": pFolios.to_json(), "weights": sharesArray.tolist(), "pfData":[float(pfVolatility*100), float(pfReturn*100)] }
 
 
-
 #Server's functions
+def isAllEven( data ):
+    even = True
+    for i in data:
+        if( i%2 != 0 ):
+            even = False
+    return even
+
 def loadPfList( usrn ):
     pfData = []
     with open("./json/portfolios.json") as f:
