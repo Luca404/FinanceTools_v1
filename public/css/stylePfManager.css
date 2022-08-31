@@ -10,7 +10,7 @@ body{
 #corpo{
     background-color: white;
 }
- 
+
 #pfSharesNumDiv{
     position: relative;
     display: flex;
@@ -66,6 +66,11 @@ body{
  
 #profileDiv:hover{
     cursor: pointer;
+}
+
+#addModal{
+    text-align: center;
+    justify-content: center;
 }
 
 #successLoginDiv{
@@ -239,6 +244,9 @@ body{
     vertical-align: middle !important;
 }
 
+.nameInput{
+    width: 90px;
+}
 
 #addPfDiv{
     position: relative;

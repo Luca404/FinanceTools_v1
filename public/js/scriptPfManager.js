@@ -131,22 +131,24 @@ function changeInputNumShares(event){
 	selectedTickers.push( ticker );
 }
 
-function removeTicker(elem){
-	removeNumShares( elem.id );
-}
 
 //Remove a number shares input 
 function removeNumShares( name ){
-	var numSharesDiv = document.getElementById("pfSharesNumDiv");
-	var numSharesDivs = numSharesDiv.getElementsByTagName("div");
-	for( var i=0;i<numSharesDivs.length;i++ ){
-		let numSharesText = numSharesDivs[i].getElementsByTagName("input")[0].label;
-		if( numSharesText == name ){
-			numSharesDiv.removeChild( numSharesDivs[i] );
-			let index = selectedTickers.indexOf( numSharesText );
+	var numSharesTable = document.getElementById("tbody2");
+	var numSharesTrs = numSharesTable.getElementsByTagName("tr");
+	console.log( numSharesTrs );
+	console.log( name );
+	for( var i=0;i<numSharesTrs.length;i++ ){
+		let td = numSharesTrs[i].getElementsByClassName( "symbolTd" )[0];
+		let symbol = td.innerText;
+		if( symbol == name ){
+			numSharesTable.removeChild( numSharesTrs[i] );
+			let index = selectedTickers.indexOf( symbol );
 			selectedTickers.splice( index, 1 );
 		}
 	}
+	if( selectedTickers.length == 0 )
+		$("#thead2").css( "opacity", 0.2 );
 }
 
 //Add a number shares input 
@@ -154,15 +156,19 @@ function addNumShares( ticker, type, name, price ){
 	var tbody = document.getElementById("tbody2");
 	console.log( tbody );
 	var tr = document.createElement("tr");
-	tr.className = "itemTabella";
 
 	var td1 = document.createElement("td");
 	td1.className = "itemTd";
-	td1.appendChild(document.createTextNode(name));
+	var nameInput = document.createElement( "input" );
+	nameInput.type = "text";
+	nameInput.className = "nameInput";
+	nameInput.disabled = true;
+	nameInput.value = name;
+	td1.appendChild(nameInput);
 	tr.appendChild(td1);
 
 	var td2 = document.createElement("td");
-	td2.className = "itemTd";
+	td2.className = "itemTd symbolTd";
 	td2.appendChild(document.createTextNode(ticker));
 	tr.appendChild(td2);
 
@@ -186,11 +192,13 @@ function addNumShares( ticker, type, name, price ){
 	deleteButt.className = "btn btn-primary";
 	deleteButt.id = ticker;
 	deleteButt.innerText = "X";
-	deleteButt.onclick = function() { removeTicker(this); };
+	deleteButt.onclick = function() { removeNumShares(this.id); };
 	td5.appendChild( deleteButt );
 	tr.appendChild( td5 );
 
 	tbody.appendChild( tr );
+
+	$("#thead2").css( "opacity", 1 );
 }
 
 //Load table with portfolios
@@ -268,12 +276,15 @@ function loadTable1(data){
 //Function for modify a portfolio
 function modifyPf(item){
 	$("#addModalLabel").text("Modify Portfolio");
-	$("#pfSharesNumDiv").empty();
+	$("#sharesNumTable tbody").empty();
 
 	pfNum = item.id.toString();
 	pfNum = pfNum.split("modifyButt")[1];
 
 	$("#addPfNameInput").val(pfData[pfNum].pfName);
+
+	let tickersPriceDict = Object.assign({}, ...tickersList[tickerType].map((x) => ({[Object.values(x)[0]]: [Object.values(x)[0].p]})));
+	console.log( tickersPriceDict );
 
 	selectedTickers = [];
 	for( let i = 0; i<pfData[pfNum].tickers.length; i++ ){
@@ -295,8 +306,7 @@ function modifyPf(item){
 			var tickerType = type;
 
 		selectedTickers.push( pfData[pfNum].tickers[i] );
-		console.log( tickersList );
-		addNumShares( pfData[pfNum].tickers[i], pfData[pfNum].type[i] );
+		addNumShares( pfData[pfNum].tickers[i], pfData[pfNum].type[i], "pollo",pfData[pfNum].prices[i] );
 		let numSharesInput = document.getElementById( pfData[pfNum].tickers[i] + "NumShares" );
 		$( numSharesInput ).val( pfData[pfNum].numShares[i] );
 	}
@@ -346,7 +356,8 @@ function addPf(){
 	showTickersInInput();
 	$("#addModalLabel").text("Add Portfolio");	
 	$("#addPfNameInput").val("");
-	$("#pfSharesNumDiv").empty();
+	$("#sharesNumTable tbody").empty();
+	$("#thead2").css( "opacity", 0.2 );
 	selectedTickers = [];
 }
 

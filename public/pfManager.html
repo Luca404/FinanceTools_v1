@@ -84,105 +84,6 @@
                                 <div id="addPfDiv" data-toggle="modal" data-target="#addModal" onclick="addPf()" >
                                     <span class="hoverText" data-hover="Click to add a Portfolio" >Add</span>
                                 </div>
-                                <!-- Add portfolio Modal -->
-                                <div class="modal fade" id="addModal" tabindex="-1" role="dialog" aria-labelledby="addModalLabel" aria-hidden="true">
-                                    <div class="modal-dialog" role="document">
-                                        <div class="modal-content">
-                                            <div class="modal-header">
-                                                <h5 class="modal-title" id="addModalLabel">Add Portfolio</h5>
-                                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                                    <span aria-hidden="true">&times;</span></button>
-                                                </button>
-                                            </div>
-                                            <div class="modal-body">
-                                                <h5>Portfolio Name:</h5>
-                                                <input id="addPfNameInput" class="inputCheck" autocomplete="one-time-code" />
-                                                <br />
-                                                <br />
-                                                <h5>Portfolio Tickers:</h5>
-                                                <span id="portfolioTickers" style="display:inline-block; vertical-align:top;">
-                                                    <span class="mb-3" style="display:inline-block; color:black;">
-                                                        <div>
-                                                            <div class="color-1">
-                                                                <select data-placeholder="Select Asset Type" class="selectpicker" id="tickerTypeInput" tabindex="1" onchange="showTickersInInput();" >
-                                                                    <option value="stocks" selected="selected">Stocks</option>
-                                                                    <option value="etf">ETF</option>
-                                                                    <option value="commodities">Commodities</option>
-                                                                    <option value="cryptocurrencies">Cryptocurrencies</option>
-                                                                </select>
-                                                            </div>                                                        
-                                                        </div>
-                                                    </span>
-                                                    <span class="mb-3" style="display:inline-block; color:black;">
-                                                        <div>
-                                                            <div class="color-1">
-                                                                <select data-placeholder="Select Country" class="selectpicker" id="tickerExchangeInput" tabindex="1" onchange="showTickersInInput();" >
-                                                                <optgroup label="Nord America">
-                                                                    <option value="nyse">NYSE</option>
-                                                                    <option value="nasdaq">NASDAQ</option>
-                                                                <optgroup label="Europe">
-                                                                    <option value="ftse">FTSE</option>
-                                                                <optgroup label="Asia">
-                                                                    <option value="csi">CSI</option>
-                                                                </select>
-                                                            </div>                                                        
-                                                        </div>
-                                                    </span>
-                                                </span>
-                                                <br />
-                                                <div class="col-md-6" id="addPfTickersDiv">
-                                                    <select id="addPfTickersInput" placeholder="Select Symbols" multiple class="selectpicker" onchange="changeInputNumShares();" autocomplete="one-time-code" data-live-search="true" title="Select Ticker" data-display="static">                                       
-                                                    </select>
-                                                </div>
-                                                <br />
-                                                <br />
-                                                <h5>Selected Tickers:</h5>
-                                                <div>
-                                                    <table id="sharesNumTable" class="table table-borderless">    
-                                                        <thead>
-                                                            <tr>
-                                                                <th scope="col">Name</th>
-                                                                <th scope="col">Symbol</th>
-                                                                <th scope="col">Price</th>
-                                                                <th scope="col">N. Shares</th>                              
-                                                            </tr>
-                                                        </thead>
-                                                        <tbody id="tbody2">
-                                                        </tbody>
-                                                    </table>
-                                                </div>
-                                            </div>
-                                            <div class="modal-footer">
-                                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                                                <button id="saveChangesButt" type="button" class="btn btn-primary" onclick="saveChangesButton();" >Save changes</button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <!-- Delete portfolio Modal -->
-                                <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
-                                    <div class="modal-dialog" role="document">
-                                        <div class="modal-content">
-                                            <div class="modal-header">
-                                                <h5 class="modal-title" id="deleteModalLabel">Delete Portfolio</h5>
-                                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                                    <span aria-hidden="true">&times;</span></button>
-                                                </button>
-                                            </div>
-                                            <div class="modal-body">
-                                                <br />
-                                                <br />
-                                                <h5 id="deletePfText"></h5>
-                                                <br />
-                                                <br />
-                                                <div class="modal-footer">
-                                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">No</button>
-                                                    <button id="deletePfButton" type="button" class="btn btn-primary" onclick="deletePfButt();">Yes</button>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
                             </td>
                         </tr>
                     </tbody>
@@ -190,6 +91,108 @@
             </div>
             <div id="profileDiv" onclick="showUserOption();" >
                 <p><a></a></p>
+            </div>
+            <!-- Modals -->
+            <!-- Add portfolio Modal -->
+            <div class="modal fade" id="addModal" tabindex="-1" role="dialog" aria-labelledby="addModalLabel" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="addModalLabel">Add Portfolio</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span></button>
+                            </button>
+                        </div>
+                        <div class="modal-body" style="padding-bottom: 40px">
+                            <h5>Portfolio Name:</h5>
+                            <input id="addPfNameInput" class="inputCheck" autocomplete="one-time-code" />
+                            <br />
+                            <br />
+                            <h5>Tickers:</h5>
+                            <span id="portfolioTickers" style="display:inline-block; vertical-align:top;">
+                                <span class="mb-3" style="display:inline-block; color:black;">
+                                    <div>
+                                        <div class="color-1">
+                                            <select data-placeholder="Select Asset Type" class="selectpicker" id="tickerTypeInput" tabindex="1" onchange="showTickersInInput();" >
+                                                <option value="stocks" selected="selected">Stocks</option>
+                                                <option value="etf">ETF</option>
+                                                <option value="commodities">Commodities</option>
+                                                <option value="cryptocurrencies">Cryptocurrencies</option>
+                                            </select>
+                                        </div>                                                        
+                                    </div>
+                                </span>
+                                <span class="mb-3" style="display:inline-block; color:black;">
+                                    <div>
+                                        <div class="color-1">
+                                            <select data-placeholder="Select Country" class="selectpicker" id="tickerExchangeInput" tabindex="1" onchange="showTickersInInput();" >
+                                            <optgroup label="Nord America">
+                                                <option value="nyse">NYSE</option>
+                                                <option value="nasdaq">NASDAQ</option>
+                                            <optgroup label="Europe">
+                                                <option value="ftse">FTSE</option>
+                                            <optgroup label="Asia">
+                                                <option value="csi">CSI</option>
+                                            </select>
+                                        </div>                                                        
+                                    </div>
+                                </span>
+                            </span>
+                            <br />
+                            <div class="col-md-6" id="addPfTickersDiv">
+                                <select id="addPfTickersInput" placeholder="Select Symbols" multiple class="selectpicker" onchange="changeInputNumShares();" autocomplete="one-time-code" data-live-search="true" title="Select Ticker" data-display="static">                                       
+                                </select>
+                            </div>
+                            <br />
+                            <br />
+                            <h5>Selected Tickers:</h5>
+                            <br />
+                            <div>
+                                <table id="sharesNumTable" class="table table-borderless">    
+                                    <thead id="thead2" style="opacity: 0.2;">
+                                        <tr>
+                                            <th scope="col">Name</th>
+                                            <th scope="col">Symbol</th>
+                                            <th scope="col">Price</th>
+                                            <th scope="col">N. Shares</th>
+                                            <th scope="col"></th>                              
+                                        </tr>
+                                    </thead>
+                                    <tbody id="tbody2">
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <button id="saveChangesButt" type="button" class="btn btn-primary" onclick="saveChangesButton();" >Save changes</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Delete portfolio Modal -->
+            <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="deleteModalLabel">Delete Portfolio</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span></button>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <br />
+                            <br />
+                            <h5 id="deletePfText"></h5>
+                            <br />
+                            <br />
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">No</button>
+                                <button id="deletePfButton" type="button" class="btn btn-primary" onclick="deletePfButt();">Yes</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
             <div class="modal fade" id="loginModal" style="display: none;">
                 <div class="modal-dialog"> 
