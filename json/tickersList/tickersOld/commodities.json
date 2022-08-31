@@ -1,0 +1,76 @@
+{
+    "data":[
+        {
+            "s":"GC=F",
+            "n":"Gold"
+        },
+        {
+            "s":"SI=F",
+            "n":"Silver"
+        },
+        {
+            "s":"PL=F",
+            "n":"Platinum"
+        },
+        {
+            "s":"HG=F",
+            "n":"Copper"
+        },
+        {
+            "s":"PA=F",
+            "n":"Palladium"
+        },
+        {
+            "s":"CL=F",
+            "n":"Crude Oil"
+        },
+        {
+            "s":"HO=F",
+            "n":"Heating Oil"
+        },
+        {
+            "s":"NG=F",
+            "n":"Natural Gas"
+        },
+        {
+            "s":"RB=F",
+            "n":"Gasoline"
+        },
+        {
+            "s":"BZ=F",
+            "n":"Brent Crude Oil"
+        },
+        {
+            "s":"ZC=F",
+            "n":"Corn"
+        },
+        {
+            "s":"ZO=F",
+            "n":"Oat"
+        },
+        {
+            "s":"ZS=F",
+            "n":"Soybean"
+        },
+        {
+            "s":"CC=F",
+            "n":"Cocoa"
+        },
+        {
+            "s":"KC=F",
+            "n":"Coffee"
+        },
+        {
+            "s":"CT=F",
+            "n":"Cotton"
+        },
+        {
+            "s":"OJ=F",
+            "n":"Orange Juice"
+        },
+        {
+            "s":"SB=F",
+            "n":"Sugar"
+        }
+    ]
+}

@@ -106,9 +106,10 @@ function showTickersInInput(){
     $("#addPfTickersInput").selectpicker('refresh');
 
 	var tickersDataList = tickersList[tickersType];
-	for( var i = 0; i < tickersDataList.length; i++ )
-		$("#addPfTickersInput").append( `<option onclick="selectTicker();" value="${tickersDataList[i].s}" data-subtext="${tickersDataList[i].n}" name="${selectedType + ':' + tickersType}">${tickersDataList[i].s}</option>` );
-	
+	for( var i = 0; i < tickersDataList.length; i++ ){
+		let key = Object.keys(tickersDataList[i]);
+		$("#addPfTickersInput").append( `<option onclick="selectTicker();" value="${key}" data-price="${tickersDataList[i][key].p}" data-subtext="${tickersDataList[i][key].n}" name="${selectedType + ':' + tickersType}">${key}</option>` );
+	}
 
 	$("#addPfTickersInput").on("changed.bs.select", selectTicker)
 	$("#addPfTickersInput").selectpicker( "refresh" );
@@ -123,9 +124,10 @@ function selectTicker(){
 //Function triggered on change of choicesJS tickers select
 function changeInputNumShares(event){
 	var ticker = $('#addPfTickersInput').val();
-	var type = $('#addPfTickersInput option:selected').attr("name");
+	var type = $('#addPfTickersInput option:selected').attr("name");	
+	var price = $('#addPfTickersInput option:selected').attr("data-price");
 	var name = $('#addPfTickersInput option:selected').attr("data-subtext");
-	addNumShares( ticker, type, name );
+	addNumShares( ticker, type, name, price );
 	selectedTickers.push( ticker );
 }
 
@@ -148,40 +150,47 @@ function removeNumShares( name ){
 }
 
 //Add a number shares input 
-function addNumShares( ticker, type, name ){
-	var numSharesDiv = document.getElementById("pfSharesNumDiv");
+function addNumShares( ticker, type, name, price ){
+	var tbody = document.getElementById("tbody2");
+	console.log( tbody );
+	var tr = document.createElement("tr");
+	tr.className = "itemTabella";
 
-	var newDiv = document.createElement("div");
-	newDiv.style.display = "flex";
-	newDiv.style.marginTop = "2%";
-	newDiv.style.marginBottom = "5%";
+	var td1 = document.createElement("td");
+	td1.className = "itemTd";
+	td1.appendChild(document.createTextNode(name));
+	tr.appendChild(td1);
 
-	var newH = document.createElement("h6");
-	newH.style.fontSize = "13px";
-	newH.innerText = name + "  (" + ticker + ")";
-	newDiv.appendChild( newH );
-	
-	var newInput = document.createElement("input");
-	newInput.className = "addSharesNumInput inputCheck";
-	$(newInput).on("keypress", ( filterLetters ));
-	newInput.label = ticker;
-	newInput.id = ticker + "NumShares";
-	newInput.name = type;
-	newInput.autocomplete = "one-time-code";
-	newInput.type = "text";
-	newDiv.appendChild( newInput );
+	var td2 = document.createElement("td");
+	td2.className = "itemTd";
+	td2.appendChild(document.createTextNode(ticker));
+	tr.appendChild(td2);
 
-	var newButt = document.createElement("button");
-	newButt.onclick = function() { removeTicker(this); };
-	newButt.className = "btn btn-primary";
-	newButt.id = ticker;
-	newButt.style.marginTop = "-6.5px";
-	newButt.style.marginLeft = "7px";
-	newButt.style.fontSize = "15px";
-	newButt.innerText = "X";
-	newDiv.appendChild( newButt );
+	var td3 = document.createElement("td");
+	td3.className = "itemTd";
+	td3.appendChild(document.createTextNode(parseFloat(price).toFixed(2) + "$"));
+	tr.appendChild(td3);
 
-	numSharesDiv.appendChild( newDiv );
+	var td4 = document.createElement("td");
+	var sharesInput = document.createElement("input");
+	sharesInput.type = "text";
+	sharesInput.className = "addSharesNumInput inputCheck";
+	sharesInput.autocomplete = "one-time-code";
+	$(sharesInput).on("keypress", ( filterLetters ));
+	td4.className = "itemTd";
+	td4.appendChild(sharesInput);
+	tr.appendChild(td4);
+
+	var td5 = document.createElement("td");
+	var deleteButt = document.createElement("button");
+	deleteButt.className = "btn btn-primary";
+	deleteButt.id = ticker;
+	deleteButt.innerText = "X";
+	deleteButt.onclick = function() { removeTicker(this); };
+	td5.appendChild( deleteButt );
+	tr.appendChild( td5 );
+
+	tbody.appendChild( tr );
 }
 
 //Load table with portfolios
