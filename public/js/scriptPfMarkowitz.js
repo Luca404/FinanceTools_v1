@@ -154,6 +154,9 @@ function setMaxValues(){
     changeMaxValues();
 }
 
+function resizeInput() {
+    this.style.width = this.value.length - 5 + "ch";
+}
 
 function loadSavedPf(){
     portFolios = pfData;
@@ -195,6 +198,7 @@ function loadMarkowitzData(){
     for( var i = 0; i<weights.length; i++ )
         text = text + pfTickers[i] + ": " + weights[i] + "    ";
     actualWeights.value = text;
+    resizeInput.call( actualWeights );
 
     var actualValue = document.getElementById( "actualValueInput" );
     var text = ""
@@ -202,6 +206,15 @@ function loadMarkowitzData(){
     for( var i = 0; i<weights.length; i++ )
         value = value + portFolios[selectedPf].prices[i] * weights[i];
     actualValue.value = parseInt(value).toString() + "$";
+    actualValue.style.width = actualWeights.style.width;
+
+    //Remove canvas
+    var canvasDiv = document.getElementById("markowitzCanvasDiv");
+    if( canvasDiv.children.length > 0 )
+        canvasDiv.removeChild( document.getElementById("singlePerfCanvas") );
+    
+    $("#markowitzCanvasCont").addClass( "ph-item" );
+    $("#markowitzCanvasDiv").addClass( "ph-picture" );
 
     server.emit("getMarkowitzData", {name: pfName, tickers: pfTickers, period: PERIOD, weights: weights, iter: ITERATION, maxShares: MAX_SHARES, maxValues: MAX_VALUES, prices:portFolios[selectedPf].prices}, (res) =>{
         var pfRetAndVol = JSON.parse( res["data"] );
@@ -215,12 +228,12 @@ function drawMarkowitzChart( data, weights, pfData, tickers, prices ){
     var pfReturn = Object.values( data["return"] );
     var pfVol = Object.values( data["volatility"] );
     var pfWeights = Object.values( weights );
+    
+    $("#markowitzCanvasCont").removeAttr( "class" );
+    $("#markowitzCanvasDiv").removeAttr( "class" );
 
     //Canvas creation
     var canvasDiv = document.getElementById("markowitzCanvasDiv");
-    if( canvasDiv.children.length > 0 ){
-        canvasDiv.removeChild( document.getElementById("singlePerfCanvas") );
-    }
     var canvasMarkowitz = document.createElement("canvas");
     canvasMarkowitz.id = "singlePerfCanvas";
     canvasDiv.appendChild(canvasMarkowitz);
@@ -302,6 +315,7 @@ function drawMarkowitzChart( data, weights, pfData, tickers, prices ){
                         }
                         else
                             selectedWeights.value = actualWeights.value; 
+                        resizeInput.call( selectedWeights );
 
                         var selectedValue = document.getElementById( "selectedValueInput" );
                         var actualValue = document.getElementById( "actualValueInput" );
@@ -315,7 +329,7 @@ function drawMarkowitzChart( data, weights, pfData, tickers, prices ){
                         }
                         else
                             selectedValue.value = actualValue.value; 
-                        
+                        selectedValue.style.width = selectedWeights.style.width;
                     }
                 }
             }

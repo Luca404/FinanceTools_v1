@@ -1,14 +1,17 @@
 #profileDiv{
     position: absolute;
     border-radius: 7px; 
-    width: auto;
-    padding: 10px 0px 10px 0px;
-    height: 40px;
+    width: 150px;
+    height: 50px;
+    padding-left: 10px;
+    padding-right: 10px;
+    padding-top: 12px;
     margin-left: 91%;
     margin-top: 1%;
     display: flex;
     justify-content: center;
     align-items: center;
+    text-align: center;
     background-color: #3445b4;
     font-size: 15px;
     color: white;
@@ -33,6 +36,19 @@
 .dataDiv > h6{
   display: flex;
   margin-top: auto;
+  white-space: nowrap ;
+}
+
+.dataInput{
+  margin-left: 20px;
+}
+
+#actualValueInput{
+  margin-left: 39.5px;
+}
+
+#selectedValueInput{
+  margin-left: 39.5px;
 }
 
 #selectedDiv{
@@ -45,10 +61,14 @@
   height: 700px !important;
 }
 
-#markowitzCanvasDiv{
+#markowitzCanvasCont{
   display: flex;
   align-items: center;
   justify-content: center;
+  width: 1400px;
+  height: 700px;  
+  padding: 0;
+  margin-left: 80px;
 }
 
 /* Set size and color of bootstrap-select */
