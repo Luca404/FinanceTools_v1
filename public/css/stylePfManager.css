@@ -244,8 +244,9 @@ body{
     vertical-align: middle !important;
 }
 
-.nameInput{
-    width: 90px;
+.nameDiv{
+    width: 90px !important;
+    overflow: hidden;
 }
 
 #addPfDiv{

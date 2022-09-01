@@ -73,22 +73,21 @@ def getCurrentPrice( ticker ):
         return "noData"
 
 def updatePrices():
-    files = os.listdir("./json/tickersList/newTickers/")
+    files = os.listdir("./json/tickersList/tickersOld/")
     for file in files:
-        with open( "./json/tickersList/newTickers/" + file ) as f:
+        with open( "./json/tickersList/tickersOld/" + file ) as f:
             jsonData = json.load(f)
         k = 0
         for data in jsonData["data"]:
-            ticker = list(data.keys())[0]
+            ticker = data["s"]
             if( file.find( "crypto" ) == 0 ):
                 ticker = ticker + "-USD"
             price = getCurrentPrice( ticker )
-            jsonData["data"][k][list(data.keys())[0]]["p"] = price
+            jsonData["data"][k]["p"] = price
             k += 1
             print( ticker, " : ", price )
         with open( "./json/tickersList/newTickers/" + file, "w" ) as f:
             json.dump(jsonData, f)
-        break
     pass
 
 if __name__ == "__main__":
