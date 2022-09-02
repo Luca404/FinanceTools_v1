@@ -3,10 +3,11 @@ var pfData = [];
 var userName = "";
 var pfDeleteNum = 0;
 var pfNum;
-var selectedTickers = [];
+var selectedTickers = {};
+var selectedType = "nyse";
 var tickersList = [];
-var tickersDict = [];
-var tempTickersDict = [];
+var tickersDict = {};
+var tempTickersDict = {};
 var punto = false;
 
 
@@ -65,7 +66,7 @@ function getTickersList(){
 		let tickersType = Object.keys( tickersList );
 		for( var i = 0; i < tickersType.length; i++ )
 			tickersDict[tickersType[i]] = Object.assign({}, ...tickersList[tickersType[i]].map((x) => ({[x.s]: [x.n,x.p]})));
-		tempTickersDict = structuredClone(tickersDict);
+		tempTickersDict = $.extend(true, {}, tickersDict);
 	});
 }
 
@@ -96,7 +97,7 @@ function showLoginModal(){
 
 //Show dropdown menu with the tickers list from the server
 function showTickersInInput(){
-	let selectedType = $("#tickerTypeInput").val();
+	selectedType = $("#tickerTypeInput").val();
 	if( selectedType == "stocks" ){
 		let selectedExchange = $("#tickerExchangeInput").val();
 		var tickersType = selectedExchange;
@@ -106,14 +107,11 @@ function showTickersInInput(){
 		$("#tickerExchangeInput").selectpicker("hide");
 		var tickersType = selectedType;
 	}
-
-    $("#addPfTickersInput").find('option').remove();
-    $("#addPfTickersInput").find('li').remove();
-    $("#addPfTickersInput").selectpicker('refresh');
-	console.log( tickersDict[tickersType] )
+	selectedType = tickersType;
 
 	var tickersDataList = tempTickersDict[tickersType];
 	var keys = Object.keys( tickersDataList );
+	keys.sort((a, b) => a.localeCompare(b))
 	for( var i = 0; i < keys.length; i++ )
 		$("#addPfTickersInput").append( `<option onclick="selectTicker();" value="${keys[i]}" data-price="${tickersDataList[keys[i]][1]}" data-subtext="${tickersDataList[keys[i]][0]}" name="${selectedType + ':' + tickersType}">${keys[i]}</option>` );
 	
@@ -134,11 +132,10 @@ function changeInputNumShares(event){
 	var type = types[0];
 	if( type == "stocks" )
 		type = 	types[1];
-	
+	selectedType = type;
 	var price = $('#addPfTickersInput option:selected').attr("data-price");
 	var name = $('#addPfTickersInput option:selected').attr("data-subtext");
 	addNumShares( ticker, type, name, price );
-	selectedTickers.push( ticker );
 }
 
 
@@ -146,18 +143,17 @@ function changeInputNumShares(event){
 function removeNumShares( name ){
 	var numSharesTable = document.getElementById("tbody2");
 	var numSharesTrs = numSharesTable.getElementsByTagName("tr");
-	console.log( numSharesTrs );
-	console.log( name );
 	for( var i=0;i<numSharesTrs.length;i++ ){
 		let td = numSharesTrs[i].getElementsByClassName( "symbolTd" )[0];
 		let symbol = td.innerText;
 		if( symbol == name ){
 			numSharesTable.removeChild( numSharesTrs[i] );
-			let index = selectedTickers.indexOf( symbol );
-			selectedTickers.splice( index, 1 );
+			tempTickersDict[selectedType][symbol] = selectedTickers[symbol].slice();
+			delete selectedTickers[symbol];
 		}
 	}
-	if( selectedTickers.length == 0 )
+	showTickersInInput();
+	if( Object.keys(selectedTickers).length == 0 )
 		$("#thead2").css( "opacity", 0.2 );
 }
 
@@ -206,9 +202,8 @@ function addNumShares( ticker, type, name, price ){
 
 	tbody.appendChild( tr );
 	//bindScroll();
-	console.log( tempTickersDict[type] );
+	selectedTickers[ticker] = tempTickersDict[type][ticker];
 	delete tempTickersDict[type][ticker];
-	console.log( tempTickersDict[type] );
 	$("#thead2").css( "opacity", 1 );
 }
 
@@ -296,32 +291,22 @@ function modifyPf(item){
 
 	selectedTickers = [];
 	for( let i = 0; i<pfData[pfNum].tickers.length; i++ ){
-		let selectedType = $("#tickerTypeInput").val();		
-		let selectedExchange = $("#tickerExchangeInput").val();
-		let type = pfData[pfNum].type[i].split(":")[0];
-		let exch = pfData[pfNum].type[i].split(":")[1];
-		if( type == selectedType ){
-			if( selectedExchange != exch )
-				$("#tickerExchangeInput").val( exch );				
-		}
-		else
-			$("#tickerTypeInput").val( type );
-		
-		//showTickersInInput();
-		if( type == "stocks" )
-			var tickerType = exch;
-		else
-			var tickerType = type;
-
-		selectedTickers.push( pfData[pfNum].tickers[i] );
-		addNumShares( pfData[pfNum].tickers[i], pfData[pfNum].type[i], tickersDict[tickerType][pfData[pfNum].tickers[i]][0], pfData[pfNum].prices[i] );
+		var type = pfData[pfNum].type[i].split(":")[0];
+		var exch = pfData[pfNum].type[i].split(":")[1];
+		$("#tickerTypeInput").val( type );
+		$("#tickerTypeInput").selectpicker( "refresh" );
+		if( type == "stocks" ){
+			type = exch;
+			$("#tickerExchangeInput").val( type );
+			$("#tickerExchangeInput").selectpicker( "refresh" );
+		}		
+	
+		addNumShares( pfData[pfNum].tickers[i], type, tickersDict[type][pfData[pfNum].tickers[i]][0], pfData[pfNum].prices[i] );
 		
 		var numSharesInputs = $(".addSharesNumInput");
 		$( numSharesInputs[i] ).val( pfData[pfNum].numShares[i] );
 	}
-	$("#addPfTickersInput").selectpicker( "refresh" );
-	$("#addPfTickersInput").selectpicker( "val", pfData[pfNum].tickers );
-	$("#addPfTickersInput").selectpicker( "refresh" );
+	showTickersInInput();
 }
 
 //Function for show modal to delete a portfolio
@@ -362,13 +347,13 @@ function deletePfButt(){
 }
  
 function addPf(){
+	tempTickersDict = $.extend(true, {}, tickersDict);
 	showTickersInInput();
 	$("#addModalLabel").text("Add Portfolio");	
 	$("#addPfNameInput").val("");
 	$("#sharesNumTable tbody").empty();
 	$("#thead2").css( "opacity", 0.2 );
 	selectedTickers = [];
-	tempTickersDict = structuredClone(tickersDict);
 }
 
 //Function to add a portFolio
