@@ -109,6 +109,10 @@ function showTickersInInput(){
 	}
 	selectedType = tickersType;
 
+	$("#addPfTickersInput").find("option").remove();
+	$("#addPfTickersInput").find("li").remove();
+	$("#addPfTickersInput").selectpicker("refresh");
+
 	var tickersDataList = tempTickersDict[tickersType];
 	var keys = Object.keys( tickersDataList );
 	keys.sort((a, b) => a.localeCompare(b))
@@ -177,7 +181,7 @@ function addNumShares( ticker, type, name, price ){
 	tr.appendChild(td2);
 
 	var td3 = document.createElement("td");
-	td3.className = "itemTd";
+	td3.className = "itemTd priceTd";
 	td3.appendChild(document.createTextNode(parseFloat(price).toFixed(2) + "$"));
 	tr.appendChild(td3);
 
@@ -195,8 +199,19 @@ function addNumShares( ticker, type, name, price ){
 	var deleteButt = document.createElement("button");
 	deleteButt.className = "btn btn-primary";
 	deleteButt.id = ticker;
-	deleteButt.innerText = "X";
+	deleteButt.style.backgroundColor = "white";
+	deleteButt.style.width = "30px";
+	deleteButt.style.height = "30px";
+	deleteButt.style.display = "flex";
+	deleteButt.style.alignItems = "center";
+	deleteButt.style.justifyContent= "center";
 	deleteButt.onclick = function() { removeNumShares(this.id); };
+	var deleteImg = document.createElement("img");
+	deleteImg.id = "deleteImg";
+	deleteImg.src = "static/img/remove-icon.png";
+	deleteImg.style.width = "30px";
+	deleteImg.style.height = "30px";
+	deleteButt.append(deleteImg);
 	td5.appendChild( deleteButt );
 	tr.appendChild( td5 );
 
@@ -205,6 +220,25 @@ function addNumShares( ticker, type, name, price ){
 	selectedTickers[ticker] = tempTickersDict[type][ticker];
 	delete tempTickersDict[type][ticker];
 	$("#thead2").css( "opacity", 1 );
+}
+
+//calculatePfValue
+function calculatePfValue( val ){
+	var tableElems = $("#tbody2 tr");
+	var pfValue = 0;
+	for( var i = 0; i<tableElems.length; i++ ){
+		let price = tableElems[i].getElementsByClassName("priceTd")[0].innerText;
+		console.log( price )
+		let nShares = tableElems[i].getElementsByClassName("addSharesNumInput")[0];
+		var nSharesValue = 0;
+		if( $(nShares).is(":focus") )
+			nSharesValue = parseInt( nShares.value + val );
+		else if( nShares.value != "" )
+			nSharesValue = parseInt( nShares.value );
+		console.log( nSharesValue );
+		var pfValue = pfValue + ( parseFloat( price.split("$")[0] ) * nSharesValue );
+	}
+	$("#pfValueInput").val( pfValue + "$" );
 }
 
 //Load table with portfolios
@@ -489,9 +523,9 @@ function saveChangesButton(){
 }
 
 function filterLetters(evt){
-	var hold = String.fromCharCode(evt.which);  
-	if( (/[a-z A-Z*!@#$%^&*()_/[\]}=+><{?",:;'"|]/.test(hold)))
-		evt.preventDefault();	  
+	var hold = String.fromCharCode(evt.which);
+	if( !(/[0-9 \\.]/.test(hold)) )
+		evt.preventDefault(); 
 	if( hold == "." && evt.target.value.indexOf(".") != -1 )
 		evt.preventDefault();
 	if( (hold == "." || hold == "0") && evt.target.value=="" )
@@ -500,6 +534,9 @@ function filterLetters(evt){
 	if( afterPunto[1] )
 		if( afterPunto[1].length > 1 )
 			evt.preventDefault();
+
+	if( !evt.isDefaultPrevented() )
+		calculatePfValue( hold );
 }
 
 

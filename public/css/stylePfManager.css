@@ -41,12 +41,6 @@ body{
     height: 25px;
 }
 
-#addPfTickersDiv{
-    position: relative;
-    max-width: 500px;
-    width: 100%;
-}
-
 #profileDiv{
     position: absolute;
     border-radius: 7px; 
@@ -361,6 +355,47 @@ input[type=number] {
 
 #setPeriodDiv > div {
     width: 70px !important;
+}
+
+#addPfTickersDiv{
+    position: relative;
+    max-width: 500px;
+    width: 100%;
+}
+
+#pfValueDiv{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#pfValueDiv > h5{
+    margin-top: 5px;
+}
+
+#pfValueDiv > input {
+    width: 100px;
+    text-align: center;
+    margin-left: 10px;
+}
+
+::-webkit-scrollbar {
+    width: 0px;
+    background: transparent; /* make scrollbar transparent */
+}
+
+#addPfTickersDiv > * >.dropdown-menu {
+    max-height: 400px !important;
+    max-width: 700px !important;
+    margin-left: -165px !important;
+}
+
+.dropdown-menu > .inner{
+    overflow: scroll !important;
+}
+
+.dropdown-menu > * > .inner{
+    text-align: center;
 }
 
 .dropdown-menu > li > a:hover,
