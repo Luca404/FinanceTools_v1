@@ -8,7 +8,6 @@ var selectedType = "nyse";
 var tickersList = [];
 var tickersDict = {};
 var tempTickersDict = {};
-var punto = false;
 
 
 //Connection to server
@@ -159,6 +158,8 @@ function removeNumShares( name ){
 	showTickersInInput();
 	if( Object.keys(selectedTickers).length == 0 )
 		$("#thead2").css( "opacity", 0.2 );
+	else
+		calculatePfValue();
 }
 
 //Add a number shares input 
@@ -168,10 +169,18 @@ function addNumShares( ticker, type, name, price ){
 
 	var td1 = document.createElement("td");
 	td1.className = "itemTd";
+	var nameP = document.createElement("p");
+	nameP.style.marginTop = "14px";
+	nameP.style.width = name.length + "ch";
+	nameP.innerText = name;
+	nameP.style.marginLeft = "0px";
+	nameP.style.paddingLeft = "0px";
+	nameP.style.textAlign = "left";
+	console.log( name );
 	var nameDiv = document.createElement( "div" );
 	nameDiv.style.whiteSpace = "nowrap";
 	nameDiv.className = "nameDiv";
-	nameDiv.innerText = name;
+	nameDiv.appendChild( nameP );
 	td1.appendChild(nameDiv);
 	tr.appendChild(td1);
 
@@ -186,18 +195,27 @@ function addNumShares( ticker, type, name, price ){
 	tr.appendChild(td3);
 
 	var td4 = document.createElement("td");
+	td4.className = "itemTd";
 	var sharesInput = document.createElement("input");
-	sharesInput.type = "text";
+	sharesInput.type = "number";
+	sharesInput.value = "1";
+	sharesInput.step = "1";
+	sharesInput.min = "1";
+	sharesInput.max = "10000";
+	sharesInput.style.outline = "none";
 	sharesInput.className = "addSharesNumInput inputCheck";
 	sharesInput.autocomplete = "one-time-code";
-	$(sharesInput).on("keypress", ( filterLetters ));
-	td4.className = "itemTd";
+	$(sharesInput).on("keydown", ( (evt) => { evt.preventDefault(); } ));
+	$(sharesInput).on("input", ( calculatePfValue ));
+	$(sharesInput).on("selectstart", ( function(){ return false }));
+
 	td4.appendChild(sharesInput);
 	tr.appendChild(td4);
 
 	var td5 = document.createElement("td");
+	td5.className = "itemTd";
 	var deleteButt = document.createElement("button");
-	deleteButt.className = "btn btn-primary";
+	//deleteButt.className = "btn btn-primary";
 	deleteButt.id = ticker;
 	deleteButt.style.backgroundColor = "white";
 	deleteButt.style.width = "30px";
@@ -205,6 +223,7 @@ function addNumShares( ticker, type, name, price ){
 	deleteButt.style.display = "flex";
 	deleteButt.style.alignItems = "center";
 	deleteButt.style.justifyContent= "center";
+	deleteButt.style.border= "none";
 	deleteButt.onclick = function() { removeNumShares(this.id); };
 	var deleteImg = document.createElement("img");
 	deleteImg.id = "deleteImg";
@@ -214,31 +233,27 @@ function addNumShares( ticker, type, name, price ){
 	deleteButt.append(deleteImg);
 	td5.appendChild( deleteButt );
 	tr.appendChild( td5 );
-
 	tbody.appendChild( tr );
-	//bindScroll();
+
+	bindScroll( nameP );
 	selectedTickers[ticker] = tempTickersDict[type][ticker];
 	delete tempTickersDict[type][ticker];
 	$("#thead2").css( "opacity", 1 );
+	calculatePfValue();
 }
 
 //calculatePfValue
-function calculatePfValue( val ){
+function calculatePfValue(){
+	console.log( "pfValue" );
 	var tableElems = $("#tbody2 tr");
 	var pfValue = 0;
 	for( var i = 0; i<tableElems.length; i++ ){
 		let price = tableElems[i].getElementsByClassName("priceTd")[0].innerText;
-		console.log( price )
 		let nShares = tableElems[i].getElementsByClassName("addSharesNumInput")[0];
-		var nSharesValue = 0;
-		if( $(nShares).is(":focus") )
-			nSharesValue = parseInt( nShares.value + val );
-		else if( nShares.value != "" )
-			nSharesValue = parseInt( nShares.value );
-		console.log( nSharesValue );
-		var pfValue = pfValue + ( parseFloat( price.split("$")[0] ) * nSharesValue );
+		var value = nShares.value;
+		var pfValue = pfValue + ( parseFloat( price.split("$")[0] ) * value );
 	}
-	$("#pfValueInput").val( pfValue + "$" );
+	$("#pfValueInput").val( pfValue.toFixed(2) + "$" );
 }
 
 //Load table with portfolios
@@ -284,6 +299,7 @@ function loadTable1(data){
         modifyButton.type = "button";
 		modifyButton.dataset.toggle = "modal";
 		modifyButton.dataset.target = "#addModal";
+		modifyButton.style.padding = "initial";
 		modifyButton.onclick = function() { modifyPf(this); };
 		var modifyImg = document.createElement("img");
 		modifyImg.id = "modifyImg";
@@ -298,6 +314,7 @@ function loadTable1(data){
         deleteButton.type = "button";
 		deleteButton.dataset.toggle = "modal";
 		deleteButton.dataset.target = "#deleteModal";
+		deleteButton.style.padding = "initial";
 		deleteButton.onclick = function() { deletePf(this); };
 		var deleteImg = document.createElement("img");
 		deleteImg.id = "deleteImg";
@@ -341,6 +358,7 @@ function modifyPf(item){
 		$( numSharesInputs[i] ).val( pfData[pfNum].numShares[i] );
 	}
 	showTickersInInput();
+	calculatePfValue();
 }
 
 //Function for show modal to delete a portfolio
@@ -387,6 +405,7 @@ function addPf(){
 	$("#addPfNameInput").val("");
 	$("#sharesNumTable tbody").empty();
 	$("#thead2").css( "opacity", 0.2 );
+	$("#pfValueInput").val( "" );
 	selectedTickers = [];
 }
 
@@ -521,24 +540,6 @@ function saveChangesButton(){
 		}
 	}
 }
-
-function filterLetters(evt){
-	var hold = String.fromCharCode(evt.which);
-	if( !(/[0-9 \\.]/.test(hold)) )
-		evt.preventDefault(); 
-	if( hold == "." && evt.target.value.indexOf(".") != -1 )
-		evt.preventDefault();
-	if( (hold == "." || hold == "0") && evt.target.value=="" )
-		evt.preventDefault();
-	var afterPunto = evt.target.value.split(".")
-	if( afterPunto[1] )
-		if( afterPunto[1].length > 1 )
-			evt.preventDefault();
-
-	if( !evt.isDefaultPrevented() )
-		calculatePfValue( hold );
-}
-
 
 //Login Functions Section
 
@@ -709,42 +710,15 @@ function hash(e){for(var r=0,i=0;i<e.length;i++)r=(r<<5)-r+e.charCodeAt(i),r&=r;
 
 
 //Onload Functions
-function bindScroll() {
-	console.log( "Pollo" );
-    var divs = $(".nameDiv");
-	for( var i = 0; i<divs.length; i++ ){
-		$(divs[i]).bind('scroll', function () {
-			var el = $(this);
-			// Scroll state machine
-			var scrollState = el.data("scrollState") || 0;
-			el.data("scrollState", (scrollState + 1) % 4);
-			switch (scrollState) {
-				case 0: // initial wait
-					el.css({ left: 0 });
-					el.show();
-					window.setTimeout(function () {
-						el.trigger("scroll");
-					}, 5000);
-					break;
-				case 1: // start scroll
-					var delta = el.parent().width() - el.width();
-					if (delta < 0) {
-						el.animate({ left: delta }, 2000, "linear", function () {
-							el.trigger("scroll");
-						});
-					}
-					break;
-				case 2: // delay before fade out
-					window.setTimeout(function () {
-						el.trigger("scroll");
-					}, 2000);
-					break;
-				case 3: // fade out
-					el.fadeOut("slow", function () {
-						el.trigger("scroll");
-					});
-					break;
-			}
-		}).trigger("scroll");
+function bindScroll( elem ) {
+	var el = $( elem );
+	if( el.width()-10 > el.parent().width() ){
+		setTimeout(function(){
+			$(el).addClass( "scrollText" );
+		}, 3000);  
+	}
+	else{
+		$(el).css( { marginLeft: "20%" } );
+		$(el).removeClass( "scrollText" );
 	}
 }

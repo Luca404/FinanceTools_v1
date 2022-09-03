@@ -37,7 +37,7 @@ body{
     margin-top: 3px;
     margin-left: 5px;
     font-size: 15px;
-    width: 40px;
+    width: 60px;
     height: 25px;
 }
 
@@ -180,8 +180,9 @@ body{
 
 /*Modify table td in portfolio manager*/
 .modifyTd{
-    width: 15%;
-    margin-right: 0px;
+    width: 100px;
+    margin-left: 10px;
+    padding-left: 2px !important;
 }
 
 /*portfolio manager table head*/
@@ -193,31 +194,33 @@ body{
 /*Button to modify a portfolio in manager*/
 .modifyPf{
     position: relative;
-    margin-top: 0%;
-    height: 100%;
-    width: 30%;
+    height: 35px;
+    width: 35px;
+    align-items: center;
+    justify-content: center;
 }
 
 /*Button to delete a portfolio in manager*/
 .deletePf{
     position: relative;
-    margin-top: 0%;
-    height: 100%;
-    width: 30%;
-    margin-left: 7%;
+    height: 35px;
+    width: 35px;
+    align-items: center;
+    justify-content: center;
+    margin-left: 5px;
 }
 
 /*Modify image in portfolio manager*/
 #modifyImg{
     position: relative;
-    width: 80%;
-    height: 80%;
+    width: 25px;
+    height: 25px;
 }
 /*Delete image in portfolio manager*/
 #deleteImg{
     position: relative;
-    width: 80%;
-    height: 80%;
+    width: 25px;
+    height: 25px;
 }
 
 .itemTabella:hover #modifyPf{
@@ -239,6 +242,9 @@ body{
 }
 
 .nameDiv{
+    text-align: center;
+    justify-content: center;
+    align-items: center;
     width: 90px !important;
     overflow: hidden;
 }
@@ -336,18 +342,6 @@ background: transparent;
 }
 
 
-/* Chrome, Safari, Edge, Opera */
-input::-webkit-outer-spin-button,
-input::-webkit-inner-spin-button {
-  -webkit-appearance: none;
-  margin: 0;
-}
-
-/* Firefox */
-input[type=number] {
-  -moz-appearance: textfield;
-}
-
 /* Set size and color of bootstrap-select */
 #savedPfMenuDiv > div {
     width: 330px !important;
@@ -412,4 +406,35 @@ input[type=number] {
 .bootstrap-select>.dropdown-toggle:after {
     color: #3445b4;
     margin-right: 5px;
+}
+
+
+
+  
+.scrollText {
+    margin-left: 0ch !important;
+    animation: scroll 15s linear infinite;
+}
+  
+@keyframes scroll {
+    0% {
+        -moz-transform: translateX(0%);
+        -webkit-transform: translateX(0%);
+        transform: translateX(0%);
+    }
+    30% {
+        -moz-transform: translateX(-50%);
+        -webkit-transform: translateX(-50%);
+        transform: translateX(-50%);
+    }
+    60% {
+        -moz-transform: translateX(0%);
+        -webkit-transform: translateX(0%);
+        transform: translateX(0%);
+    }
+    100% {
+        -moz-transform: translateX(0%);
+        -webkit-transform: translateX(0%);
+        transform: translateX(0%);
+    }
 }
