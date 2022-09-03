@@ -162,6 +162,15 @@ function removeNumShares( name ){
 	calculatePfValue();
 }
 
+function getTextWidth(text, font) {
+	// re-use canvas object for better performance
+	const canvas = getTextWidth.canvas || (getTextWidth.canvas = document.createElement("canvas"));
+	const context = canvas.getContext("2d");
+	context.font = font;
+	const metrics = context.measureText(text);
+	return metrics.width;
+}
+
 //Add a number shares input 
 function addNumShares( ticker, type, name, price ){
 	var tbody = document.getElementById("tbody2");
@@ -170,13 +179,36 @@ function addNumShares( ticker, type, name, price ){
 	var td1 = document.createElement("td");
 	td1.className = "itemTd";
 	var nameP = document.createElement("p");
+	const nameSize = getTextWidth(name, getCanvasFont(nameP));
 	nameP.style.marginTop = "14px";
-	nameP.style.width = name.length + "ch";
+	nameP.style.width = nameSize + "px";
 	nameP.innerText = name;
 	nameP.style.marginLeft = "0px";
 	nameP.style.paddingLeft = "0px";
 	nameP.style.textAlign = "left";
-	console.log( name );
+	
+	console.log( name.length, nameSize );
+	if( nameSize > 115 ){
+		var cssAnimation = document.createElement('style');
+		cssAnimation.type = 'text/css';
+		var marginLeft = nameSize-110;
+		if( marginLeft > 0 )
+			marginLeft = -(marginLeft);
+		var rules = document.createTextNode('@-webkit-keyframes scroll' + ticker.toString() + ' {'+
+			'from { margin-left:0px; }'+
+			'20% { margin-left:0px; }'+
+			'50% { margin-left:'+ marginLeft.toString() + 'px; }'+
+			'80% { margin-left:0px; }'+
+			'to { margin-left:0px; }'+
+		'}');
+		cssAnimation.appendChild(rules);
+		document.getElementsByTagName("head")[0].appendChild(cssAnimation);
+		if( nameSize > 200 )
+			nameP.style.animation = 'scroll' + ticker.toString() + ' 20s linear infinite';
+		else
+			nameP.style.animation = 'scroll' + ticker.toString() + ' 10s linear infinite';
+	}
+
 	var nameDiv = document.createElement( "div" );
 	nameDiv.style.whiteSpace = "nowrap";
 	nameDiv.className = "nameDiv";
@@ -236,7 +268,6 @@ function addNumShares( ticker, type, name, price ){
 	tr.appendChild( td5 );
 	tbody.appendChild( tr );
 
-	bindScroll( nameP );
 	selectedTickers[ticker] = tempTickersDict[type][ticker];
 	delete tempTickersDict[type][ticker];
 	$("#thead2").css( "opacity", 1 );
@@ -721,4 +752,16 @@ function bindScroll( elem ) {
 		$(el).css( { marginLeft: "20%" } );
 		$(el).removeClass( "scrollText" );
 	}
+}
+
+function getCssStyle(element, prop) {
+    return window.getComputedStyle(element, null).getPropertyValue(prop);
+}
+
+function getCanvasFont(el = document.body) {
+  const fontWeight = getCssStyle(el, 'font-weight') || 'normal';
+  const fontSize = getCssStyle(el, 'font-size') || '16px';
+  const fontFamily = getCssStyle(el, 'font-family') || 'Times New Roman';
+  
+  return `${fontWeight} ${fontSize} ${fontFamily}`;
 }

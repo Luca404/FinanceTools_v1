@@ -245,7 +245,7 @@ body{
     text-align: center;
     justify-content: center;
     align-items: center;
-    width: 120px !important;
+    width: 125px !important;
     overflow: hidden;
 }
 
@@ -411,12 +411,9 @@ background: transparent;
 
 
   
-.scrollText {
-    margin-left: 0ch !important;
-    animation: scroll 15s linear infinite;
-}
+
   
-@keyframes scroll {
+@keyframes scroll1 {
     0% {
         -moz-transform: translateX(0%);
         -webkit-transform: translateX(0%);
