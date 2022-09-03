@@ -37,7 +37,7 @@ body{
     margin-top: 3px;
     margin-left: 5px;
     font-size: 15px;
-    width: 60px;
+    width: 50px;
     height: 25px;
 }
 
@@ -180,9 +180,9 @@ body{
 
 /*Modify table td in portfolio manager*/
 .modifyTd{
-    width: 100px;
+    width: 120px;
     margin-left: 10px;
-    padding-left: 2px !important;
+    padding-left: 0px !important;
 }
 
 /*portfolio manager table head*/
@@ -245,7 +245,7 @@ body{
     text-align: center;
     justify-content: center;
     align-items: center;
-    width: 90px !important;
+    width: 120px !important;
     overflow: hidden;
 }
 
@@ -423,9 +423,9 @@ background: transparent;
         transform: translateX(0%);
     }
     30% {
-        -moz-transform: translateX(-50%);
-        -webkit-transform: translateX(-50%);
-        transform: translateX(-50%);
+        -moz-transform: translateX(-30%);
+        -webkit-transform: translateX(-30%);
+        transform: translateX(-30%);
     }
     60% {
         -moz-transform: translateX(0%);
@@ -438,3 +438,14 @@ background: transparent;
         transform: translateX(0%);
     }
 }
+
+/* Block selection on all page */
+::selection {
+    background: transparent; /* WebKit/Blink Browsers */
+  }
+  ::-moz-selection {
+    background: transparent; /* Gecko Browsers */
+  }
+
+  body{-webkit-user-select:none;-moz-user-select:-moz-none;
+    -ms-user-select:none;user-select:none}

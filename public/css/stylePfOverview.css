@@ -73,3 +73,13 @@
     margin-right: 5px;
 }
 
+/* Block selection on all page */
+::selection {
+    background: transparent; /* WebKit/Blink Browsers */
+  }
+  ::-moz-selection {
+    background: transparent; /* Gecko Browsers */
+  }
+
+  body{-webkit-user-select:none;-moz-user-select:-moz-none;
+    -ms-user-select:none;user-select:none}

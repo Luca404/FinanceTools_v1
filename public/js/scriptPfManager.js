@@ -158,8 +158,8 @@ function removeNumShares( name ){
 	showTickersInInput();
 	if( Object.keys(selectedTickers).length == 0 )
 		$("#thead2").css( "opacity", 0.2 );
-	else
-		calculatePfValue();
+
+	calculatePfValue();
 }
 
 //Add a number shares input 
@@ -201,14 +201,15 @@ function addNumShares( ticker, type, name, price ){
 	sharesInput.value = "1";
 	sharesInput.step = "1";
 	sharesInput.min = "1";
-	sharesInput.max = "10000";
+	sharesInput.max = "1000";
 	sharesInput.style.outline = "none";
+	sharesInput.style.caretColor = "transparent";
+	sharesInput.style.userSelect = "none";
 	sharesInput.className = "addSharesNumInput inputCheck";
 	sharesInput.autocomplete = "one-time-code";
 	$(sharesInput).on("keydown", ( (evt) => { evt.preventDefault(); } ));
 	$(sharesInput).on("input", ( calculatePfValue ));
-	$(sharesInput).on("selectstart", ( function(){ return false }));
-
+	
 	td4.appendChild(sharesInput);
 	tr.appendChild(td4);
 
@@ -244,7 +245,6 @@ function addNumShares( ticker, type, name, price ){
 
 //calculatePfValue
 function calculatePfValue(){
-	console.log( "pfValue" );
 	var tableElems = $("#tbody2 tr");
 	var pfValue = 0;
 	for( var i = 0; i<tableElems.length; i++ ){
@@ -405,7 +405,7 @@ function addPf(){
 	$("#addPfNameInput").val("");
 	$("#sharesNumTable tbody").empty();
 	$("#thead2").css( "opacity", 0.2 );
-	$("#pfValueInput").val( "" );
+	$("#pfValueInput").val( "0.00$" );
 	selectedTickers = [];
 }
 
