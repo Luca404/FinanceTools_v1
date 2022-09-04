@@ -238,7 +238,84 @@ body{
 .itemTd{    
     position: relative;
     text-align: center;
+    align-items: center;
     vertical-align: middle !important;
+}
+
+.sharesTd{
+    display: flex !important;
+    margin-top: 7.5px !important;
+}
+
+.sharesTd > div.dropdown > select{
+    display: flex !important;
+    text-align: center;
+    margin-left: 5px !important;
+    margin-top: 3px;
+}
+
+.sharesTd > div.dropdown{
+    width: 40px !important;
+}
+
+.sharesTd > div.dropdown > button{
+    width: 40px !important;
+    margin-top: 3px !important;
+    text-align: center;
+    font-size: small;
+    height: 30px;
+    padding-left: 11px;
+}
+
+.sharesTd > div.dropdown > button > div{
+    text-align: center !important;
+    margin-top: -1px !important;
+}
+
+.sharesTd > div.dropdown > .dropdown-menu {
+    width: 40px;
+    padding: initial;
+}
+
+.sharesTd > div.dropdown > .dropdown-menu > div > ul{
+    font-size: small;
+    text-align: center;
+}
+
+.sharesTd > div.dropdown > .dropdown-toggle:focus{
+    outline: none !important;
+}
+
+.sharesTd > div.dropdown > .dropdown-menu > div > ul > li > a{
+    padding: initial;
+    text-align: center;
+}
+
+.sharesTd > select{
+    -o-appearance: none;
+   -ms-appearance: none;
+   -webkit-appearance: none;
+   -moz-appearance: none;
+   appearance: none;
+}
+
+.sharesTd > div.dropdown > .dropdown-toggle:after {
+    display: none !important;
+}
+
+
+.deleteTd{
+    padding-top: 2px !important;
+}
+
+.deleteTd > button{
+    align-items: center;
+    justify-content: center;
+    display: flex;
+    background-color: white;
+    width: 30px;
+    height: 30px;
+    border: none;
 }
 
 .nameDiv{
@@ -260,6 +337,11 @@ body{
     text-align: center;
     vertical-align: middle;
     padding: 0px;
+}
+
+div.tooltip
+{
+    font-size:10px;
 }
 
 #addTd:hover{
@@ -384,10 +466,6 @@ background: transparent;
     margin-left: -165px !important;
 }
 
-.dropdown-menu > .inner{
-    overflow: scroll !important;
-}
-
 .dropdown-menu > * > .inner{
     text-align: center;
 }
@@ -396,7 +474,7 @@ background: transparent;
 .dropdown-menu > li > a:focus {
     text-decoration: none;
     color: #ffffff;
-    background-color: #3445b4;
+    background-color: #a5d1ff;
 }
 
 .dropdown-menu > li > a.active {
@@ -409,40 +487,13 @@ background: transparent;
 }
 
 
-
-  
-
-  
-@keyframes scroll1 {
-    0% {
-        -moz-transform: translateX(0%);
-        -webkit-transform: translateX(0%);
-        transform: translateX(0%);
-    }
-    30% {
-        -moz-transform: translateX(-30%);
-        -webkit-transform: translateX(-30%);
-        transform: translateX(-30%);
-    }
-    60% {
-        -moz-transform: translateX(0%);
-        -webkit-transform: translateX(0%);
-        transform: translateX(0%);
-    }
-    100% {
-        -moz-transform: translateX(0%);
-        -webkit-transform: translateX(0%);
-        transform: translateX(0%);
-    }
-}
-
 /* Block selection on all page */
 ::selection {
     background: transparent; /* WebKit/Blink Browsers */
-  }
-  ::-moz-selection {
+}
+::-moz-selection {
     background: transparent; /* Gecko Browsers */
-  }
+}
 
-  body{-webkit-user-select:none;-moz-user-select:-moz-none;
+body{-webkit-user-select:none;-moz-user-select:-moz-none;
     -ms-user-select:none;user-select:none}

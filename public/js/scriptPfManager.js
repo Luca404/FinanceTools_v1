@@ -187,7 +187,6 @@ function addNumShares( ticker, type, name, price ){
 	nameP.style.paddingLeft = "0px";
 	nameP.style.textAlign = "left";
 	
-	console.log( name.length, nameSize );
 	if( nameSize > 115 ){
 		var cssAnimation = document.createElement('style');
 		cssAnimation.type = 'text/css';
@@ -217,17 +216,17 @@ function addNumShares( ticker, type, name, price ){
 	tr.appendChild(td1);
 
 	var td2 = document.createElement("td");
-	td2.className = "itemTd symbolTd";
+	td2.classList.add( "itemTd", "symbolTd" );
 	td2.appendChild(document.createTextNode(ticker));
 	tr.appendChild(td2);
 
 	var td3 = document.createElement("td");
-	td3.className = "itemTd priceTd";
+	td3.classList.add( "itemTd", "priceTd" );
 	td3.appendChild(document.createTextNode(parseFloat(price).toFixed(2) + "$"));
 	tr.appendChild(td3);
 
 	var td4 = document.createElement("td");
-	td4.className = "itemTd";
+	td4.classList.add( "itemTd", "sharesTd" );
 	var sharesInput = document.createElement("input");
 	sharesInput.type = "number";
 	sharesInput.value = "1";
@@ -237,26 +236,39 @@ function addNumShares( ticker, type, name, price ){
 	sharesInput.style.outline = "none";
 	sharesInput.style.caretColor = "transparent";
 	sharesInput.style.userSelect = "none";
-	sharesInput.className = "addSharesNumInput inputCheck";
 	sharesInput.autocomplete = "one-time-code";
+	sharesInput.classList.add( "addSharesNumInput", "inputCheck" );
+	sharesInput.id = ticker + "sharesInput";
 	$(sharesInput).on("keydown", ( (evt) => { evt.preventDefault(); } ));
 	$(sharesInput).on("input", ( calculatePfValue ));
-	
+	var stepSelect = document.createElement("select");
+	stepSelect.className = "selectpicker";
+	stepSelect.id = ticker + "stepSelect";
+	var opt1 = document.createElement( "option" );
+	opt1.value = "1";
+	opt1.innerText = "1";
+	stepSelect.appendChild( opt1 );
+	var opt2 = document.createElement( "option" );
+	opt2.value = "5";
+	opt2.innerText = "5";
+	stepSelect.appendChild( opt2 );
+	var opt3 = document.createElement( "option" );
+	opt3.value = "10";
+	opt3.innerText = "10";
+	stepSelect.appendChild( opt3 );
+	$(stepSelect).on("change", (changeStepValue) );
+
 	td4.appendChild(sharesInput);
+	td4.appendChild(stepSelect);
+	$(stepSelect).selectpicker("refresh");
+	$(stepSelect).data('selectpicker').$button.attr('title', 'Set Step');
 	tr.appendChild(td4);
 
 	var td5 = document.createElement("td");
-	td5.className = "itemTd";
+	td5.classList.add( "itemTd", "deleteTd" );
 	var deleteButt = document.createElement("button");
 	//deleteButt.className = "btn btn-primary";
 	deleteButt.id = ticker;
-	deleteButt.style.backgroundColor = "white";
-	deleteButt.style.width = "30px";
-	deleteButt.style.height = "30px";
-	deleteButt.style.display = "flex";
-	deleteButt.style.alignItems = "center";
-	deleteButt.style.justifyContent= "center";
-	deleteButt.style.border= "none";
 	deleteButt.onclick = function() { removeNumShares(this.id); };
 	var deleteImg = document.createElement("img");
 	deleteImg.id = "deleteImg";
@@ -272,6 +284,24 @@ function addNumShares( ticker, type, name, price ){
 	delete tempTickersDict[type][ticker];
 	$("#thead2").css( "opacity", 1 );
 	calculatePfValue();
+}
+
+//Change step of sharesInput
+function changeStepValue(evt){
+	var ticker = evt.target.id.split( "stepSelect" )[0];
+	var inputs = $("#tbody2 tr td input");
+	for( var i = 0; i < inputs.length; i++ ){
+		let id = inputs[i].id.split( "sharesInput" )[0];
+		console.log( id );
+		if( id == ticker )
+			inputs[i].step = evt.target.value;
+	}
+	
+	console.log( $(evt.target).data('selectpicker').$button );
+	$(evt.target).selectpicker();
+	$(evt.target).data('selectpicker').$button.attr('title', 'Set Step').selectpicker('render');
+	document.fireEvent("onchange");
+    $(evt.target).selectpicker("refresh");
 }
 
 //calculatePfValue
