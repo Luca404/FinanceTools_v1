@@ -172,14 +172,18 @@ function getTextWidth(text, font) {
 	return metrics.width;
 }
 
-function setTitle( elem ) {
-    var selectpicker = $(elem);
-    selectpicker.selectpicker();
-	selectpicker.selectpicker("refresh");
-    selectpicker.data('selectpicker').$button.attr('title', 'Set Step');
-    //selectpicker.hide().show(0);
-	//$(window).trigger('resize');
-    //selectpicker.selectpicker("refresh");
+function setTitle( elem, i ) {
+	setTimeout(function(){
+		var selectpicker = $(elem);
+		//selectpicker.selectpicker();
+		//selectpicker.selectpicker("refresh");
+		//selectpicker.data('selectpicker').$button.attr('title', 'Set Step');
+		selectpicker.selectpicker('val', i).selectpicker('render');
+		selectpicker.selectpicker("title", i ).selectpicker('render');
+		//selectpicker.hide().show(0);
+		//$(window).trigger('resize');
+		//selectpicker.selectpicker("refresh");	
+	}, 500);
 }
 
 //Add a number shares input 
@@ -272,7 +276,7 @@ function addNumShares( ticker, type, name, price ){
 	td4.appendChild(sharesInput);
 	td4.appendChild(stepSelect);
 
-	setTitle( stepSelect );
+	setTitle( stepSelect, 1 );
 	tr.appendChild(td4);
 
 	var td5 = document.createElement("td");
@@ -299,6 +303,7 @@ function addNumShares( ticker, type, name, price ){
 
 //Change step of sharesInput
 function changeStepValue(evt){
+	console.log("change");
 	var ticker = evt.target.id.split( "stepSelect" )[0];
 	var inputs = $("#tbody2 tr td input");
 	for( var i = 0; i < inputs.length; i++ ){
@@ -308,7 +313,7 @@ function changeStepValue(evt){
 			inputs[i].step = evt.target.value;
 			console.log( $(evt.target).parent()[0].getElementsByTagName("button")[0].title );
 			//$(evt.target).selectpicker("refresh");
-			setTitle( evt.target );
+			setTitle( evt.target, evt.target.value );
 			//$(evt.target).parent()[0].getElementsByTagName("button")[0].title = 'Set Step';
 			//$(evt.target).selectpicker('render');
 			//$(evt.target).selectpicker("refresh");
