@@ -118,7 +118,8 @@ function showTickersInInput(){
 	for( var i = 0; i < keys.length; i++ )
 		$("#addPfTickersInput").append( `<option onclick="selectTicker();" value="${keys[i]}" data-price="${tickersDataList[keys[i]][1]}" data-subtext="${tickersDataList[keys[i]][0]}" name="${selectedType + ':' + tickersType}">${keys[i]}</option>` );
 	
-	$("#addPfTickersInput").on("changed.bs.select", selectTicker)
+	$("#addPfTickersInput").on("changed.bs.select", selectTicker);
+	$("#addPfTickersInput").parent()[0].getElementsByTagName("input")[0].autocomplete = "one-time-code";
 	$("#addPfTickersInput").selectpicker( "refresh" );
 
 }
@@ -169,6 +170,16 @@ function getTextWidth(text, font) {
 	context.font = font;
 	const metrics = context.measureText(text);
 	return metrics.width;
+}
+
+function setTitle( elem ) {
+    var selectpicker = $(elem);
+    selectpicker.selectpicker();
+	selectpicker.selectpicker("refresh");
+    selectpicker.data('selectpicker').$button.attr('title', 'Set Step');
+    //selectpicker.hide().show(0);
+	//$(window).trigger('resize');
+    //selectpicker.selectpicker("refresh");
 }
 
 //Add a number shares input 
@@ -260,8 +271,8 @@ function addNumShares( ticker, type, name, price ){
 
 	td4.appendChild(sharesInput);
 	td4.appendChild(stepSelect);
-	$(stepSelect).selectpicker("refresh");
-	$(stepSelect).data('selectpicker').$button.attr('title', 'Set Step');
+
+	setTitle( stepSelect );
 	tr.appendChild(td4);
 
 	var td5 = document.createElement("td");
@@ -293,15 +304,20 @@ function changeStepValue(evt){
 	for( var i = 0; i < inputs.length; i++ ){
 		let id = inputs[i].id.split( "sharesInput" )[0];
 		console.log( id );
-		if( id == ticker )
+		if( id == ticker ){
 			inputs[i].step = evt.target.value;
+			console.log( $(evt.target).parent()[0].getElementsByTagName("button")[0].title );
+			//$(evt.target).selectpicker("refresh");
+			setTitle( evt.target );
+			//$(evt.target).parent()[0].getElementsByTagName("button")[0].title = 'Set Step';
+			//$(evt.target).selectpicker('render');
+			//$(evt.target).selectpicker("refresh");
+			console.log( $(evt.target).parent()[0].getElementsByTagName("button")[0].title );
+		}
 	}
 	
-	console.log( $(evt.target).data('selectpicker').$button );
-	$(evt.target).selectpicker();
-	$(evt.target).data('selectpicker').$button.attr('title', 'Set Step').selectpicker('render');
-	document.fireEvent("onchange");
-    $(evt.target).selectpicker("refresh");
+	//$(evt.target).selectpicker();
+	//document.fireEvent("onchange");
 }
 
 //calculatePfValue
