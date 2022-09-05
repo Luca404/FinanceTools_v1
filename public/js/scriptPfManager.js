@@ -173,17 +173,7 @@ function getTextWidth(text, font) {
 }
 
 function setTitle( elem, i ) {
-	setTimeout(function(){
-		var selectpicker = $(elem);
-		//selectpicker.selectpicker();
-		//selectpicker.selectpicker("refresh");
-		//selectpicker.data('selectpicker').$button.attr('title', 'Set Step');
-		selectpicker.selectpicker('val', i).selectpicker('render');
-		selectpicker.selectpicker("title", i ).selectpicker('render');
-		//selectpicker.hide().show(0);
-		//$(window).trigger('resize');
-		//selectpicker.selectpicker("refresh");	
-	}, 500);
+	
 }
 
 //Add a number shares input 
@@ -276,7 +266,13 @@ function addNumShares( ticker, type, name, price ){
 	td4.appendChild(sharesInput);
 	td4.appendChild(stepSelect);
 
-	setTitle( stepSelect, 1 );
+	$("td.sharesTd > div.dropdown > div.dropdown-menu").attr( "x-placement", "bottom-start" );
+
+	var selectpicker = $(stepSelect).selectpicker();
+	selectpicker.data('selectpicker').$button.attr('title', 'Set Step').tooltip();
+	selectpicker.data('selectpicker').$button.on( "click", function(evt){ $(evt.currentTarget).attr('title', 'Set Step').tooltip("hide"); });
+	selectpicker.selectpicker( "refresh" );
+
 	tr.appendChild(td4);
 
 	var td5 = document.createElement("td");
@@ -303,26 +299,17 @@ function addNumShares( ticker, type, name, price ){
 
 //Change step of sharesInput
 function changeStepValue(evt){
-	console.log("change");
 	var ticker = evt.target.id.split( "stepSelect" )[0];
 	var inputs = $("#tbody2 tr td input");
 	for( var i = 0; i < inputs.length; i++ ){
 		let id = inputs[i].id.split( "sharesInput" )[0];
-		console.log( id );
 		if( id == ticker ){
 			inputs[i].step = evt.target.value;
-			console.log( $(evt.target).parent()[0].getElementsByTagName("button")[0].title );
-			//$(evt.target).selectpicker("refresh");
-			setTitle( evt.target, evt.target.value );
-			//$(evt.target).parent()[0].getElementsByTagName("button")[0].title = 'Set Step';
-			//$(evt.target).selectpicker('render');
-			//$(evt.target).selectpicker("refresh");
-			console.log( $(evt.target).parent()[0].getElementsByTagName("button")[0].title );
+			var selectpicker = $(evt.target).selectpicker();
+			selectpicker.data('selectpicker').$button.attr('title', 'Set Step').tooltip("hide");
 		}
 	}
 	
-	//$(evt.target).selectpicker();
-	//document.fireEvent("onchange");
 }
 
 //calculatePfValue
