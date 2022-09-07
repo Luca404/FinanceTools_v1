@@ -91,7 +91,6 @@ body{
     width: 100%;
     color: green;
     font-size: 20px;    
-    margin-top: -15%;
     margin-left: 0.7em;    
     z-index: 1041;
 }
@@ -100,8 +99,7 @@ body{
     position: relative;
     width: 100%;
     color: red;
-    font-size: 20px;    
-    margin-top: -25%;
+    font-size: 20px;   
     margin-left: 0.7em;    
     z-index: 1041;
 }
@@ -301,6 +299,10 @@ body{
 
 .sharesTd > div.dropdown > .dropdown-toggle:after {
     display: none !important;
+}
+
+.sharesTd > div.dropdown > .dropdown-menu{
+    transform: translate3d(0px, 32.5px, 0px)!important;
 }
 
 

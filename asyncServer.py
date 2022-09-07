@@ -85,6 +85,10 @@ async def savePf(sid, data):
         k = 0
         for pf in pfData["PortFolios"]:
             if( pf["userID"] == data["user"] ):
+                prices = []
+                for ticker in data["data"]["tickers"]:
+                    prices.append( getCurrentPrice( ticker ) )
+                data["data"]["prices"] = prices
                 pfData["PortFolios"][k]["pfData"].append( data["data"] )
             k += 1
         
@@ -109,6 +113,10 @@ async def modifyPf(sid, data):
             print( "Pollo" )
             for i in pf["pfData"]:
                 if( k == int(data["pfNum"]) ):
+                    prices = []
+                    for ticker in data["data"]["tickers"]:
+                        prices.append( getCurrentPrice( ticker ) )
+                    data["data"]["prices"] = prices
                     pfData["PortFolios"][c]["pfData"][k] = data["data"]
                     break
                 k += 1
@@ -119,7 +127,6 @@ async def modifyPf(sid, data):
     
     pfList = loadPfList( data["user"] )
     return {"data": pfList}
-
 
 @server.event
 async def deletePf(sid, data):
@@ -260,6 +267,14 @@ async def getMarkowitzData( sid, data ):
 
 
 #Server's functions
+def getCurrentPrice( ticker ):
+    try:
+        data = yf.Ticker( ticker )
+        price = data.history(period="1w")["Close"][-1]
+        return price
+    except:
+        return "noData"
+
 def isAllEven( data ):
     even = True
     for i in data:

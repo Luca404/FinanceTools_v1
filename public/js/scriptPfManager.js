@@ -106,8 +106,6 @@ function showTickersInInput(){
 		$("#tickerExchangeInput").selectpicker("hide");
 		var tickersType = selectedType;
 	}
-	selectedType = tickersType;
-
 	$("#addPfTickersInput").find("option").remove();
 	$("#addPfTickersInput").find("li").remove();
 	$("#addPfTickersInput").selectpicker("refresh");
@@ -118,6 +116,8 @@ function showTickersInInput(){
 	for( var i = 0; i < keys.length; i++ )
 		$("#addPfTickersInput").append( `<option onclick="selectTicker();" value="${keys[i]}" data-price="${tickersDataList[keys[i]][1]}" data-subtext="${tickersDataList[keys[i]][0]}" name="${selectedType + ':' + tickersType}">${keys[i]}</option>` );
 	
+		
+	selectedType = tickersType;
 	$("#addPfTickersInput").on("changed.bs.select", selectTicker);
 	$("#addPfTickersInput").parent()[0].getElementsByTagName("input")[0].autocomplete = "one-time-code";
 	$("#addPfTickersInput").selectpicker( "refresh" );
@@ -132,14 +132,15 @@ function selectTicker(){
 //Function triggered on change of choicesJS tickers select
 function changeInputNumShares(event){
 	var ticker = $('#addPfTickersInput').val();
-	var types = $('#addPfTickersInput option:selected').attr("name").split(":");
-	var type = types[0];
+	var types = $('#addPfTickersInput option:selected').attr("name");
+	console.log( types );
+	var type = types.split(":")[0];
 	if( type == "stocks" )
-		type = 	types[1];
+		type = 	types.split(":")[1];
 	selectedType = type;
 	var price = $('#addPfTickersInput option:selected').attr("data-price");
 	var name = $('#addPfTickersInput option:selected').attr("data-subtext");
-	addNumShares( ticker, type, name, price );
+	addNumShares( ticker, types, name, price );
 }
 
 
@@ -152,6 +153,7 @@ function removeNumShares( name ){
 		let symbol = td.innerText;
 		if( symbol == name ){
 			numSharesTable.removeChild( numSharesTrs[i] );
+			console.log( selectedType );
 			tempTickersDict[selectedType][symbol] = selectedTickers[symbol].slice();
 			delete selectedTickers[symbol];
 		}
@@ -192,10 +194,10 @@ function addNumShares( ticker, type, name, price ){
 	nameP.style.paddingLeft = "0px";
 	nameP.style.textAlign = "left";
 	
-	if( nameSize > 115 ){
+	if( nameSize > 119 ){
 		var cssAnimation = document.createElement('style');
 		cssAnimation.type = 'text/css';
-		var marginLeft = nameSize-110;
+		var marginLeft = nameSize-115;
 		if( marginLeft > 0 )
 			marginLeft = -(marginLeft);
 		var rules = document.createTextNode('@-webkit-keyframes scroll' + ticker.toString() + ' {'+
@@ -234,6 +236,7 @@ function addNumShares( ticker, type, name, price ){
 	td4.classList.add( "itemTd", "sharesTd" );
 	var sharesInput = document.createElement("input");
 	sharesInput.type = "number";
+	sharesInput.name = type;
 	sharesInput.value = "1";
 	sharesInput.step = "1";
 	sharesInput.min = "1";
@@ -262,18 +265,17 @@ function addNumShares( ticker, type, name, price ){
 	opt3.innerText = "10";
 	stepSelect.appendChild( opt3 );
 	$(stepSelect).on("change", (changeStepValue) );
-
 	td4.appendChild(sharesInput);
 	td4.appendChild(stepSelect);
-
-	$("td.sharesTd > div.dropdown > div.dropdown-menu").attr( "x-placement", "bottom-start" );
-
+	
 	var selectpicker = $(stepSelect).selectpicker();
 	selectpicker.data('selectpicker').$button.attr('title', 'Set Step').tooltip();
 	selectpicker.data('selectpicker').$button.on( "click", function(evt){ $(evt.currentTarget).attr('title', 'Set Step').tooltip("hide"); });
-	selectpicker.selectpicker( "refresh" );
+	//selectpicker.selectpicker( "refresh" );
 
 	tr.appendChild(td4);
+	$(sharesInput).bind( "mousewheel", scrollNumShares )
+	$(td4).find("div.dropdown > button").bind( 'mousewheel', scrollStep );
 
 	var td5 = document.createElement("td");
 	td5.classList.add( "itemTd", "deleteTd" );
@@ -291,10 +293,48 @@ function addNumShares( ticker, type, name, price ){
 	tr.appendChild( td5 );
 	tbody.appendChild( tr );
 
-	selectedTickers[ticker] = tempTickersDict[type][ticker];
-	delete tempTickersDict[type][ticker];
+	let selType = type.split(":")[1];
+	selectedTickers[ticker] = tempTickersDict[selType][ticker];
+	delete tempTickersDict[selType][ticker];
 	$("#thead2").css( "opacity", 1 );
 	calculatePfValue();
+}
+
+//Scroll num shares input
+function scrollNumShares(e){
+	var min = e.currentTarget.min;
+	var max = e.currentTarget.max;
+	if( e.originalEvent.deltaY < 0 ) 
+		e.currentTarget.value = Math.min( parseInt(e.currentTarget.value) + parseInt(e.currentTarget.step), max );
+	if( e.originalEvent.deltaY > 0 )
+		e.currentTarget.value = Math.max( parseInt(e.currentTarget.value) - parseInt(e.currentTarget.step), min );
+	e.preventDefault();
+	calculatePfValue();
+}
+
+//Scroll step input
+function scrollStep(e){
+	var elem = $(this);
+	var select = elem.parent()[0].getElementsByTagName( "select" )[0];
+	var input = elem.parent().parent()[0].getElementsByTagName( "input" )[0];
+	if (this.hasFocus) {
+		return;
+	}
+	if (e.originalEvent.deltaY < 0) {
+		let ind = Math.max($(select).prop('selectedIndex') - 1, 0)
+		$(select).prop('selectedIndex', ind);
+		$(select).selectpicker("refresh");
+		input.step = $(select).val();
+		input.min = $(select).val();
+	}
+	if (e.originalEvent.deltaY > 0) {
+		let ind = Math.min($(select).prop('selectedIndex') + 1, 2)
+		$(select).prop('selectedIndex', ind);
+		$(select).selectpicker("refresh");
+		input.step = $(select).val();
+		input.min = $(select).val();
+	}
+	e.preventDefault();
 }
 
 //Change step of sharesInput
@@ -305,6 +345,7 @@ function changeStepValue(evt){
 		let id = inputs[i].id.split( "sharesInput" )[0];
 		if( id == ticker ){
 			inputs[i].step = evt.target.value;
+			inputs[i].min = evt.target.value;
 			var selectpicker = $(evt.target).selectpicker();
 			selectpicker.data('selectpicker').$button.attr('title', 'Set Step').tooltip("hide");
 		}
@@ -413,15 +454,16 @@ function modifyPf(item){
 	for( let i = 0; i<pfData[pfNum].tickers.length; i++ ){
 		var type = pfData[pfNum].type[i].split(":")[0];
 		var exch = pfData[pfNum].type[i].split(":")[1];
+		var selType = type;
 		$("#tickerTypeInput").val( type );
 		$("#tickerTypeInput").selectpicker( "refresh" );
 		if( type == "stocks" ){
-			type = exch;
-			$("#tickerExchangeInput").val( type );
+			selType = exch;
+			$("#tickerExchangeInput").val( exch );
 			$("#tickerExchangeInput").selectpicker( "refresh" );
 		}		
-	
-		addNumShares( pfData[pfNum].tickers[i], type, tickersDict[type][pfData[pfNum].tickers[i]][0], pfData[pfNum].prices[i] );
+
+		addNumShares( pfData[pfNum].tickers[i], type + ":" + selType, tickersDict[selType][pfData[pfNum].tickers[i]][0], pfData[pfNum].prices[i] );
 		
 		var numSharesInputs = $(".addSharesNumInput");
 		$( numSharesInputs[i] ).val( pfData[pfNum].numShares[i] );
@@ -448,7 +490,8 @@ function deletePfButt(){
 			content.style = "filter: blur(10px)";
 			var divSuccess = document.createElement("div");
 			divSuccess.appendChild(document.createTextNode("Portfolio deleted successfully"));
-			divSuccess.id = "successDeleteDiv";
+			divSuccess.style.marginTop = "-" + ($(content).height() + 200) / 2 +"px";
+			divSuccess.id = "successSavedDiv";
 			delModal.appendChild(divSuccess);
 			content.style.pointerEvents = "none";
 			delModal.style.userSelect = "none";
@@ -482,7 +525,7 @@ function addPf(){
 function saveChangesButton(){
 	let check = true;
 	var pfName = document.getElementById("addPfNameInput");
-	var pfTickers = selectedTickers;
+	var pfTickers = Object.keys(selectedTickers);
 	var pfTypes = [];
 	var pfShares = [];
 
@@ -503,11 +546,8 @@ function saveChangesButton(){
 
 	//Check Pf tickers
 	//Check numbers of shares
-	let pfSharesDiv = document.getElementById( "pfSharesNumDiv" );
-	let pfSharesInputs = pfSharesDiv.getElementsByTagName( "input" );
-	console.log( pfSharesInputs.length );
+	let pfSharesInputs = $("#tbody2 input.addSharesNumInput");
 	if( pfSharesInputs.length == 0 ){
-		console.log( "Error" );
 		var title = document.getElementsByClassName( "filter-option-inner-inner" )[2];
 		title.innerText = 'Insert Ticker';
 		title.style.color = "red";
@@ -521,19 +561,6 @@ function saveChangesButton(){
 		for(let i = 0 ; i < pfSharesInputs.length; i++){
 			pfShares.push( parseInt( pfSharesInputs[i].value ) );
 			pfTypes.push( pfSharesInputs[i].name )
-			if( pfSharesInputs[i].value == "" ){
-				pfSharesInputs[i].style.animation = "0.25s linear 0s 1 normal forwards running error";
-				pfSharesInputs[i].value = "";
-				pfSharesInputs[i].color = "red";
-				pfSharesInputs[i].placeholder = "Error";
-				setTimeout(() => {
-					pfSharesInputs[i].style.animation = "";
-				}, 250);
-				setTimeout(() => {
-					pfSharesInputs[i].placeholder = "";
-				}, 1500);
-				check = false;
-			}
 		}
 	}
 	if( check ){
@@ -546,6 +573,7 @@ function saveChangesButton(){
 					content.style = "filter: blur(10px)";
 					var divSuccess = document.createElement("div");
 					divSuccess.appendChild(document.createTextNode("Portfolio added successfully"));
+					divSuccess.style.marginTop = "-" + ($(content).height() + 200) / 2 +"px";
 					divSuccess.id = "successSavedDiv";
 					addModal.appendChild(divSuccess);
 					content.style.pointerEvents = "none";
@@ -559,18 +587,20 @@ function saveChangesButton(){
 					loadTable1( pfData );
 				}
 				else{
-					alert("Error with server");
+					alert("Error with server!!");
 				}
 			});
 		}
 		else if( modalName == "Modify" ){
 			var data = { pfName: pfNameValue, tickers: pfTickers, type: pfTypes, numShares: pfShares };
+			data["prices"] = pfData[pfNum]["prices"];			
 			if( JSON.stringify(pfData[pfNum]) === JSON.stringify(data) ){
 				let addModal = document.getElementById("addModal");
 				let content = addModal.getElementsByClassName("modal-content")[0];
 				content.style = "filter: blur(10px)";
 				var divError = document.createElement("div");
 				divError.appendChild(document.createTextNode("No Changes"));
+				divError.style.marginTop = "-" + ($(content).height() + 200) / 2 +"px";
 				divError.id = "errorSavedDiv";
 				addModal.appendChild(divError);
 				content.style.pointerEvents = "none";
@@ -578,7 +608,7 @@ function saveChangesButton(){
 				setTimeout(() => {
 					$("#errorSavedDiv").remove();
 					content.style = "filter: blur(0px)";
-				}, 2000);
+				}, 1000);
 			}
 			else{
 				server.emit( "modifyPf", { "data": data, "pfNum": pfNum, "user": userName }, (result) => {
@@ -589,6 +619,7 @@ function saveChangesButton(){
 						content.style = "filter: blur(10px)";
 						var divSuccess = document.createElement("div");
 						divSuccess.appendChild(document.createTextNode("Portfolio modified successfully"));
+						divSuccess.style.marginTop = "-" + ($(content).height() + 200) / 2 +"px";
 						divSuccess.id = "successSavedDiv";
 						addModal.appendChild(divSuccess);
 						content.style.pointerEvents = "none";
