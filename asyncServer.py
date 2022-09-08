@@ -447,9 +447,14 @@ def getAssetsInfo( tickers ):
             assetInfo["Symbol"] = t
             assetInfo["Name"] = assetData["longName"]
             assetInfo["Type"] = assetData["quoteType"]
-            assetInfo["Sector"] = assetData["sector"]
-            assetInfo["Industry"] = assetData["industry"]
-            assetInfo["Country"] = assetData["country"]
+            assetInfo["Descr"] = assetData["longBusinessSummary"]
+            if( assetInfo["Type"] == "ETF" ):
+                assetInfo["Category"] = assetData["category"]
+                assetInfo["totAsset"] = assetData["totalAssets"]
+            else:
+                assetInfo["Sector"] = assetData["sector"]
+                assetInfo["Industry"] = assetData["industry"]
+                assetInfo["Country"] = assetData["country"]
 
             fileData["info"].append( assetInfo )
             with open("./json/assetInfo/assetInfo.json", "w") as f:

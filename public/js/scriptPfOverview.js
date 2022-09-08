@@ -232,7 +232,7 @@ function loadSavedPf(){
         $("#savedPfMenu").selectpicker( "val", getCookie( "selectedPf" ) );
     else{
         $("#savedPfMenu").selectpicker( "val", "0" );
-        setCookie( "selectedPf", k, 0 );
+        setCookie( "selectedPf", 0, 5 );
     }
 
     $("#savedPfMenu").selectpicker("refresh");
@@ -257,6 +257,7 @@ function loadSingleAssetData(){
 function drawAssetInfo( info ){
     var infoTable = document.getElementById("assetInfoTable").getElementsByTagName("tbody")[0];
     $(infoTable).empty();
+    console.log( info );
     for(var i = 0; i < info.length; i++) {
         var tr = document.createElement("tr");
 
@@ -271,10 +272,38 @@ function drawAssetInfo( info ){
         var td2 = document.createElement("td");
         td2.appendChild(document.createTextNode(info[i].Name));
         tr.appendChild(td2);
-
+        
         var td3 = document.createElement("td");
-        td3.appendChild(document.createTextNode(info[i].Sector));
+        //td3.style = "width: 300px";
+        td3.appendChild(document.createTextNode(info[i].Descr.slice(0,70) + "..."));
         tr.appendChild(td3);
+
+        if( info[i].Type == "ETF" ){
+            var td4 = document.createElement("td");
+            td4.appendChild(document.createTextNode(info[i].Category));
+            tr.appendChild(td4);
+
+            var td5 = document.createElement("td");
+            td5.appendChild(document.createTextNode(""));
+            tr.appendChild(td5);
+
+            var td6 = document.createElement("td");
+            td6.appendChild(document.createTextNode(""));
+            tr.appendChild(td6);
+        }
+        else{
+            var td4 = document.createElement("td");
+            td4.appendChild(document.createTextNode(info[i].Sector));
+            tr.appendChild(td4);
+
+            var td5 = document.createElement("td");
+            td5.appendChild(document.createTextNode(info[i].Industry));
+            tr.appendChild(td5);
+
+            var td6 = document.createElement("td");
+            td6.appendChild(document.createTextNode(info[i].Country));
+            tr.appendChild(td6);
+        }
 
         infoTable.appendChild(tr);
     }
