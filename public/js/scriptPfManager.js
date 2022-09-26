@@ -129,7 +129,7 @@ function selectTicker(){
 	$('#addPfTickersInput').selectpicker('refresh');
 }
 
-//Function triggered on change of choicesJS tickers select
+//Function triggered on change of boostrap tickers select
 function changeInputNumShares(event){
 	var ticker = $('#addPfTickersInput').val();
 	var types = $('#addPfTickersInput option:selected').attr("name");
@@ -197,7 +197,7 @@ function addNumShares( ticker, type, name, price ){
 	if( nameSize > 119 ){
 		var cssAnimation = document.createElement('style');
 		cssAnimation.type = 'text/css';
-		var marginLeft = nameSize-115;
+		var marginLeft = nameSize-110;
 		if( marginLeft > 0 )
 			marginLeft = -(marginLeft);
 		var rules = document.createTextNode('@-webkit-keyframes scroll' + ticker.toString() + ' {'+
@@ -693,8 +693,8 @@ function checkLogin(){
 	}
 	
 	if( usrn.value != "" && passwd.value != "" ){		
-		var hashPass = hash(passwd.value);
-		server.emit("login",{"username":usrn.value, "password":hashPass});
+		//var hashPass = hash(passwd.value);
+		server.emit("login",{"username":usrn.value, "password":passwd.value});
 	}
 }
 
@@ -801,8 +801,8 @@ function registerUser(){
 	}
 
 	if( usrn.value != "" && passwd.value != "" && passwd.value == passwdConf.value ){		
-		var hashPass = hash(passwd.value);
-		server.emit("registerUser",{"username":usrn.value, "password":hashPass});
+		//var hashPass = hash(passwd.value);
+		server.emit("registerUser",{"username":usrn.value, "password":passwd.value});
 	}
 }
 

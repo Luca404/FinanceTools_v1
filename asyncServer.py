@@ -6,10 +6,12 @@ import pandas as pd
 import numpy as np
 import yfinance as yf
 from pandas_datareader import data as wb
+import mysql.connector
 import json
 import math
 import re
 
+#Server object
 server = socketio.AsyncServer(async_mode="asgi")
 app = socketio.ASGIApp(server, static_files={
     '/': './public/pfManager.html',
@@ -19,6 +21,14 @@ app = socketio.ASGIApp(server, static_files={
     '/markowitz':"./public/pfMarkowitz.html",
     "/static": "./public/",
 })
+
+#Database
+db = mysql.connector.connect(
+    host="localhost",
+    user="root",
+    password="",
+    database="finance-tools"
+)
  
 @server.event
 async def connect(sid, env):
