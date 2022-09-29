@@ -18,6 +18,7 @@ app = socketio.ASGIApp(server, static_files={
     '/correlation':"./public/pfCorrelation.html",
     '/risk':"./public/pfRisk.html",
     '/markowitz':"./public/pfMarkowitz.html",
+    '/montecarlo':"./public/pfMonteCarlo.html",
     "/static": "./public/",
 })
 
@@ -267,6 +268,46 @@ async def getMarkowitzData( sid, data ):
 
     return { "data": pFolios.to_json(), "weights": sharesArray.tolist(), "pfData":[float(pfVolatility*100), float(pfReturn*100)] }
 
+@server.event
+async def getMontecarloData( sid, data ):
+    dfData = loadPfData( data, True )
+    pfWeights = np.array( calculateWeights( data["weights"], dfData ) )
+    logReturns = np.log(dfData / dfData.shift(1))
+    nAsset = len(pfWeights)
+    prices = data["prices"]
+    iteration = data["iter"]
+
+    pfVariance = np.dot( pfWeights.T, np.dot( logReturns.cov() * 250, pfWeights ) )
+    pfVolatility = pfVariance ** 0.5
+    pfReturn = np.sum(pfWeights * logReturns.mean()) * 250
+
+    pFolioReturns = []
+    pFolioVolatility = []
+    weightsArray = []
+    sharesArray = []
+
+    x = 0
+    while( x<iteration ):
+        shares = np.random.randint(1, maxShares, size=nAsset)
+        value = 0
+        for i in range( 0, len(shares) ):
+            value = value + prices[i] * shares[i]
+        if( value < maxValues and not( isAllEven( shares ) ) ):
+            sharesArray.append( shares )
+            weights = calculateWeights( shares, dfData )
+            weights /= np.sum(weights)
+            pFolioReturns.append(np.sum(weights * logReturns.mean()) * 250)
+            pFolioVolatility.append(np.sqrt(np.dot(weights.T, np.dot(logReturns.cov() * 250, weights))))
+            x += 1
+
+    pFolioReturns = np.array(pFolioReturns)
+    pFolioVolatility = np.array(pFolioVolatility)
+    sharesArray = np.array(sharesArray)
+
+    pFolios = pd.DataFrame({"return": pFolioReturns*100, "volatility": pFolioVolatility*100})
+    pFolioW = pd.DataFrame(weightsArray, columns=logReturns.columns.tolist())
+
+    return { "data": pFolios.to_json(), "weights": sharesArray.tolist(), "pfData":[float(pfVolatility*100), float(pfReturn*100)] }
 
 #Server's functions
 def getCurrentPrice( ticker ):
