@@ -6,7 +6,6 @@ import pandas as pd
 import numpy as np
 import yfinance as yf
 from pandas_datareader import data as wb
-import mysql.connector
 import json
 import math
 import re
@@ -22,14 +21,7 @@ app = socketio.ASGIApp(server, static_files={
     "/static": "./public/",
 })
 
-#Database
-db = mysql.connector.connect(
-    host="localhost",
-    user="root",
-    password="",
-    database="finance-tools"
-)
- 
+
 @server.event
 async def connect(sid, env):
     print(sid, "connected")
@@ -49,7 +41,7 @@ async def login(sid, data):
     for user in data["Users"]:
         if( user["usern"] == username ):
             accountExist = True
-            if( int(user["passwd"]) == int(password) ):
+            if( user["passwd"] == password ):
                 logged = True
 
     if( accountExist and not(logged) ):
