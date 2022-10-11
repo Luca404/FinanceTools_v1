@@ -43,14 +43,18 @@
   margin-left: 20px;
 }
 
-#actualValueInput{
+#expReturn{
+  display: inline-block;
+}
+
+#volatilityInput{
   margin-left: 39.5px;
 }
 
 #selectedValueInput{
   margin-left: 39.5px;
 }
-
+ 
 #selectedDiv{
   margin-left:70px;
 }

@@ -4,7 +4,7 @@
         <meta charset="UTF-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Markowitz Portfolio Optimization</title>
+        <title>MonteCarlo Portfolio Analyses</title>
 
         <!-- Bootstrap -->
         <link href="https://fonts.googleapis.com/css?family=Poppins:300,400,500,600,700,800,900" rel="stylesheet">
@@ -108,13 +108,35 @@
                 <br />
                 <br />
                 <div class="dataContDiv">
-                    <div id="expReturn"> 
-                        <h6>Expected annual return: </h6>
-                        <input id="returnsInput" class="dataInput" disabled>
+                    <div id="bestCase">
+                        <div id="expReturn" class="dataDiv"> 
+                            <h6>Best case return: </h6>
+                            <input id="returnsInput" class="dataInput" style="margin-left:29.5px;" disabled>
+                        </div>
+                        <div id="expVolatility" class="dataDiv">
+                            <h6>Best case volatility: </h6>
+                            <input id="volatilityInput" class="dataInput" disabled>
+                        </div>
                     </div>
-                    <div id="expVolatility">
-                        <h6>Expected annual volatility: </h6>
-                        <input id="volatilityInput" class="dataInput" disabled>
+                    <div id="worstCase">
+                        <div id="worstReturn" class="dataDiv"> 
+                            <h6>Worst case return: </h6>
+                            <input id="returnsInput" class="dataInput" style="margin-left:29.5px;" disabled>
+                        </div>
+                        <div id="worstVolatility" class="dataDiv">
+                            <h6>Worst case volatility: </h6>
+                            <input id="volatilityInput" class="dataInput" disabled>
+                        </div>
+                    </div>
+                    <div id="meanCase">
+                        <div id="meanReturn" class="dataDiv"> 
+                            <h6>Mean return: </h6>
+                            <input id="returnsInput" class="dataInput" style="margin-left:29.5px;" disabled>
+                        </div>
+                        <div id="meanVolatility" class="dataDiv">
+                            <h6>Mean volatility: </h6>
+                            <input id="volatilityInput" class="dataInput" disabled>
+                        </div>
                     </div>
                 </div>
             </div>

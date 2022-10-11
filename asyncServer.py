@@ -6,6 +6,7 @@ import pandas as pd
 import numpy as np
 import yfinance as yf
 from pandas_datareader import data as wb
+from scipy.stats import norm
 import json
 import math
 import re
@@ -270,44 +271,24 @@ async def getMarkowitzData( sid, data ):
 
 @server.event
 async def getMontecarloData( sid, data ):
-    dfData = loadPfData( data, True )
-    pfWeights = np.array( calculateWeights( data["weights"], dfData ) )
-    logReturns = np.log(dfData / dfData.shift(1))
-    nAsset = len(pfWeights)
-    prices = data["prices"]
+    dfData = loadPfData( data, False )
+    pfData = pd.DataFrame( dfData["pfRet"] )
+    lastDate = str(pfData.index[-1]).split(" ")[0]
+    logReturns = np.log(1 + pfData.pct_change())
+    interval = int(data["period"]) * 250
     iteration = data["iter"]
+    mean = logReturns.mean()
+    var = logReturns.var()
+    stdev = pd.Series( logReturns.std() )
+    drift = pd.Series( mean - (0.5 * var) )
+    dailyReturns = np.exp(drift.values + stdev.values * norm.ppf(np.random.rand(interval, iteration)))
+    priceList = np.zeros_like(dailyReturns)
+    priceList[0] = pfData.iloc[-1]
+    for t in range(1, interval):
+        priceList[t] = priceList[t - 1] * dailyReturns[t]
 
-    pfVariance = np.dot( pfWeights.T, np.dot( logReturns.cov() * 250, pfWeights ) )
-    pfVolatility = pfVariance ** 0.5
-    pfReturn = np.sum(pfWeights * logReturns.mean()) * 250
-
-    pFolioReturns = []
-    pFolioVolatility = []
-    weightsArray = []
-    sharesArray = []
-
-    x = 0
-    while( x<iteration ):
-        shares = np.random.randint(1, maxShares, size=nAsset)
-        value = 0
-        for i in range( 0, len(shares) ):
-            value = value + prices[i] * shares[i]
-        if( value < maxValues and not( isAllEven( shares ) ) ):
-            sharesArray.append( shares )
-            weights = calculateWeights( shares, dfData )
-            weights /= np.sum(weights)
-            pFolioReturns.append(np.sum(weights * logReturns.mean()) * 250)
-            pFolioVolatility.append(np.sqrt(np.dot(weights.T, np.dot(logReturns.cov() * 250, weights))))
-            x += 1
-
-    pFolioReturns = np.array(pFolioReturns)
-    pFolioVolatility = np.array(pFolioVolatility)
-    sharesArray = np.array(sharesArray)
-
-    pFolios = pd.DataFrame({"return": pFolioReturns*100, "volatility": pFolioVolatility*100})
-    pFolioW = pd.DataFrame(weightsArray, columns=logReturns.columns.tolist())
-
-    return { "data": pFolios.to_json(), "weights": sharesArray.tolist(), "pfData":[float(pfVolatility*100), float(pfReturn*100)] }
+    print( priceList )
+    return { "data": priceList.tolist(), "lastDate": lastDate }
 
 #Server's functions
 def getCurrentPrice( ticker ):

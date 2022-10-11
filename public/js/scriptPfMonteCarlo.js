@@ -2,7 +2,7 @@
 var pfData;
 var selectedPf;
 var PERIOD = 2;
-var ITERATION = 1000;
+var ITERATION = 50;
 var portFolios;
 
 //Connection to server
@@ -152,127 +152,93 @@ function loadMontecarloData(){
     //Remove canvas
     var canvasDiv = document.getElementById("montecarloCanvasDiv");
     if( canvasDiv.children.length > 0 )
-        canvasDiv.removeChild( document.getElementById("singlePerfCanvas") );
+        canvasDiv.removeChild( document.getElementById("montecarloCanvas") );
     
     $("#montecarloCanvasCont").addClass( "ph-item" );
     $("#montecarloCanvasDiv").addClass( "ph-picture" );
 
-    server.emit("getMontecarloData", {name: pfName, tickers: pfTickers, period: PERIOD, weights: weights, iter: ITERATION, prices:portFolios[selectedPf].prices}, (res) =>{
-        var pfRetAndVol = JSON.parse( res["data"] );
-        var pfWeights = res["weights"];
-        var pfData = res["pfData"];
-        drawMarkowitzChart( pfRetAndVol, pfWeights, pfData, pfTickers, portFolios[selectedPf].prices );
+    server.emit("getMontecarloData", {name: pfName, tickers: pfTickers, period: PERIOD, weights: weights, iter: ITERATION}, (res) =>{
+        drawMontecarloChart( res["data"], res["lastDate"] );
     })
 }
 
-function drawMarkowitzChart( data, weights, pfData, tickers, prices ){
-    var pfReturn = Object.values( data["return"] );
-    var pfVol = Object.values( data["volatility"] );
-    var pfWeights = Object.values( weights );
-    
-    $("#markowitzCanvasCont").removeAttr( "class" );
-    $("#markowitzCanvasDiv").removeAttr( "class" );
+function drawMontecarloChart( data, lastDate ){
+    $("#montecarloCanvasCont").removeAttr( "class" );
+    $("#montecarloCanvasDiv").removeAttr( "class" );
 
     //Canvas creation
-    var canvasDiv = document.getElementById("markowitzCanvasDiv");
-    var canvasMarkowitz = document.createElement("canvas");
-    canvasMarkowitz.id = "singlePerfCanvas";
-    canvasDiv.appendChild(canvasMarkowitz);
+    var canvasDiv = document.getElementById("montecarloCanvasDiv");
+    var canvasMontecarlo = document.createElement("canvas");
+    canvasMontecarlo.id = "montecarloCanvas";
+    canvasDiv.appendChild(canvasMontecarlo);
 
-    var dataList = []
-    for( var i = 0; i<pfReturn.length; i++ )
-        dataList[i] = {
-            x: parseFloat( pfVol[i] ), 
-            y: parseFloat( pfReturn[i] ),
-            id: i
-        };
-
-    //Markowitz chart Draw
-    new Chart(document.getElementById("singlePerfCanvas"), {
-        type: 'scatter',
+    var dataset = [];
+    var dateList = [];
+    var k = 0;
+    date = new Date(lastDate);
+    for(var i = 0; i < data[k].length; i++){
+        dataset.push( {} );
+        for( var a = 0; a < data.length; a++ ){
+            if( k == 0 ){
+                dateList[a] = date.toLocaleDateString();;
+                date.setDate(date.getDate() + 1);
+                while( date.getDay() > 5 ){
+                    date.setDate(date.getDate() + 1);
+                }
+            }
+            dataset[k][a] = data[a][i];
+        }
+        k += 1;
+    }
+    const randomNum = () => Math.floor(Math.random() * (235 - 52 + 1) + 52);
+    const randomRGB = () => `rgb(${randomNum()}, ${randomNum()}, ${randomNum()})`;
+    var dset = [];
+    for( var i = 0; i < dataset.length; i++ ){
+        dset[i] = {
+            data: Object.values(dataset[i]),
+            borderColor: randomRGB(),
+            fill: false
+        }
+    }
+    
+    //Montecarlo chart Draw
+    new Chart(document.getElementById("montecarloCanvas"), {
+        type: 'line',
         data: {
-            datasets:[  
-            {
-                label: "Actual Weights",
-                data: [{ x: pfData[0], y: pfData[1] }],
-                fill: false,
-                pointBackgroundColor: 'grey',       
-                showLine: false,
-                pointRadius: 5,
-                pointHoverRadius: 7
-            },
-            {
-                label: "Markowitz Efficient Frontier",
-                data: dataList,
-                fill: false,
-                pointBackgroundColor: 'blue',       
-                showLine: false
-            }]
+            labels: dateList,
+            datasets: dset
         },
         options: {
             responsive: true,
             maintainAspectRatio: true,
+            legend: {
+                display: false
+            },
             tooltips: {
                 callbacks: {
-                    label: function(tooltipItem, data) {
-                        return ["Return: " + tooltipItem.yLabel.toFixed(2), "Volatility: " + tooltipItem.xLabel.toFixed(2)];
-                    }
-                  },
-                  backgroundColor: '#FFF',
-                  titleFontSize: 16,
-                  titleFontColor: '#0066ff',
-                  bodyFontColor: '#000',
-                  bodyFontSize: 14,
-                  displayColors: false
+                   label: function(tooltipItem) {
+                          return tooltipItem.yLabel;
+                   }
+                }
+            },
+            elements: {
+                point:{
+                    radius: 0
+                }
             },
             scales: {
                 xAxes: [{
                     scaleLabel: {
                         display: true,
-                        labelString: 'Volatility'
+                        labelString: 'Date'
                     }
                 }],
                 yAxes: [{
                     scaleLabel: {
                       display: true,
-                      labelString: 'Return'
+                      labelString: 'Price'
                     }
                   }]
-            },
-            hover: {
-                mode: 'nearest',
-                intersect: true,
-                onHover: function (e, item) {
-                    if (item.length) {
-                        var selectedWeights = document.getElementById( "selectedWeightsInput" );
-                        var actualWeights = document.getElementById( "actualWeightsInput" );
-                        var text = "";
-                        if( item[0]._datasetIndex == 1 ){
-                            var data = item[0]._chart.config.data.datasets[1].data[item[0]._index];
-                            var id = data.id;
-                            for( var i = 0; i<tickers.length; i++ )
-                                text = text + tickers[i] + ": " + pfWeights[id][i] + "    ";
-                            selectedWeights.value = text;   
-                        }
-                        else
-                            selectedWeights.value = actualWeights.value; 
-                        resizeInput.call( selectedWeights );
-
-                        var selectedValue = document.getElementById( "selectedValueInput" );
-                        var actualValue = document.getElementById( "actualValueInput" );
-                        var value = 0;
-                        if( item[0]._datasetIndex == 1 ){
-                            var data = item[0]._chart.config.data.datasets[1].data[item[0]._index];
-                            var id = data.id;
-                            for( var i = 0; i<tickers.length; i++ )
-                                value = value + prices[i] * pfWeights[id][i];
-                            selectedValue.value = parseInt(value).toString() + "$";   
-                        }
-                        else
-                            selectedValue.value = actualValue.value; 
-                        selectedValue.style.width = selectedWeights.style.width;
-                    }
-                }
             }
         }          
     });
