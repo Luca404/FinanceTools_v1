@@ -158,11 +158,11 @@ function loadMontecarloData(){
     $("#montecarloCanvasDiv").addClass( "ph-picture" );
 
     server.emit("getMontecarloData", {name: pfName, tickers: pfTickers, period: PERIOD, weights: weights, iter: ITERATION}, (res) =>{
-        drawMontecarloChart( res["data"], res["lastDate"] );
+        drawMontecarloChart( res["data"], res["lastDate"], JSON.parse( res["info"] ) );
     })
 }
 
-function drawMontecarloChart( data, lastDate ){
+function drawMontecarloChart( data, lastDate, info ){
     $("#montecarloCanvasCont").removeAttr( "class" );
     $("#montecarloCanvasDiv").removeAttr( "class" );
 
@@ -172,30 +172,22 @@ function drawMontecarloChart( data, lastDate ){
     canvasMontecarlo.id = "montecarloCanvas";
     canvasDiv.appendChild(canvasMontecarlo);
 
-    var dataset = [];
     var dateList = [];
-    var k = 0;
     date = new Date(lastDate);
-    for(var i = 0; i < data[k].length; i++){
-        dataset.push( {} );
-        for( var a = 0; a < data.length; a++ ){
-            if( k == 0 ){
-                dateList[a] = date.toLocaleDateString();;
-                date.setDate(date.getDate() + 1);
-                while( date.getDay() > 5 ){
-                    date.setDate(date.getDate() + 1);
-                }
-            }
-            dataset[k][a] = data[a][i];
-        }
-        k += 1;
+    for(var i = 0; i < Object.values(data[0]).length; i++){
+        dateList[i] = date.toLocaleDateString();
+        date.setDate(date.getDate() + 1);
+        while( date.getDay() > 5 )
+            date.setDate(date.getDate() + 1);
     }
+
     const randomNum = () => Math.floor(Math.random() * (235 - 52 + 1) + 52);
     const randomRGB = () => `rgb(${randomNum()}, ${randomNum()}, ${randomNum()})`;
-    var dset = [];
-    for( var i = 0; i < dataset.length; i++ ){
-        dset[i] = {
-            data: Object.values(dataset[i]),
+    
+    var dataset = [];
+    for( var i = 0; i < data.length; i++ ){
+        dataset[i] = {
+            data: Object.values(data[i]),
             borderColor: randomRGB(),
             fill: false
         }
@@ -206,7 +198,7 @@ function drawMontecarloChart( data, lastDate ){
         type: 'line',
         data: {
             labels: dateList,
-            datasets: dset
+            datasets: dataset
         },
         options: {
             responsive: true,
@@ -242,6 +234,15 @@ function drawMontecarloChart( data, lastDate ){
             }
         }          
     });
+
+    //montecarlo best, worst and mean values
+    console.log( info )
+    $("#bestReturn > input").val( info["best"][0] + "%" )
+    $("#bestVolatility > input").val( info["best"][1] + "%" )
+    $("#worstReturn > input").val( info["worst"][0] + "%" )
+    $("#worstVolatility > input").val( info["worst"][1] + "%" )
+    $("#meanReturn > input").val( info["mean"][0] + "%" )
+    $("#meanVolatility > input").val( info["mean"][1] + "%" )
 }
 
 function filterLetters(evt){

@@ -194,6 +194,21 @@
             35.650001525878906,
             19.063400268554688
           ]
+        },
+        {
+          "pfName": "singleTest",
+          "tickers": [
+            "META"
+          ],
+          "type": [
+            "stocks:nasdaq"
+          ],
+          "numShares": [
+            1
+          ],
+          "prices": [
+            126.9800033569336
+          ]
         }
       ]
     }

@@ -40,14 +40,19 @@
 }
 
 .dataInput{
+  text-align: center;
   margin-left: 20px;
 }
 
 #expReturn{
   display: inline-block;
 }
-
+ 
 #volatilityInput{
+  margin-left: 39.5px;
+}
+
+#actualValueInput{
   margin-left: 39.5px;
 }
 

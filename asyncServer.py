@@ -20,6 +20,7 @@ app = socketio.ASGIApp(server, static_files={
     '/risk':"./public/pfRisk.html",
     '/markowitz':"./public/pfMarkowitz.html",
     '/montecarlo':"./public/pfMonteCarlo.html",
+    '/capm':"./public/capm.html",
     "/static": "./public/",
 })
 
@@ -278,17 +279,38 @@ async def getMontecarloData( sid, data ):
     interval = int(data["period"]) * 250
     iteration = data["iter"]
     mean = logReturns.mean()
-    var = logReturns.var()
+    var = logReturns.var()  
     stdev = pd.Series( logReturns.std() )
     drift = pd.Series( mean - (0.5 * var) )
     dailyReturns = np.exp(drift.values + stdev.values * norm.ppf(np.random.rand(interval, iteration)))
     priceList = np.zeros_like(dailyReturns)
     priceList[0] = pfData.iloc[-1]
+
     for t in range(1, interval):
         priceList[t] = priceList[t - 1] * dailyReturns[t]
 
-    print( priceList )
-    return { "data": priceList.tolist(), "lastDate": lastDate }
+    dataset = []
+    k = 0
+    for i in range( 0, iteration ):
+        dataset.append( {} )
+        for a in range( 0, interval ):
+            dataset[k][a] = priceList[a][i]
+        k += 1
+    
+    returns = []
+    volatilities = []
+    for iter in dataset:
+        iter = pd.Series( iter )
+        returns.append( round( ((iter.iloc[-1] / iter.iloc[0]) - 1) * 100, 2 ) )
+        volatilities.append( round((iter.std() * 250) ** 0.5, 2) )
+
+    montecarloInfo = pd.DataFrame( columns=["best","worst","mean"] )    
+    montecarloInfo["best"] = pd.Series( [max(returns), min(volatilities)] )
+    montecarloInfo["worst"] = pd.Series( [min(returns), max(volatilities)] )
+    montecarloInfo["mean"] = pd.Series( [round( sum(returns) / len(returns), 2), round( sum(volatilities) / len(volatilities), 2) ] )
+
+    return { "data": dataset, "lastDate": lastDate, "info": montecarloInfo.to_json() }
+
 
 #Server's functions
 def getCurrentPrice( ticker ):
