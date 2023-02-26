@@ -15,6 +15,7 @@ import re
 server = socketio.AsyncServer(async_mode="asgi")
 app = socketio.ASGIApp(server, static_files={
     '/': './public/pfManager.html',
+    '/generator':"./public/pfGenerator.html",
     '/overview':"./public/pfOverview.html",
     '/correlation':"./public/pfCorrelation.html",
     '/risk':"./public/pfRisk.html",
