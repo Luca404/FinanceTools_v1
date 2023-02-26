@@ -1,0 +1,54 @@
+body{
+    color:black;
+}
+
+#questionContent{
+    display:flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 20px 0;
+}
+
+#questionTab{
+    margin-left: 5%;
+}
+
+#questionDiv{
+    margin-top: 60px;
+    padding-left: 5%;
+}    
+
+#options{
+    margin-top: 20px;
+}
+
+.nav-item:hover{
+    cursor: pointer;
+}
+
+#nextQuestionButton{
+    margin-left: 25%;
+}
+
+
+
+#profileDiv{
+    position: absolute;
+    border-radius: 7px; 
+    width: 8%;
+    height: 5%;
+    margin-left: 91%;
+    margin-top: 1%;
+    justify-content: center;
+    display: flex;
+    vertical-align: center;
+    text-align: center;
+    background-color: #3445b4;
+    font-size: 15px;
+    padding-top: 10px;
+    color: white;
+}
+
+#profileDiv:hover{
+    cursor: pointer;
+}

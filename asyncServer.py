@@ -65,6 +65,12 @@ async def registerUser( sid, data ):
         json.dump( jsonData, f )
 
 @server.event
+async def getQuestions(sid):
+    with open( "./json/generate/questions.json", "r" ) as f:
+        jsonData = json.load( f )
+    return {"data": jsonData}
+
+@server.event
 async def getTickersList(sid):
     files = os.listdir("./json/tickersList/tickers/")
     tickersList = {}

@@ -1,13 +1,98 @@
+//CONST
+var questions = [];
+var actualQuestion = 0;
+var responses = [];
+
 //Connection to server
 const server = io();
 server.on("connect", () => {
     console.log("Connected");
     showLoginDiv();
+	getQuestion();
 });
  
 server.on("disconnect", () => {
     console.log("Disconnected");
 });
+
+
+function getQuestion(){
+	server.emit( "getQuestions", (result) => {
+		questions = result["data"];
+		console.log( result["data"] );
+	} );
+}
+
+function showQuestion(){
+	$("#riskQuestionnaireButton").hide();
+	$("#options").show();
+	$("#questionTab").show();
+	$("#nextQuestionButton").show();
+
+	var questionDiv = document.getElementById("questions");
+	questionDiv.innerText = questions[actualQuestion]["q"];
+
+	$( ".nav-pills .nav-link" ).bind( "click", function(event) {
+		event.preventDefault();
+		var clickedItem = $( this );
+		if( checkOption() ){
+			$( ".nav-pills .nav-link" ).each( function() {
+				$( this ).removeClass( "active" );
+			});
+			clickedItem.addClass( "active" );
+			actualQuestion = parseInt($(this).text())-1;
+			setQuestion();
+		}
+	});
+}
+
+function nextQuestion(){
+	if( checkOption() ){
+		uncheckOption();
+
+		$( "#item" + actualQuestion ).removeClass( "active" );
+		actualQuestion+=1;
+		$( "#item" + actualQuestion ).addClass( "active" );
+
+		var questionDiv = document.getElementById("questions");
+		questionDiv.innerText = questions[actualQuestion]["q"];
+		if( actualQuestion+1 == questions.length ){
+			document.getElementById("nextQuestionButton").innerText = "Finish";
+			document.getElementById("nextQuestionButton").onclick = finishQuestion;
+		}
+	}
+}
+
+function finishQuestion(){
+	console.log( "finished" );
+}
+
+function setQuestion(){
+	uncheckOption();
+	var questionDiv = document.getElementById("questions");
+	questionDiv.innerText = questions[actualQuestion]["q"];
+	if( actualQuestion+1 == questions.length ){
+		document.getElementById("nextQuestionButton").innerText = "Finish";
+		document.getElementById("nextQuestionButton").onclick = finishQuestion;
+	}
+	else{
+		document.getElementById("nextQuestionButton").innerText = "Next";
+		document.getElementById("nextQuestionButton").onclick = nextQuestion;
+	}
+}
+
+function checkOption(){
+	var bool = $('#opt1').is(':checked') || $('#opt2').is(':checked') || $('#opt3').is(':checked') || $('#opt4').is(':checked') || $('#opt5').is(':checked');
+	return bool;
+}
+
+function uncheckOption(){
+	$('#opt1').prop('checked', false);
+	$('#opt2').prop('checked', false);
+	$('#opt3').prop('checked', false);
+	$('#opt4').prop('checked', false);
+	$('#opt5').prop('checked', false);
+}
 
 //Show login div
 function showLoginDiv(){
@@ -40,6 +125,16 @@ function getCookie( cname ){
 		}
 	}
 	return "";
+}
+
+//Fix SideBar
+function fixContent(){
+    var sideBar = document.getElementById("sidebar");
+    var content = document.getElementById("content");
+    if( sideBar.classList[0] == "active" )
+        content.style.marginLeft = "300px";
+    else
+        content.style.marginLeft = "20px";
 }
 
 //Login Functions Section

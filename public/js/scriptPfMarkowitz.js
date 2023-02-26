@@ -88,7 +88,7 @@ function loadSelectedPf(){
     saveSelectedPf();
     loadMarkowitzData();
 }
-
+ 
 function setPeriod(){
     var opt = document.getElementById("setPeriod");
     var pfPeriod = opt.options[opt.selectedIndex].text;

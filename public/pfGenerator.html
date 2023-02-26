@@ -11,7 +11,7 @@
         <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
         <link rel="stylesheet" href="./static/css/style.css">
         
-        <link rel="stylesheet" href="./static/css/stylePfRisk.css">
+        <link rel="stylesheet" href="./static/css/stylePfGenerator.css">
 
         <!-- Chart.JS -->
         <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.5.0/Chart.min.js"></script>
@@ -72,8 +72,80 @@
             </div>
 
             <!-- Page Content  -->
-            <div id="content" class="p-4 p-md-5 pt-5" >
+            <div id="content" class="p-4 p-md-5 pt-5">
                 <h2 class="mb-4">Portfolio Generator</h2>
+                <div id="questionContent">
+                    <button type="button" class="btn btn-primary" id="riskQuestionnaireButton" onclick="showQuestion();">Start Risk Questionnaire</button>
+                    <div id="questionTab" style="display:none">
+                        <ul class="nav nav-pills">
+                            <li class="nav-item">
+                                <a class="nav-link active" id="item0">1</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" id="item1">2</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" id="item2">3</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" id="item3">4</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" id="item4">5</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" id="item5">6</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" id="item6">7</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" id="item7">8</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" id="item8">9</a>
+                            </li>
+                        </ul>
+                    </div>
+                    <div id="questionDiv">
+                        <div id="questions"></div>
+                        <div id="options" style="display:none">
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="flexRadioDefault" id="opt1">
+                                <label class="form-check-label" for="opt1">
+                                    Strongly Agree
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="flexRadioDefault" id="opt2">
+                                <label class="form-check-label" for="opt2">
+                                    Agree
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="flexRadioDefault" id="opt3">
+                                <label class="form-check-label" for="opt3">
+                                    Neither agree or disagree
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="flexRadioDefault" id="opt4">
+                                <label class="form-check-label" for="opt4">
+                                    Disagree
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="flexRadioDefault" id="opt5">
+                                <label class="form-check-label" for="opt5">
+                                    Strongly disagree
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="next">
+                        <button type="button" class="btn btn-primary" id="nextQuestionButton" onclick="nextQuestion();" style="display:none">Next</button>
+                    </div>
+                </div>
             </div>
             <div id="profileDiv">
                 <p><a></a></p>
