@@ -2,6 +2,7 @@
 var questions = [];
 var actualQuestion = 0;
 var responses = [];
+var riskScore = 0;
 
 //Connection to server
 const server = io();
@@ -35,11 +36,13 @@ function showQuestion(){
 	$( ".nav-pills .nav-link" ).bind( "click", function(event) {
 		event.preventDefault();
 		var clickedItem = $( this );
-		if( checkOption() ){
+		if( checkOption() || parseInt($(this).text())-1 < actualQuestion ){
 			$( ".nav-pills .nav-link" ).each( function() {
 				$( this ).removeClass( "active" );
 			});
 			clickedItem.addClass( "active" );
+
+			responses[actualQuestion] = getCheckedOption();
 			actualQuestion = parseInt($(this).text())-1;
 			setQuestion();
 		}
@@ -48,6 +51,7 @@ function showQuestion(){
 
 function nextQuestion(){
 	if( checkOption() ){
+		responses[actualQuestion] = getCheckedOption();
 		uncheckOption();
 
 		$( "#item" + actualQuestion ).removeClass( "active" );
@@ -64,7 +68,17 @@ function nextQuestion(){
 }
 
 function finishQuestion(){
-	console.log( "finished" );
+	responses[actualQuestion] = getCheckedOption();
+	console.log( responses );
+	if( responses.length == 9 ){
+		console.log( "finished" );
+		
+		for( let i = 0; i<responses.length; i++ ){
+			riskScore = riskScore + responses[i]
+		}
+
+		console.log( riskScore )
+	}
 }
 
 function setQuestion(){
@@ -79,6 +93,17 @@ function setQuestion(){
 		document.getElementById("nextQuestionButton").innerText = "Next";
 		document.getElementById("nextQuestionButton").onclick = nextQuestion;
 	}
+	if( responses[actualQuestion] )
+		$('#opt' + responses[actualQuestion]).prop('checked', true)
+}
+
+function allQuestion(){
+	console.log( responses );
+	for( let i = 0; i < responses.length; i++ ){
+		console.log( responses[i] )
+		//if( responses[i] == empty )
+	}
+	return true
 }
 
 function checkOption(){
@@ -92,6 +117,14 @@ function uncheckOption(){
 	$('#opt3').prop('checked', false);
 	$('#opt4').prop('checked', false);
 	$('#opt5').prop('checked', false);
+}
+
+function getCheckedOption(){
+	for(let i = 1; i<6; i++){
+		if( $('#opt' + i).is(':checked') )
+			return i;
+	}
+	return false;
 }
 
 //Show login div
