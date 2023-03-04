@@ -60,6 +60,10 @@ function nextQuestion(){
 
 		var questionDiv = document.getElementById("questions");
 		questionDiv.innerText = questions[actualQuestion]["q"];
+
+		if( responses[actualQuestion] )
+			$('#opt' + responses[actualQuestion]).prop('checked', true)
+
 		if( actualQuestion+1 == questions.length ){
 			document.getElementById("nextQuestionButton").innerText = "Finish";
 			document.getElementById("nextQuestionButton").onclick = finishQuestion;
@@ -69,8 +73,7 @@ function nextQuestion(){
 
 function finishQuestion(){
 	responses[actualQuestion] = getCheckedOption();
-	console.log( responses );
-	if( responses.length == 9 ){
+	if( allQuestion() ){
 		console.log( "finished" );
 		
 		for( let i = 0; i<responses.length; i++ ){
@@ -98,10 +101,13 @@ function setQuestion(){
 }
 
 function allQuestion(){
-	console.log( responses );
-	for( let i = 0; i < responses.length; i++ ){
-		console.log( responses[i] )
-		//if( responses[i] == empty )
+	if( responses.length < 9 )
+		return false
+	else{
+		for( let i = 0; i < responses.length; i++ ){
+			if( responses[i] == undefined || responses[i] == false )
+				return false
+		}
 	}
 	return true
 }
