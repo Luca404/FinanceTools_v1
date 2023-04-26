@@ -20,18 +20,40 @@ server.on("disconnect", () => {
 function getQuestion(){
 	server.emit( "getQuestions", (result) => {
 		questions = result["data"];
+		answers = result["data"];
 		console.log( result["data"] );
 	} );
 }
 
 function showQuestion(){
 	$("#riskQuestionnaireButton").hide();
-	$("#options").show();
+
+	var questionTab = document.getElementById("questionTab");
+	var tabUl = document.createElement("ul");
+	tabUl.classList.add("nav", "nav-pills")
+	for(let i=0; i<questions.length; i++){
+		var li = document.createElement("li");
+		li.classList.add("nav-item");
+		
+		var a = document.createElement("a");
+		a.classList.add("nav-link");
+		a.id = "item" + i;
+		a.innerText = i+1;
+		if( i==0 )
+			a.classList.add( "active" );
+
+		li.appendChild(a);
+		tabUl.appendChild(li);
+	}
+	questionTab.appendChild(tabUl);
+
 	$("#questionTab").show();
 	$("#nextQuestionButton").show();
 
 	var questionDiv = document.getElementById("questions");
 	questionDiv.innerText = questions[actualQuestion]["q"];
+
+	printAnswers();
 
 	$( ".nav-pills .nav-link" ).bind( "click", function(event) {
 		event.preventDefault();
@@ -45,9 +67,39 @@ function showQuestion(){
 			responses[actualQuestion] = getCheckedOption();
 			actualQuestion = parseInt($(this).text())-1;
 			setQuestion();
+			printAnswers();
+			$('#opt' + responses[actualQuestion]).prop('checked', true)
 		}
 	});
 }
+
+function printAnswers(){
+	var answerDiv = document.getElementById("answers");
+	while (answerDiv.firstChild)
+		answerDiv.removeChild(answerDiv.lastChild);
+
+	for(let i=0;i<answers[actualQuestion]["r"].length;i++){
+		//Create answer elements
+		formCheckDiv = document.createElement("div");
+		formCheckDiv.classList.add("form-check");
+
+		inputAnswer = document.createElement("input");
+		inputAnswer.classList.add("form-check-input");
+		inputAnswer.type = "radio";
+		inputAnswer.name = "flexRadioDefault";
+		inputAnswer.id = "opt" + i;
+
+		answerText = document.createElement("label");
+		answerText.classList.add("form-check-label");
+		answerText.htmlFor = "opt" + i;
+		answerText.id = "answer" + i ;
+		answerText.innerText = answers[actualQuestion]["r"][i];
+
+		formCheckDiv.appendChild(inputAnswer);
+		formCheckDiv.appendChild(answerText);
+		answerDiv.appendChild(formCheckDiv);
+	}
+}	
 
 function nextQuestion(){
 	if( checkOption() ){
@@ -62,12 +114,15 @@ function nextQuestion(){
 		questionDiv.innerText = questions[actualQuestion]["q"];
 
 		if( responses[actualQuestion] )
-			$('#opt' + responses[actualQuestion]).prop('checked', true)
+			$('#opt' + responses[actualQuestion]).prop('checked', true);
 
+		console.log( responses, actualQuestion );
 		if( actualQuestion+1 == questions.length ){
 			document.getElementById("nextQuestionButton").innerText = "Finish";
 			document.getElementById("nextQuestionButton").onclick = finishQuestion;
 		}
+		else
+			printAnswers()
 	}
 }
 
@@ -96,13 +151,12 @@ function setQuestion(){
 		document.getElementById("nextQuestionButton").innerText = "Next";
 		document.getElementById("nextQuestionButton").onclick = nextQuestion;
 	}
-	if( responses[actualQuestion] )
-		$('#opt' + responses[actualQuestion]).prop('checked', true)
 }
 
 function allQuestion(){
-	if( responses.length < 9 )
+	if( responses.length < questions.length )
 		return false
+	
 	else{
 		for( let i = 0; i < responses.length; i++ ){
 			if( responses[i] == undefined || responses[i] == false )
@@ -113,25 +167,26 @@ function allQuestion(){
 }
 
 function checkOption(){
-	var bool = $('#opt1').is(':checked') || $('#opt2').is(':checked') || $('#opt3').is(':checked') || $('#opt4').is(':checked') || $('#opt5').is(':checked');
+	var bool = $('#opt0').is(':checked')
+	for(let i=1; i<answers[actualQuestion]["r"].length; i++)
+		bool = bool || $('#opt'+i).is(':checked');
+
 	return bool;
 }
 
 function uncheckOption(){
-	$('#opt1').prop('checked', false);
-	$('#opt2').prop('checked', false);
-	$('#opt3').prop('checked', false);
-	$('#opt4').prop('checked', false);
-	$('#opt5').prop('checked', false);
+	for(let i=0; i<answers[actualQuestion]["r"].length; i++)
+		$('#opt' + i).prop('checked', false);
 }
 
 function getCheckedOption(){
-	for(let i = 1; i<6; i++){
+	for(let i = 0; i<answers[actualQuestion]["r"].length; i++){
 		if( $('#opt' + i).is(':checked') )
 			return i;
 	}
 	return false;
 }
+
 
 //Show login div
 function showLoginDiv(){
