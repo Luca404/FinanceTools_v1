@@ -87,18 +87,21 @@ function printAnswers(){
 		inputAnswer.classList.add("form-check-input");
 		inputAnswer.type = "radio";
 		inputAnswer.name = "flexRadioDefault";
-		inputAnswer.id = "opt" + i;
+		inputAnswer.id = "opt" + (i+1);
 
 		answerText = document.createElement("label");
 		answerText.classList.add("form-check-label");
-		answerText.htmlFor = "opt" + i;
-		answerText.id = "answer" + i ;
+		answerText.htmlFor = "opt" + (i+1);
+		answerText.id = "answer" + (i+1);
 		answerText.innerText = answers[actualQuestion]["r"][i];
 
 		formCheckDiv.appendChild(inputAnswer);
 		formCheckDiv.appendChild(answerText);
 		answerDiv.appendChild(formCheckDiv);
 	}
+
+	if( responses[actualQuestion] )
+		$('#opt' + responses[actualQuestion]).prop('checked', true);
 }	
 
 function nextQuestion(){
@@ -123,19 +126,6 @@ function nextQuestion(){
 		}
 		else
 			printAnswers()
-	}
-}
-
-function finishQuestion(){
-	responses[actualQuestion] = getCheckedOption();
-	if( allQuestion() ){
-		console.log( "finished" );
-		
-		for( let i = 0; i<responses.length; i++ ){
-			riskScore = riskScore + responses[i]
-		}
-
-		console.log( riskScore )
 	}
 }
 
@@ -167,8 +157,8 @@ function allQuestion(){
 }
 
 function checkOption(){
-	var bool = $('#opt0').is(':checked')
-	for(let i=1; i<answers[actualQuestion]["r"].length; i++)
+	var bool = $('#opt1').is(':checked')
+	for(let i=2; i<answers[actualQuestion]["r"].length+1; i++)
 		bool = bool || $('#opt'+i).is(':checked');
 
 	return bool;
@@ -176,16 +166,96 @@ function checkOption(){
 
 function uncheckOption(){
 	for(let i=0; i<answers[actualQuestion]["r"].length; i++)
-		$('#opt' + i).prop('checked', false);
+		$('#opt' + (i+1)).prop('checked', false);
 }
 
 function getCheckedOption(){
 	for(let i = 0; i<answers[actualQuestion]["r"].length; i++){
-		if( $('#opt' + i).is(':checked') )
-			return i;
+		if( $('#opt' + (i+1)).is(':checked') )
+			return i+1;
 	}
 	return false;
 }
+
+
+function finishQuestion(){
+	responses[actualQuestion] = getCheckedOption();
+	if( allQuestion() ){
+		console.log( "finished" );
+		
+		for( let i = 0; i<responses.length; i++ ){
+			riskScore = riskScore + responses[i]
+		}
+
+		console.log( riskScore );
+		showQuizResult();
+	}
+}
+
+function showQuizResult(){
+	$("#questionContent").hide();
+	$(".assetMixLabel").show();
+	$(".assetMixLabel").css("display", "flex");
+	$(".assetMixLabel").css("justify-content", "center");
+	$(".assetMixLabel").css("text-align", "center");
+
+	drawAssetMixGraph()
+	$("#retakeQuestionnaireButton").show();
+	$("#nextPhase").show();
+}
+
+function drawAssetMixGraph(){
+	var data = [];
+	var labels = ["Bonds","Stocks"];
+	if( riskScore < 10 ){
+		//100 bond 0 stocks
+		data = [100,0];
+	}
+	else if( riskScore < 20 ){
+		//70 bond 30 stocks
+		data = [70,30];
+	}
+	else if( riskScore < 30 ){
+		//50 bond 50 stocks
+		data = [50,50];
+	}
+	else if( riskScore < 40 ){
+		//30 bond 70 stocks
+		data = [30,70];
+	}
+	else{
+		//0 bond 100 stocks
+		data = [0,100];
+
+	}
+
+	assetMixCanvas = document.getElementById("assetMixCanvas");
+	assetMixCanvas.width = 300;
+    assetMixCanvas.height = 50;
+
+	new Chart(assetMixCanvas, {
+        type: 'pie',
+        data: {
+            labels: labels,
+            datasets: [{
+                data: data,
+                hoverOffset: 2,
+                backgroundColor: ["blue","red"]
+            }]
+        },
+		options: {
+            tooltips: {
+                callbacks: {
+                    label: function(context) {
+                        return data[context.index]+"% "+labels[context.index];
+                    }
+                }
+            }
+        }    
+    });
+
+}
+
 
 
 //Show login div

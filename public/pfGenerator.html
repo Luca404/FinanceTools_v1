@@ -88,6 +88,18 @@
                         <button type="button" class="btn btn-primary" id="nextQuestionButton" onclick="nextQuestion();" style="display:none">Next</button>
                     </div>
                 </div>
+                <div class="assetMixLabel" style="display: none;">Suggested asset mix:</div>
+                <br />
+                <canvas id="assetMixCanvas"></canvas>
+                <br />
+                <div class="assetMixLabel" style="display: none;">You may find that the suggested mix doesn't fit your needs exactly. 
+                <br />You may be a more aggressive or conservative investor than the questionnaire suggests. 
+                <br />If so, you can adjust your asset mix as needed.
+                </div>
+                <br />
+                <button type="button" class="btn btn-primary" id="retakeQuestionnaireButton" onclick="showQuestion();" style="display: none;">Retake Questionnaire</button>
+                <button type="button" class="btn btn-primary" id="nextPhase" onclick="nextPhase();" style="display: none;">Next</button>
+
             </div>
             <div id="profileDiv">
                 <p><a></a></p>

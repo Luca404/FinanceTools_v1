@@ -30,6 +30,7 @@ server.on("loginResult", (data) => {
 		failedLogin( data["text"] );
 });
 
+
 function fixContent(){
     var sideBar = document.getElementById("sidebar");
     var content = document.getElementById("content");
@@ -640,6 +641,7 @@ function saveChangesButton(){
 		}
 	}
 }
+
 
 //Login Functions Section
 
