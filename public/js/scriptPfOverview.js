@@ -1,53 +1,26 @@
-//Connection to server
-const server = io();
-server.on("connect", () => {
-    console.log("Connected");
-    showLoginDiv();
-});
- 
-server.on("disconnect", () => {
-    console.log("Disconnected");
-});
-
-
-function fixContent(){
-    var sideBar = document.getElementById("sidebar");
-    var content = document.getElementById("content");
-    if( sideBar.classList[0] == "active" )
-        content.style.marginLeft = "300px";
-    else
-        content.style.marginLeft = "20px";
-}
- 
-//Show login div
-function showLoginDiv(){
-	let usern = getCookie( "username" );
-    userName = usern;
-    let profileDiv = document.getElementById("profileDiv");
-	let profileP = profileDiv.getElementsByTagName("p")[0];
-	profileP.innerText = "User:    " + usern;
-	server.emit("getPfList",{"username":usern}, (data) =>{ 
-        pfData = [];
-        if( data["data"].length > 0 ){
-            pfData = data["data"];
-            loadSavedPf();
-        }
-        else
-            console.log("No saved Portfolio for logged user!");
-    });
-}
-
 //CONST
 var pfData = [];
 var singleAssetData = [];
 var portFolios = [];
 var userName = "";
 var selectedPf;
+
 //PortFolio Period
 var sPERIOD = 2;
 var NORMALIZED = true;
 var pfPERIOD = 2;
 var colorsArray = ["#17A589","#F9E79F","#EC7063","#82E0AA","#F7DC6F","#99A3A4","#B3B6B7","#A569BD","#CB4335","#196F3D"];
+
+async function onLoad(){
+    connectToServer();
+    pfData = await showLoginDiv();
+    console.log( pfData );
+    if( pfData != false )
+        loadSavedPf();
+    else
+        console.log("No saved Portfolio for logged user!");
+}
+
 
 function drawSingleAssetsChart(data, info) {
     //Canvas creation
@@ -165,7 +138,6 @@ function drawPfChart(data) {
     });
 }
 
-
 function setPfPeriod(){
     var opt = document.getElementById("selectPfPeriod");
     var pfPeriod = opt.options[opt.selectedIndex].text;
@@ -191,30 +163,6 @@ function saveSelectedPf(){
     }
     setCookie( "selectedPf", k, 5 );
     selectedPf = k;
-}
-
-//Save cookies function
-function setCookie(cname, cvalue, exdays) {
-	const d = new Date();
-	d.setTime(d.getTime() + (exdays*24*60*60*1000));
-	let expires = "expires="+ d.toUTCString();
-	document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
-}
-
-function getCookie( cname ){
-	let decodedCookie = decodeURIComponent(document.cookie);
-	let cookie = decodedCookie.split(';');
-	let cookieName = cname + "=";
-	for(let i = 0; i <cookie.length; i++) {
-		let c = cookie[i];
-		while (c.charAt(0) == ' ') {
-		  c = c.substring(1);
-		}
-		if (c.indexOf(cookieName) == 0) {
-		  return c.substring(cookieName.length, c.length);
-		}
-	}
-	return "";
 }
 
 function loadSavedPf(){
@@ -244,6 +192,7 @@ function loadSingleAssetData(){
     selectedPf = getCookie( "selectedPf" );
     if( selectedPf == "" )
         selectedPf = 0;
+    
     var pfName = portFolios[selectedPf].pfName;
     var pfTickers = portFolios[selectedPf].tickers;
     var weights = portFolios[selectedPf].numShares;

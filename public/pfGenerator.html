@@ -24,17 +24,11 @@
 
         <script src="./static/js/scriptPfGenerator.js"></script>
     </head>
-    <body id="corpo">
+    <body id="corpo" onload="onLoad()">
 
         <div class="wrapper d-flex align-items-stretch">
             <div class="d-flex">
                 <nav id="sidebar">
-                    <div class="custom-menu">
-                        <button type="button" id="sidebarCollapse" class="btn btn-primary" onclick="fixContent();" >
-                            <i class="fa fa-bars"></i>
-                            <span class="sr-only">Toggle Menu</span>
-                        </button>
-                    </div>
                     <div class="p-4">
                         <h1><a href="/" class="logo">Finance Tools<span>Portfolio Optimization Tools</span></a></h1>
                         <ul id="lista" class="list-unstyled components mb-5">
@@ -97,8 +91,10 @@
                 <br />If so, you can adjust your asset mix as needed.
                 </div>
                 <br />
-                <button type="button" class="btn btn-primary" id="retakeQuestionnaireButton" onclick="showQuestion();" style="display: none;">Retake Questionnaire</button>
-                <button type="button" class="btn btn-primary" id="nextPhase" onclick="nextPhase();" style="display: none;">Next</button>
+                <div id="finishQuestButtonsDiv" style="display: flex; justify-content: center; gap:20px">
+                    <button type="button" class="btn btn-primary" id="retakeQuestionnaireButton" onclick="retakeQuest();" style="display: none;">Retake Questionnaire</button>
+                    <button type="button" class="btn btn-primary" id="nextPhase" onclick="nextPhase();" style="display: none;">Next</button>
+                </div>
 
             </div>
             <div id="profileDiv">

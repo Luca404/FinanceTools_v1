@@ -1,71 +1,19 @@
 //CONST
 var PERIOD = 2;
 var NORMALIZED = 2;
+var pfData;
 var portFolios;
 var colorsArray = ["#17A589","#F9E79F","#EC7063","#82E0AA","#F7DC6F","#99A3A4","#B3B6B7","#A569BD","#CB4335","#196F3D"];
 
-//Connection to server
-const server = io();
-server.on("connect", () => {
-    console.log("Connected");
-    showLoginDiv();
-});
- 
-server.on("disconnect", () => {
-    console.log("Disconnected");
-});
 
-//Show login div
-function showLoginDiv(){
-	let usern = getCookie( "username" );
-    userName = usern;
-    let profileDiv = document.getElementById("profileDiv");
-	let profileP = profileDiv.getElementsByTagName("p")[0];
-	profileP.innerText = "User:    " + usern;
-	server.emit("getPfList",{"username":usern}, (data) =>{ 
-        pfData = [];
-        if( data["data"].length > 0 ){
-            pfData = data["data"];
-            loadSavedPf();
-        }
-        else
-            console.log("No saved Portfolio for logged user!");
-    });
-}
-
- 
-//Fix SideBar
-function fixContent(){
-    var sideBar = document.getElementById("sidebar");
-    var content = document.getElementById("content");
-    if( sideBar.classList[0] == "active" )
-        content.style.marginLeft = "300px";
+async function onLoad(){
+    connectToServer();
+    pfData = await showLoginDiv();
+    console.log( pfData );
+    if( pfData != false )
+        loadSavedPf();
     else
-        content.style.marginLeft = "20px";
-}
-
-//Save cookies function
-function setCookie(cname, cvalue, exdays) {
-	const d = new Date();
-	d.setTime(d.getTime() + (exdays*24*60*60*1000));
-	let expires = "expires="+ d.toUTCString();
-	document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
-}
-
-function getCookie( cname ){
-	let decodedCookie = decodeURIComponent(document.cookie);
-	let cookie = decodedCookie.split(';');
-	let cookieName = cname + "=";
-	for(let i = 0; i <cookie.length; i++) {
-		let c = cookie[i];
-		while (c.charAt(0) == ' ') {
-		  c = c.substring(1);
-		}
-		if (c.indexOf(cookieName) == 0) {
-		  return c.substring(cookieName.length, c.length);
-		}
-	}
-	return "";
+        console.log("No saved Portfolio for logged user!");
 }
 
 function loadSavedPf(){
@@ -139,8 +87,6 @@ function loadSingleAssetData(){
         drawSingleAssetsChart( singleAssetData );
     });
 }
-
-
 
 function loadCorrelationData(){
     selectedPf = getCookie( "selectedPf" );

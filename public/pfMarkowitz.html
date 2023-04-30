@@ -26,17 +26,11 @@
 
         <script src="./static/js/scriptPfMarkowitz.js"></script>
     </head>
-    <body id="corpo">
+    <body id="corpo" onload="onLoad()">
 
         <div class="wrapper d-flex align-items-stretch">
             <div class="d-flex">
                 <nav id="sidebar">
-                    <div class="custom-menu">
-                        <button type="button" id="sidebarCollapse" class="btn btn-primary" onclick="fixContent();" >
-                            <i class="fa fa-bars"></i>
-                            <span class="sr-only">Toggle Menu</span>
-                        </button>
-                    </div>
                     <div class="p-4">
                         <h1><a href="/" class="logo">Finance Tools<span>Portfolio Optimization Tools</span></a></h1>
                         <ul id="lista" class="list-unstyled components mb-5">
